@@ -598,3 +598,54 @@
     min-height: 88px;
   }
 }
+
+/* Pantalla vertical de kiosco (1080×1920): todas las categorías a la vista y platos al tamaño del dedo a un brazo
+   de distancia; en una pantalla así sobra alto y falta nada de ancho. */
+@media (min-width: 900px) and (max-aspect-ratio: 4 / 3) {
+  .k-categorias {
+    flex-wrap: wrap;
+    overflow-x: visible;
+    padding-block: 14px;
+  }
+  .k-categoria {
+    min-height: 76px;
+    font-size: 1.5rem;
+    padding-inline: 26px;
+  }
+  .k-platos {
+    padding: 20px 24px;
+  }
+  .k-platos__lista {
+    grid-template-columns: repeat(auto-fill, minmax(19rem, 1fr));
+    gap: 16px;
+  }
+  .k-plato {
+    min-height: 210px;
+    padding: 22px;
+  }
+  .k-plato__nombre {
+    font-size: 1.75rem;
+  }
+  .k-plato__desc {
+    font-size: 1.1875rem;
+  }
+  .k-plato__precio {
+    font-size: 1.5rem;
+  }
+}
+
+/* De noche el reposo no ilumina el local con un verde claro de pared a pared: fondo oscuro y el llamado en verde. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-tema='claro']) .reposo__toque {
+    background: var(--fondo);
+    color: var(--tinta);
+  }
+  :root:not([data-tema='claro']) .reposo__titulo {
+    border-color: var(--primario);
+    color: var(--primario-texto);
+  }
+}
+:root[data-tema='oscuro'] .reposo__toque {
+  background: var(--fondo);
+  color: var(--tinta);
+}
