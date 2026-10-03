@@ -11,7 +11,7 @@ import { textoError } from '../nucleo/textos.mjs';
 
 let caja = null;
 const PESTANAS = ['carta', 'mesas', 'nfc', 'ajustes'];
-const ui = { tab: 'carta', zonaPlacas: '', mesaNfc: 7, nfcEstado: null, bloquear: false, ajustesError: '', cartaError: [] };
+const ui = { tab: 'carta', zonaPlacas: '', mesaNfc: 7, nfcEstado: null, bloquear: false, ajustesError: '', cartaError: [], abiertos: new Set() };
 const dinero = (c) => formatear(c);
 const est = () => caja.estado;
 const ESTACIONES = { caliente: 'Cocina caliente', frios: 'Fríos', bar: 'Bar' };
@@ -123,33 +123,42 @@ function pintarCarta() {
   );
 }
 
+/**
+ * Plegable que recuerda si estaba abierto: cada cambio de la carta repinta el panel (también un «agotado» marcado
+ * desde otra pestaña), y sin esto se cerraba con cada Tab y el foco caía en <body>.
+ */
+function plegable(clave, titulo, ...hijos) {
+  return h('details', { class: 'editor-admin', open: ui.abiertos.has(clave), ontoggle: (ev) => (ev.target.open ? ui.abiertos.add(clave) : ui.abiertos.delete(clave)) },
+    h('summary', { 'data-foco': `sum-${clave}` }, titulo),
+    ...hijos,
+  );
+}
+
 function editorCategorias(c) {
-  return h('details', { class: 'editor-admin' },
-    h('summary', {}, 'Categorías y su orden'),
+  return plegable('categorias', 'Categorías y su orden',
     h('ul', { class: 'lista-editor' },
       c.categorias.map((cat, i) => {
         const usadas = c.platos.filter((p) => p.cat === cat.id).length;
         return h('li', { class: 'fila-editor' },
-          h('div', { class: 'campo' }, h('label', { for: `cat-es-${cat.id}` }, 'Nombre'), h('input', { id: `cat-es-${cat.id}`, value: texto(cat.nombre, 'es'), maxlength: '40', onchange: (ev) => { const n = copiaCarta(); n.categorias[i].nombre = { ...n.categorias[i].nombre, es: ev.target.value.trim() }; guardarCarta(n, 'Categoría guardada.'); } })),
-          h('div', { class: 'campo' }, h('label', { for: `cat-en-${cat.id}` }, 'En inglés'), h('input', { id: `cat-en-${cat.id}`, value: cat.nombre.en ?? '', maxlength: '40', onchange: (ev) => { const n = copiaCarta(); n.categorias[i].nombre = { ...n.categorias[i].nombre, en: ev.target.value.trim() }; guardarCarta(n, 'Categoría guardada.'); } })),
+          h('div', { class: 'campo' }, h('label', { for: `cat-es-${cat.id}` }, 'Nombre'), h('input', { id: `cat-es-${cat.id}`, 'data-foco': `cat-es-${cat.id}`, value: texto(cat.nombre, 'es'), maxlength: '40', onchange: (ev) => { const n = copiaCarta(); n.categorias[i].nombre = { ...n.categorias[i].nombre, es: ev.target.value.trim() }; guardarCarta(n, 'Categoría guardada.'); } })),
+          h('div', { class: 'campo' }, h('label', { for: `cat-en-${cat.id}` }, 'En inglés'), h('input', { id: `cat-en-${cat.id}`, 'data-foco': `cat-en-${cat.id}`, value: cat.nombre.en ?? '', maxlength: '40', onchange: (ev) => { const n = copiaCarta(); n.categorias[i].nombre = { ...n.categorias[i].nombre, en: ev.target.value.trim() }; guardarCarta(n, 'Categoría guardada.'); } })),
           h('div', { class: 'fila-botones' },
-            h('button', { type: 'button', class: 'boton-icono', 'aria-label': `Subir ${texto(cat.nombre)}`, disabled: i === 0, onclick: () => { const n = copiaCarta(); [n.categorias[i - 1], n.categorias[i]] = [n.categorias[i], n.categorias[i - 1]]; guardarCarta(n, 'Orden guardado.'); } }, icono('atras', 'icono icono--arriba')),
-            h('button', { type: 'button', class: 'boton-icono', 'aria-label': `Bajar ${texto(cat.nombre)}`, disabled: i === c.categorias.length - 1, onclick: () => { const n = copiaCarta(); [n.categorias[i + 1], n.categorias[i]] = [n.categorias[i], n.categorias[i + 1]]; guardarCarta(n, 'Orden guardado.'); } }, icono('atras', 'icono icono--abajo')),
+            h('button', { type: 'button', class: 'boton-icono', 'aria-label': `Subir ${texto(cat.nombre)}`, 'data-foco': `sub-${cat.id}`, disabled: i === 0, onclick: () => { const n = copiaCarta(); [n.categorias[i - 1], n.categorias[i]] = [n.categorias[i], n.categorias[i - 1]]; guardarCarta(n, 'Orden guardado.'); } }, icono('atras', 'icono icono--arriba')),
+            h('button', { type: 'button', class: 'boton-icono', 'aria-label': `Bajar ${texto(cat.nombre)}`, 'data-foco': `baj-${cat.id}`, disabled: i === c.categorias.length - 1, onclick: () => { const n = copiaCarta(); [n.categorias[i + 1], n.categorias[i]] = [n.categorias[i], n.categorias[i + 1]]; guardarCarta(n, 'Orden guardado.'); } }, icono('atras', 'icono icono--abajo')),
             h('button', { type: 'button', class: 'boton boton--texto', disabled: usadas > 0, title: usadas ? 'Primero mueve o quita sus platos' : '', onclick: async () => { if (!(await confirmar({ titulo: `¿Quitar la categoría «${texto(cat.nombre)}»?`, aceptar: 'Quitar', peligro: true }))) return; const n = copiaCarta(); n.categorias.splice(i, 1); guardarCarta(n, 'Categoría quitada.'); } }, usadas ? `Tiene ${usadas} platos` : 'Quitar'),
           ),
         );
       }),
     ),
     h('form', { class: 'fila-editor', onsubmit: (ev) => { ev.preventDefault(); const inp = ev.target.querySelector('input'); const nombre = inp.value.trim(); if (!nombre) return; const n = copiaCarta(); n.categorias.push({ id: idDesde(nombre, new Set(n.categorias.map((x) => x.id))), nombre: { es: nombre, en: '' } }); guardarCarta(n, 'Categoría agregada.'); } },
-      h('div', { class: 'campo' }, h('label', { for: 'cat-nueva' }, 'Categoría nueva'), h('input', { id: 'cat-nueva', maxlength: '40', placeholder: 'Por ejemplo: Desayunos' })),
+      h('div', { class: 'campo' }, h('label', { for: 'cat-nueva' }, 'Categoría nueva'), h('input', { id: 'cat-nueva', 'data-foco': 'cat-nueva', maxlength: '40', placeholder: 'Por ejemplo: Desayunos' })),
       h('button', { type: 'submit', class: 'boton boton--secundario' }, 'Agregar categoría'),
     ),
   );
 }
 
 function editorGrupos(c) {
-  return h('details', { class: 'editor-admin' },
-    h('summary', {}, 'Opciones de los platos (acompañamiento, término, extras…)'),
+  return plegable('grupos', 'Opciones de los platos (acompañamiento, término, extras…)',
     h('p', { class: 'ayuda' }, '«Elige una» obliga a escoger una opción; «varias» deja marcar las que quiera. El precio de una opción se suma al del plato, también con ITBMS incluido.'),
     h('ul', { class: 'lista-editor' },
       c.grupos.map((g, gi) => {
@@ -157,16 +166,16 @@ function editorGrupos(c) {
         const set = (fn, msg = 'Opciones guardadas.') => { const n = copiaCarta(); fn(n.grupos[gi]); guardarCarta(n, msg); };
         return h('li', { class: 'grupo-admin' },
           h('div', { class: 'fila-editor' },
-            h('div', { class: 'campo' }, h('label', { for: `g-es-${g.id}` }, 'Nombre del grupo'), h('input', { id: `g-es-${g.id}`, value: texto(g.nombre, 'es'), maxlength: '40', onchange: (ev) => set((x) => (x.nombre = { ...x.nombre, es: ev.target.value.trim() })) })),
-            h('div', { class: 'campo' }, h('label', { for: `g-en-${g.id}` }, 'En inglés'), h('input', { id: `g-en-${g.id}`, value: g.nombre.en ?? '', maxlength: '40', onchange: (ev) => set((x) => (x.nombre = { ...x.nombre, en: ev.target.value.trim() })) })),
-            h('div', { class: 'campo' }, h('label', { for: `g-tipo-${g.id}` }, 'Cómo se elige'), h('select', { id: `g-tipo-${g.id}`, onchange: (ev) => set((x) => { x.tipo = ev.target.value; x.obligatorio = ev.target.value === 'uno'; }) }, h('option', { value: 'uno', selected: g.tipo === 'uno' }, 'Elige una (obligatorio)'), h('option', { value: 'varios', selected: g.tipo === 'varios' }, 'Varias (opcional)'))),
+            h('div', { class: 'campo' }, h('label', { for: `g-es-${g.id}` }, 'Nombre del grupo'), h('input', { id: `g-es-${g.id}`, 'data-foco': `g-es-${g.id}`, value: texto(g.nombre, 'es'), maxlength: '40', onchange: (ev) => set((x) => (x.nombre = { ...x.nombre, es: ev.target.value.trim() })) })),
+            h('div', { class: 'campo' }, h('label', { for: `g-en-${g.id}` }, 'En inglés'), h('input', { id: `g-en-${g.id}`, 'data-foco': `g-en-${g.id}`, value: g.nombre.en ?? '', maxlength: '40', onchange: (ev) => set((x) => (x.nombre = { ...x.nombre, en: ev.target.value.trim() })) })),
+            h('div', { class: 'campo' }, h('label', { for: `g-tipo-${g.id}` }, 'Cómo se elige'), h('select', { id: `g-tipo-${g.id}`, 'data-foco': `g-tipo-${g.id}`, onchange: (ev) => set((x) => { x.tipo = ev.target.value; x.obligatorio = ev.target.value === 'uno'; }) }, h('option', { value: 'uno', selected: g.tipo === 'uno' }, 'Elige una (obligatorio)'), h('option', { value: 'varios', selected: g.tipo === 'varios' }, 'Varias (opcional)'))),
           ),
           h('ul', { class: 'opciones-admin' },
             g.opciones.map((o, oi) =>
               h('li', { class: 'fila-editor fila-editor--opcion' },
-                h('div', { class: 'campo' }, h('label', { for: `o-es-${g.id}-${o.id}` }, 'Opción'), h('input', { id: `o-es-${g.id}-${o.id}`, value: texto(o.nombre, 'es'), maxlength: '40', onchange: (ev) => set((x) => (x.opciones[oi].nombre = { ...x.opciones[oi].nombre, es: ev.target.value.trim() })) })),
-                h('div', { class: 'campo' }, h('label', { for: `o-en-${g.id}-${o.id}` }, 'En inglés'), h('input', { id: `o-en-${g.id}-${o.id}`, value: o.nombre.en ?? '', maxlength: '40', onchange: (ev) => set((x) => (x.opciones[oi].nombre = { ...x.opciones[oi].nombre, en: ev.target.value.trim() })) })),
-                h('div', { class: 'campo campo--corto' }, h('label', { for: `o-p-${g.id}-${o.id}` }, 'Suma (B/.)'), h('input', { id: `o-p-${g.id}-${o.id}`, inputmode: 'decimal', value: ((o.precio ?? 0) / 100).toFixed(2), onchange: (ev) => { const m = leerMonto(ev.target.value); if (m === null) { anunciar('Ese precio no se entiende. Escríbelo con números, por ejemplo 1.50.', { tipo: 'alerta' }); return; } set((x) => (x.opciones[oi].precio = m)); } })),
+                h('div', { class: 'campo' }, h('label', { for: `o-es-${g.id}-${o.id}` }, 'Opción'), h('input', { id: `o-es-${g.id}-${o.id}`, 'data-foco': `o-es-${g.id}-${o.id}`, value: texto(o.nombre, 'es'), maxlength: '40', onchange: (ev) => set((x) => (x.opciones[oi].nombre = { ...x.opciones[oi].nombre, es: ev.target.value.trim() })) })),
+                h('div', { class: 'campo' }, h('label', { for: `o-en-${g.id}-${o.id}` }, 'En inglés'), h('input', { id: `o-en-${g.id}-${o.id}`, 'data-foco': `o-en-${g.id}-${o.id}`, value: o.nombre.en ?? '', maxlength: '40', onchange: (ev) => set((x) => (x.opciones[oi].nombre = { ...x.opciones[oi].nombre, en: ev.target.value.trim() })) })),
+                h('div', { class: 'campo campo--corto' }, h('label', { for: `o-p-${g.id}-${o.id}` }, 'Suma (B/.)'), h('input', { id: `o-p-${g.id}-${o.id}`, 'data-foco': `o-p-${g.id}-${o.id}`, inputmode: 'decimal', value: ((o.precio ?? 0) / 100).toFixed(2), onchange: (ev) => { const m = leerMonto(ev.target.value); if (m === null) { anunciar('Ese precio no se entiende. Escríbelo con números, por ejemplo 1.50.', { tipo: 'alerta' }); return; } set((x) => (x.opciones[oi].precio = m)); } })),
                 h('button', { type: 'button', class: 'boton boton--texto', disabled: g.opciones.length <= 1, onclick: () => set((x) => x.opciones.splice(oi, 1), 'Opción quitada.') }, 'Quitar'),
               ),
             ),

@@ -234,8 +234,140 @@ async function mismoNavegador(browser) {
   await ctx.close();
 }
 
+async function casosDeBorde(browser) {
+  console.log('\n2. Casos de borde (los que encontró la revisión del 3-oct)');
+  const ctx = await browser.newContext({ locale: 'es-PA' });
+  const salon = await ctx.newPage();
+  await salon.setViewportSize({ width: 1280, height: 800 });
+  vigilar(salon, 'salón');
+  await salon.goto(`${BASE}salon.html`);
+  await salon.waitForSelector('.mesa-tile');
+  await salon.click('.barra-demo [data-restablecer]');
+  await salon.click('.dialogo-confirmar .boton--peligro');
+  await salon.waitForTimeout(300);
+  const sala = await salon.evaluate(() => JSON.parse(localStorage.getItem('atk-mesa:sala')));
+  const cocina = await ctx.newPage();
+  await cocina.setViewportSize({ width: 1280, height: 800 });
+  vigilar(cocina, 'cocina');
+  await cocina.goto(`${BASE}cocina.html`);
+  await cocina.waitForSelector('.renglon-cocina');
+  const tel = await ctx.newPage();
+  await tel.setViewportSize({ width: 390, height: 844 });
+  vigilar(tel, 'teléfono');
+  await tel.goto(`${BASE}mesa.html?sala=${sala}&m=7#carta`);
+  await tel.waitForSelector('[data-plato=cerveza]');
+  const pedirCerveza = async () => {
+    await tel.click('#tab-carta');
+    await tel.click('[data-plato=cerveza]');
+    await tel.click('#dlg-plato button[type=submit]');
+    await tel.click('#boton-carrito');
+    await tel.click('#dlg-carrito [data-foco=enviar]');
+  };
+  // Un cambio en otra pantalla: la cocina marca y desmarca un renglón de otra mesa (repinta salón y teléfono).
+  const otraPantallaCambiaAlgo = async () => {
+    const r = cocina.locator('.renglon-cocina').first();
+    const k = await r.getAttribute('data-foco');
+    await cocina.click(`.renglon-cocina[data-foco="${k}"]`);
+    await cocina.click(`.renglon-cocina[data-foco="${k}"]`);
+    await salon.waitForTimeout(300);
+  };
+
+  await paso('el motivo de rechazo elegido sobrevive a un cambio de otra pantalla', async () => {
+    await pedirCerveza();
+    await salon.waitForSelector('.mesa-tile.est-pidio[data-id=m7]', { timeout: 5000 });
+    await salon.click('.mesa-tile[data-id=m7]');
+    await salon.click('#panel-mesa button:has-text("Rechazar")');
+    await salon.locator('#panel-mesa select').selectOption({ label: 'Otro (escríbelo)' });
+    await salon.fill('#panel-mesa input[id^=otro-]', 'Pedido de prueba');
+    await otraPantallaCambiaAlgo();
+    if ((await salon.locator('#panel-mesa select').inputValue()) !== '') throw new Error('el motivo volvió a la primera opción');
+    if ((await salon.locator('#panel-mesa input[id^=otro-]').inputValue()) !== 'Pedido de prueba') throw new Error('se perdió el texto del motivo');
+  });
+  await paso('rechazar el único pedido: el teléfono ve «El mesero no lo aceptó» con el motivo, aunque la mesa quede libre', async () => {
+    await salon.click('#panel-mesa button:has-text("Rechazar pedido")');
+    await salon.waitForSelector('.mesa-tile.est-libre[data-id=m7]', { timeout: 5000 });
+    await esperarTexto(tel, '#vista-mesa', 'El mesero no lo aceptó: Pedido de prueba');
+    await tel.click('#vista-mesa button:has-text("Entendido")');
+    await esperarTexto(tel, '#vista-mesa', 'Aún no hay pedidos');
+  });
+  await paso('cobro en caja: escribir «5», otra pantalla cambia algo, escribir «0» da 50 (no 05)', async () => {
+    await salon.click('.mesa-tile[data-id=m10]');
+    await salon.click('#panel-mesa [data-foco=cobrar]');
+    await salon.click('#cobro-recibido');
+    await salon.keyboard.type('5');
+    await otraPantallaCambiaAlgo();
+    await salon.keyboard.type('0');
+    const v = await salon.locator('#cobro-recibido').inputValue();
+    if (v !== '50') throw new Error(`el campo quedó en «${v}»`);
+    await salon.click('#panel-mesa button:has-text("Cancelar")');
+  });
+  await paso('propina «Otra cifra» en el teléfono: «2», el salón atiende otra mesa, «.50» da 2.50', async () => {
+    await pedirCerveza();
+    await salon.waitForSelector('.mesa-tile.est-pidio[data-id=m7]', { timeout: 5000 });
+    await salon.click('.mesa-tile[data-id=m7]');
+    await salon.click('#panel-mesa button:has-text("Aceptar y enviar a cocina")');
+    await tel.click('#tab-cuenta');
+    await tel.locator('input[name=modo][value=todo]').check();
+    await tel.locator('input[name=propina][value=monto]').check();
+    await tel.click('#monto-propina');
+    await tel.keyboard.type('2');
+    await salon.click('.mesa-tile[data-id=m11]');
+    await salon.click('#panel-mesa button:has-text("Atender")');
+    await tel.waitForTimeout(300);
+    await tel.keyboard.type('.50');
+    const v = await tel.locator('#monto-propina').inputValue();
+    if (v !== '2.50') throw new Error(`la propina quedó en «${v}»`);
+  });
+  await paso('cocina: «Deshacer» de un pedido que el salón ya sirvió avisa que no se puede y no dice «Deshecho»', async () => {
+    const t = cocina.locator('.ticket--cocina', { has: cocina.locator('h3', { hasText: /^Mesa 7 / }) }).first();
+    await t.waitFor({ timeout: 8000 });
+    const clave = await t.getAttribute('data-clave');
+    await cocina.click(`.ticket--cocina[data-clave="${clave}"] .renglon-cocina`);
+    await cocina.click(`.ticket--cocina[data-clave="${clave}"] .boton-listo`);
+    await salon.click('.mesa-tile[data-id=m7]');
+    await salon.click('#panel-mesa button:has-text("Marcar servido")');
+    await esperarTexto(salon, '#panel-mesa', 'Servido');
+    await cocina.click('#boton-deshacer');
+    await cocina.waitForTimeout(400);
+    if (/Deshecho/.test(await cocina.locator('#anuncio-cocina').textContent())) throw new Error('anunció «Deshecho»');
+    await esperarTexto(cocina, 'body', 'Ya no se puede deshacer');
+    const boton = await cocina.locator('#boton-deshacer').innerText();
+    if (/Mesa 7/.test(boton)) throw new Error(`el botón sigue ofreciendo deshacer ese pedido: «${boton}»`);
+  });
+  await paso('PIN equivocado: el campo vuelve a salir (también tras recargar) y con el PIN bueno el pedido entra', async () => {
+    const admin = await ctx.newPage();
+    vigilar(admin, 'panel');
+    await admin.setViewportSize({ width: 1280, height: 800 });
+    await admin.goto(`${BASE}admin.html#ajustes`);
+    await admin.check('#aj-pin');
+    await admin.click('#panel-ajustes button[type=submit]:has-text("Guardar ajustes")');
+    await admin.waitForFunction(() => JSON.parse(localStorage.getItem('atk-mesa:estado')).ajustes.pin === true, null, { polling: 200 });
+    const pin = await admin.evaluate(() => JSON.parse(localStorage.getItem('atk-mesa:estado')).plano.mesas.find((m) => m.numero === 3).pin);
+    const p3 = await ctx.newPage();
+    vigilar(p3, 'teléfono mesa 3');
+    await p3.setViewportSize({ width: 390, height: 844 });
+    await p3.goto(`${BASE}mesa.html?sala=${sala}&m=3#carta`);
+    await p3.click('[data-plato=cerveza]');
+    await p3.click('#dlg-plato button[type=submit]');
+    await p3.click('#boton-carrito');
+    await p3.fill('#pin-mesa', pin === '111' ? '222' : '111');
+    await p3.click('#dlg-carrito [data-foco=enviar]');
+    await esperarTexto(p3, '#vista-mesa', 'El PIN no coincide');
+    await p3.reload();
+    await p3.click('#vista-mesa button:has-text("Ver pedido")');
+    await p3.waitForSelector('#pin-mesa', { timeout: 3000 });
+    await p3.fill('#pin-mesa', pin);
+    await p3.click('#dlg-carrito [data-foco=enviar]');
+    await esperarTexto(p3, '#vista-mesa .ticket--pedido .estado', 'Esperando al mesero');
+    await admin.uncheck('#aj-pin');
+    await admin.click('#panel-ajustes button[type=submit]:has-text("Guardar ajustes")');
+    await admin.close();
+  });
+  await ctx.close();
+}
+
 async function porRelevo() {
-  console.log('\n2. Dos navegadores distintos por el relevo ntfy.sh (sin localStorage compartido)');
+  console.log('\n3. Dos navegadores distintos por el relevo ntfy.sh (sin localStorage compartido)');
   const compu = await chromium.launch();
   const telefono = await chromium.launch();
   try {
@@ -300,6 +432,11 @@ try {
   if (!SOLO_RELEVO) await mismoNavegador(browser);
 } catch {
   /* el paso ya dijo qué falló */
+}
+try {
+  if (!SOLO_RELEVO) await casosDeBorde(browser);
+} catch {
+  /* idem */
 } finally {
   await browser.close();
 }

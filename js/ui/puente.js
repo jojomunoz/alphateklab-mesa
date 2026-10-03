@@ -53,7 +53,7 @@ export function conectarCajaAlRelevo(caja, { alEstado = () => {} } = {}) {
       if (!vistos.nuevo(msg.id)) return;
       if (msg.disp === caja.disp) return;
       if (!TIPOS_COMENSAL.has(msg.tipo)) return;
-      const r = await caja.despachar(msg, { remoto: true, automatico: true });
+      const r = await caja.despachar(msg, { remoto: true });
       // Solo la pestaña que aplicó el cambio contesta (las demás ven «repetido»). «pedir-estado» siempre cambia
       // la marca de remoto de la mesa, así que también se contesta una sola vez.
       if (r.cambio && Number.isInteger(msg.mesa)) programarEstado(msg.mesa);

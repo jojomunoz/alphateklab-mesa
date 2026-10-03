@@ -375,17 +375,19 @@ function bloquePedido(p, n, ahora) {
   const claseEstado = p.estado === 'por-aceptar' ? 'estado--espera' : p.estado === 'listo' ? 'estado--ok' : p.estado === 'rechazado' ? 'estado--alerta' : '';
   const acciones = [];
   if (p.estado === 'por-aceptar') {
-    if (ui.rechazando === p.id) {
-      const sel = h('select', { id: `motivo-${p.id}`, 'data-foco': `motivo-${p.id}` }, MOTIVOS_RECHAZO.map((x) => h('option', {}, x)), h('option', { value: '' }, 'Otro (escríbelo)'));
-      const otro = h('input', { id: `otro-${p.id}`, maxlength: '80', placeholder: 'Motivo', hidden: true });
-      sel.addEventListener('change', () => (otro.hidden = sel.value !== ''));
+    if (ui.rechazando?.pedido === p.id) {
+      // Lo elegido vive en ui.rechazando: cualquier cambio de otra pantalla repinta el panel y no puede devolver el
+      // motivo a la primera opción (el comensal recibiría un motivo que no es).
+      const r = ui.rechazando;
+      const sel = h('select', { id: `motivo-${p.id}`, 'data-foco': `motivo-${p.id}`, onchange: (ev) => { r.motivo = ev.target.value; otro.hidden = r.motivo !== ''; } }, MOTIVOS_RECHAZO.map((x) => h('option', { value: x, selected: r.motivo === x }, x)), h('option', { value: '', selected: r.motivo === '' }, 'Otro (escríbelo)'));
+      const otro = h('input', { id: `otro-${p.id}`, 'data-foco': `otro-${p.id}`, maxlength: '80', 'aria-label': 'Otro motivo', placeholder: 'Motivo', value: r.otro, hidden: r.motivo !== '', oninput: (ev) => { r.otro = ev.target.value; } });
       acciones.push(
         h(
           'div',
           { class: 'rechazo' },
           h('div', { class: 'campo' }, h('label', { for: `motivo-${p.id}` }, 'Motivo (lo ve el teléfono de la mesa)'), sel, otro),
           h('div', { class: 'fila-botones' },
-            h('button', { type: 'button', class: 'boton boton--peligro', onclick: async () => { const motivo = sel.value || otro.value.trim(); ui.rechazando = null; await hacer({ tipo: 'rechazar-pedido', datos: { pedido: p.id, motivo } }, 'Pedido rechazado.'); } }, 'Rechazar pedido'),
+            h('button', { type: 'button', class: 'boton boton--peligro', onclick: async () => { const motivo = r.motivo || r.otro.trim(); ui.rechazando = null; await hacer({ tipo: 'rechazar-pedido', datos: { pedido: p.id, motivo } }, 'Pedido rechazado.'); } }, 'Rechazar pedido'),
             h('button', { type: 'button', class: 'boton boton--secundario', onclick: () => { ui.rechazando = null; pintarPanel(); } }, 'Cancelar'),
           ),
         ),
@@ -394,7 +396,7 @@ function bloquePedido(p, n, ahora) {
       acciones.push(
         h('div', { class: 'fila-botones' },
           h('button', { type: 'button', class: 'boton boton--primario', 'data-foco': `aceptar-${p.id}`, onclick: () => hacer({ tipo: 'aceptar-pedido', datos: { pedido: p.id } }, `Pedido de la mesa ${n} enviado a cocina.`) }, icono('cocina'), 'Aceptar y enviar a cocina'),
-          h('button', { type: 'button', class: 'boton boton--secundario', 'data-foco': `rechazar-${p.id}`, onclick: () => { ui.rechazando = p.id; pintarPanel(); $(`#motivo-${p.id}`)?.focus(); } }, 'Rechazar'),
+          h('button', { type: 'button', class: 'boton boton--secundario', 'data-foco': `rechazar-${p.id}`, onclick: () => { ui.rechazando = { pedido: p.id, motivo: MOTIVOS_RECHAZO[0], otro: '' }; pintarPanel(); $(`#motivo-${p.id}`)?.focus(); } }, 'Rechazar'),
         ),
       );
     }

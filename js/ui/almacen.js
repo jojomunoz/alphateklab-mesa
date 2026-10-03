@@ -68,3 +68,11 @@ export function escribirSesion(clave, valor) {
     /* sin sesión: se volverá a pedir */
   }
 }
+
+export function borrarSesion(clave) {
+  try {
+    sessionStorage.removeItem(PREFIJO + clave);
+  } catch {
+    /* nada que borrar */
+  }
+}

@@ -32,7 +32,7 @@ export async function arrancarCaja({ conRelevo = true } = {}) {
   const puente = conRelevo ? conectarCajaAlRelevo(caja, { alEstado: (e) => pintarConexion(indicador, e) }) : null;
   if (!conRelevo) pintarConexion(indicador, { estado: 'local', segundos: 0 });
   if (!caja.guardaDatos) {
-    const aviso = h('p', { class: 'nota nota--espera contenedor' }, 'Este navegador no deja guardar datos (¿ventana privada?). La demo funciona, pero cada pestaña va por su cuenta y todo se pierde al cerrarla.');
+    const aviso = h('p', { class: 'nota nota--espera contenedor' }, 'Este navegador no deja guardar datos (¿ventana privada?). La demo funciona, pero cada pestaña va por su cuenta (con su propio ejemplo y su propio código de sala) y todo se pierde al cerrarla.');
     ($('#principal') ?? document.body).prepend(aviso);
   }
   return { caja, puente };

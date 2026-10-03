@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { aplicar, estadoVacio, estadoVisible, porAtender, mesaRt, estadoInicialPedido, MAX_POR_ACEPTAR } from '../js/nucleo/caja.mjs';
-import { planoEjemplo, crearSemilla } from '../js/nucleo/semilla.mjs';
+import { planoEjemplo, crearSemilla, semillaVieja, cuentaComoUso, REFRESCAR_SEMILLA_MS } from '../js/nucleo/semilla.mjs';
 import { resumenCuenta } from '../js/nucleo/cuenta.mjs';
 import { ticketsCocina } from '../js/nucleo/cocina.mjs';
 
@@ -325,6 +325,24 @@ test('semilla: se arma con acciones válidas; la mesa 7 queda libre y hay ticket
   const minutos = tickets.map((t) => Math.floor((ahora - t.entrada) / 60000));
   assert.ok(minutos.some((m) => m < 10) && minutos.some((m) => m >= 10 && m <= 20) && minutos.some((m) => m > 20), minutos.join(','));
   assert.deepEqual(e.errores, []);
+});
+
+test('semilla vieja: se refresca sola solo si nadie la usó; el pedido de un teléfono por el relevo cuenta como uso', () => {
+  const e = crearSemilla({ sala: 'abcdefghjk', carta: CARTA, ahora: T0, generarPin: () => '321' });
+  const tarde = T0 + REFRESCAR_SEMILLA_MS + 60_000;
+  assert.equal(semillaVieja(e, T0 + 60_000), false, 'recién hecha');
+  assert.equal(semillaVieja(e, tarde), true, 'sin tocar y pasados 20 min');
+  assert.equal(semillaVieja({ ...e, semilla: { ...e.semilla, tocado: true } }, tarde), false);
+  // Un teléfono pide por el relevo (acción remota) y nadie más toca nada: ese pedido no se puede perder.
+  const r = aplicar(e, { v: 1, tipo: 'pedido', mesa: 7, datos: { renglones: [{ plato: 'cerveza', cant: 1, mods: [] }] }, id: 'tel-1', t: T0 + 60_000, disp: 'tel' }, { ahora: T0 + 60_000, remoto: true });
+  assert.equal(r.error, undefined);
+  assert.equal(cuentaComoUso('pedido'), true);
+  assert.equal(semillaVieja(r.estado, tarde), false, 'hay una cuenta abierta después de la semilla');
+  // Lo automático no cuenta: el acuse de la cocina y el teléfono que solo pide el estado.
+  assert.equal(cuentaComoUso('cocina-recibir'), false);
+  assert.equal(cuentaComoUso('pedir-estado'), false);
+  const soloEstado = aplicar(e, { v: 1, tipo: 'pedir-estado', mesa: 7, datos: {}, id: 'pe-1', t: T0 + 60_000 }, { ahora: T0 + 60_000, remoto: true });
+  assert.equal(semillaVieja(soloEstado.estado, tarde), true);
 });
 
 test('tipo de local: un restaurante cobra 7 % en la comida; una fonda no cobra ITBMS en la comida y sí 10 % en el alcohol', () => {

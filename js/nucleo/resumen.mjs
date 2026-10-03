@@ -28,7 +28,7 @@ export function resumenMesa(estado, n, cartaBase, ahora = Date.now()) {
     ts: ahora,
     local,
     est: m.estado,
-    aj: { ap: estado.ajustes.aprobacion, pin: estado.ajustes.pin ? 1 : 0, pr: estado.ajustes.propinas, re: estado.ajustes.resena },
+    aj: { ap: estado.ajustes.aprobacion, pin: estado.ajustes.pin ? 1 : 0, pr: estado.ajustes.propinas, re: estado.ajustes.resena, tl: estado.ajustes.tipoLocal },
     pc: cartaBase ? parcheCarta(cartaBase, estado.carta) : null,
     cid: c?.id ?? null,
     ped: (c?.pedidos ?? []).map((p) => [
@@ -48,7 +48,7 @@ export function resumenMesa(estado, n, cartaBase, ahora = Date.now()) {
   return recortar(s);
 }
 
-/** Si el resumen no cabe, quita notas, luego nombres, luego los avisos ya cerrados. */
+/** Si el resumen no cabe, quita notas, luego nombres, luego los avisos ya cerrados y lo grande de la carta. */
 export function recortar(s) {
   if (bytesDe(s) <= LIMITE_BYTES) return s;
   const r = structuredClone(s);
@@ -57,7 +57,10 @@ export function recortar(s) {
   for (const p of r.ped ?? []) for (const x of p[5]) x[6] = '';
   if (bytesDe(r) <= LIMITE_BYTES) return { ...r, recortado: 2 };
   r.av = (r.av ?? []).filter((a) => a[2] === 'abierta');
-  r.pc = r.pc ? { agotados: r.pc.agotados, precios: {}, ocultos: [] } : null;
+  // De la carta quedan agotados, precios, quitados y la huella: el teléfono ve que no le llegó todo y lo dice.
+  r.pc = r.pc ? { agotados: r.pc.agotados, precios: r.pc.precios, ocultos: r.pc.ocultos, h: r.pc.h } : null;
+  if (bytesDe(r) <= LIMITE_BYTES) return { ...r, recortado: 3 };
+  if (r.pc) r.pc = { agotados: r.pc.agotados, precios: {}, ocultos: [], h: r.pc.h };
   return { ...r, recortado: 3 };
 }
 
@@ -102,7 +105,7 @@ export function expandirResumen(s) {
     ts: s.ts,
     local: s.local,
     estado: s.est,
-    ajustes: { aprobacion: s.aj.ap, pin: Boolean(s.aj.pin), propinas: s.aj.pr, resena: s.aj.re },
+    ajustes: { aprobacion: s.aj.ap, pin: Boolean(s.aj.pin), propinas: s.aj.pr, resena: s.aj.re, tipoLocal: s.aj.tl === 'fonda' ? 'fonda' : 'restaurante' },
     parche: s.pc,
     cuenta,
     errores: (s.err ?? []).map(([ref, motivo, detalle]) => ({ ref, motivo, detalle: detalle ?? null })),

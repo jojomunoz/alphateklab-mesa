@@ -36,6 +36,23 @@ MUT=[
  ('la fonda tampoco cobra el alcohol','js/nucleo/dinero.mjs',"return tipoLocal === 'fonda' && tasaPlato === 7 ? 0 : tasaPlato;","return tipoLocal === 'fonda' ? 0 : tasaPlato;"),
  ('la caja ignora el tipo de local','js/nucleo/caja.mjs',"const res = armarRenglon(e.carta, r, { tipoLocal: e.ajustes.tipoLocal });","const res = armarRenglon(e.carta, r);"),
  ('quitar mesa ocupada','js/nucleo/plano.mjs',"if (ocupadas.has(m.numero)) return { ok: false, error: `La mesa ${m.numero} tiene una cuenta abierta. Cóbrala y libérala antes de quitarla.` };",""),
+ ('pedido tras pagar no reabre la mesa','js/nucleo/caja.mjs',"if (m.estado === 'libre' || m.estado === 'pagada') {","if (m.estado === 'libre') {"),
+ ('pagada con pedidos por aceptar','js/nucleo/cuenta.mjs',"return r.total > 0 && r.saldoConfirmado <= 0 && r.porAceptar === 0;","return r.total > 0 && r.saldoConfirmado <= 0;"),
+ ('liberar con pagos pendientes','js/nucleo/caja.mjs',"if ((m.cuenta?.pagos ?? []).some((p) => p.estado === 'pendiente')) return fallo('pagos-pendientes');",""),
+ ('pagar una parte con otro monto','js/nucleo/caja.mjs',"if (parte.monto !== d.monto) return fallo('monto');",""),
+ ('aviso atendido se puede cancelar','js/nucleo/estados.mjs',"  atendida: [],\n  cancelada: [],","  atendida: ['cancelada'],\n  cancelada: [],"),
+ ('más de 30 renglones','js/nucleo/caja.mjs',"if (lista.length > MAX_RENGLONES) return fallo('pedido-largo');",""),
+ ('cantidad hasta 99','js/nucleo/carta.mjs','export const MAX_CANT = 20;','export const MAX_CANT = 99;'),
+ ('por atender al revés','js/nucleo/caja.mjs','return out.sort((a, b) => a.t - b.t);','return out.sort((a, b) => b.t - a.t);'),
+ ('nombre del local vacío','js/nucleo/caja.mjs','if (!s || s.length > 60)','if (s.length > 60)'),
+ ('kiosco no vuelve a 001','js/nucleo/caja.mjs','e.kiosco.siguiente = numero >= 999 ? 1 : numero + 1;','e.kiosco.siguiente = numero + 1;'),
+ ('m=1e1 es la mesa 10','js/nucleo/url.mjs',r"&& /^\d+$/.test(m.trim())",''),
+ ('el rechazo no vuelve al teléfono','js/nucleo/intentos.mjs',"if (e) intentos.set(id, { tipo: 'pedido'","if (false) intentos.set(id, { tipo: 'pedido'"),
+ ('el PIN queda guardado en el teléfono','js/nucleo/intentos.mjs',"if (!datos || typeof datos !== 'object' || !('pin' in datos)) return datos;","return datos;"),
+ ('el parche no lleva los grupos de opciones','js/nucleo/carta.mjs',"if (Object.keys(grupos).length) parche.grupos = grupos;",""),
+ ('el parche no lleva los platos nuevos','js/nucleo/carta.mjs',"if (nuevos.length) parche.nuevos = nuevos;",""),
+ ('la semilla se refresca con un pedido nuevo','js/nucleo/semilla.mjs',"for (const m of Object.values(estado.mesas ?? {})) {","for (const m of []) {"),
+ ('la fonda dice «ITBMS incluido»','js/nucleo/textos.mjs',"tipoLocal === 'fonda' ? 'preciosFonda' : 'preciosIncluyen'","'preciosIncluyen'"),
 ]
 atrapadas=0
 for nombre, archivo, a, b in MUT:

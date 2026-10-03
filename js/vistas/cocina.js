@@ -7,6 +7,8 @@ import { leer, escribir } from '../ui/almacen.js';
 import { ticketsCocina, listosParaServir, sinAcusar, semaforo, minutosDesde } from '../nucleo/cocina.mjs';
 import { formatoOrden } from '../nucleo/kiosco.mjs';
 import { texto, indexar } from '../nucleo/carta.mjs';
+import { buscarPedido } from '../nucleo/caja.mjs';
+import { textoError } from '../nucleo/textos.mjs';
 
 const ESTACIONES = [
   { id: null, nombre: 'Todas' },
@@ -39,7 +41,7 @@ function descripcion(accion) {
 async function hacer(accion, registro) {
   const r = await caja.despachar(accion);
   if (r.error) {
-    anunciar(`No se pudo: ${r.error === 'transicion' ? 'ese pedido ya cambió en el salón' : r.error}`, { tipo: 'alerta' });
+    anunciar(`No se pudo: ${r.error === 'transicion' ? 'ese pedido ya cambió en el salón. Mira el estado en el salón.' : textoError(r.error)}`, { tipo: 'alerta' });
     return false;
   }
   if (registro) {
@@ -60,8 +62,18 @@ function pintarDeshacer() {
 async function deshacerUltimo() {
   const a = deshacer.pop();
   if (!a) return;
-  if (a.tipo === 'renglon') await caja.despachar({ tipo: 'cocina-renglon', datos: { pedido: a.pedido, renglon: a.renglon, hecho: !a.hecho } });
-  else await caja.despachar({ tipo: 'cocina-deshacer-listo', datos: { pedido: a.pedido, estacion: a.estacion } });
+  const r = a.tipo === 'renglon'
+    ? await caja.despachar({ tipo: 'cocina-renglon', datos: { pedido: a.pedido, renglon: a.renglon, hecho: !a.hecho } })
+    : await caja.despachar({ tipo: 'cocina-deshacer-listo', datos: { pedido: a.pedido, estacion: a.estacion } });
+  if (r.error) {
+    // El salón ya lo sirvió (o el pedido ya no está): nada de ese pedido se puede deshacer, así que sale de la pila
+    // entero en vez de fallar una vez por cada toque.
+    for (let i = deshacer.length - 1; i >= 0; i--) if (deshacer[i].pedido === a.pedido) deshacer.splice(i, 1);
+    const servido = caja.estado && buscarPedido(caja.estado, a.pedido)?.pedido.estado === 'servido';
+    anunciar(`Ya no se puede deshacer (${a.etiqueta}): ${servido ? 'el salón ya lo sirvió' : 'ese pedido ya cambió en el salón'}.`, { tipo: 'alerta', duracion: 6000 });
+    pintarDeshacer();
+    return;
+  }
   $('#anuncio-cocina').textContent = `Deshecho: ${descripcion(a)}`;
   pintarDeshacer();
 }
@@ -209,7 +221,7 @@ function pintarTablero() {
 function acusar() {
   // «Recibido en cocina» es honesto solo si esta pantalla está a la vista.
   if (document.visibilityState !== 'visible' || !caja) return;
-  for (const id of sinAcusar(caja.estado)) caja.despachar({ tipo: 'cocina-recibir', datos: { pedido: id } }, { automatico: true });
+  for (const id of sinAcusar(caja.estado)) caja.despachar({ tipo: 'cocina-recibir', datos: { pedido: id } });
 }
 
 function pintarReloj() {

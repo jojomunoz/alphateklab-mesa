@@ -4,11 +4,11 @@ import { $, $$, h, icono, pintar, hora } from '../ui/dom.js';
 import { anunciar, prepararBarra, pintarConexion } from '../ui/comun.js';
 import { cargarCartaBase } from '../ui/caja-local.js';
 import { crearClienteMesa } from '../ui/cliente-mesa.js';
-import { leer, escribir, borrar, leerSesion, escribirSesion } from '../ui/almacen.js';
+import { leer, escribir, borrar, leerSesion, escribirSesion, borrarSesion } from '../ui/almacen.js';
 import { leerParametros, urlMesa, baseDe, esSala } from '../nucleo/url.mjs';
-import { t as tr, textoError } from '../nucleo/textos.mjs';
+import { t as tr, textoError, textoPrecios } from '../nucleo/textos.mjs';
 import { formatear } from '../nucleo/dinero.mjs';
-import { texto, indexar, validarSeleccion, alergenosDe, aplicarParche, MAX_CANT, MAX_NOTA } from '../nucleo/carta.mjs';
+import { texto, indexar, validarSeleccion, alergenosDe, aplicarParche, cartaAlDia, MAX_CANT, MAX_NOTA } from '../nucleo/carta.mjs';
 import { resumenCuenta } from '../nucleo/cuenta.mjs';
 import { resolverPropina, opcionesPropina, propinaPorcentaje } from '../nucleo/propina.mjs';
 import { partesIguales, porPlatos, MAX_PARTES } from '../nucleo/division.mjs';
@@ -19,6 +19,7 @@ const ui = {
   carrito: [],
   pago: nuevoPago(),
   misPagos: [],
+  pinFallo: false,
 };
 let cliente = null;
 let cartaBase = null;
@@ -44,6 +45,13 @@ function cartaVista() {
   return aplicarParche(cartaBase, cliente?.resumen?.parche);
 }
 
+/** Aviso si la carta que armó este teléfono no es la de la caja (el resumen se recortó). */
+function avisoCartaDesfasada() {
+  if (cliente?.cartaCaja || !cliente?.resumen?.parche) return null;
+  if (cartaAlDia(cartaVista(), cliente.resumen.parche)) return null;
+  return h('p', { class: 'nota nota--espera', role: 'status' }, icono('alerta'), h('span', {}, T('cartaDesfasada')));
+}
+
 function nombrePlato(id, nombreGuardado = '') {
   const p = indexar(cartaVista()).platos.get(id) ?? indexar(cartaBase).platos.get(id);
   return p ? texto(p.nombre, ui.idioma) : nombreGuardado || id;
@@ -57,7 +65,7 @@ function nombreOpcion(grupo, opcion) {
 }
 
 function nombreAlergeno(id) {
-  const a = (cartaBase.alergenos ?? []).find((x) => x.id === id);
+  const a = (cartaVista().alergenos ?? cartaBase.alergenos ?? []).find((x) => x.id === id);
   return a ? texto(a.nombre, ui.idioma) : id;
 }
 
@@ -75,6 +83,25 @@ function lineaMods(mods, nota) {
   const partes = mods.map((m) => nombreOpcion(m.grupo, m.opcion));
   if (nota) partes.push(`«${nota}»`);
   return partes.join(', ');
+}
+
+// ——— PIN de la mesa ———
+// Se guarda en la sesión (no en el teléfono) junto con el id del último pedido que lo usó. Si la caja contesta que
+// no coincide, se borra: así el carrito vuelve a pedirlo, también tras recargar.
+const clavePin = () => `pin:${sala}:${mesa}`;
+function pinGuardado() {
+  const g = leerSesion(clavePin());
+  if (typeof g === 'string') return { v: g, id: null };
+  return g && typeof g.v === 'string' ? g : null;
+}
+function revisarPin() {
+  const g = pinGuardado();
+  if (!g?.id) return;
+  const it = cliente.intentos.get(g.id);
+  if (it?.envio === 'error' && it.error === 'pin') {
+    borrarSesion(clavePin());
+    ui.pinFallo = true;
+  }
 }
 
 // ——— Carrito ———
@@ -291,9 +318,11 @@ function pintarTodo() {
     'sin-conexion': (s) => T('conexion.sin-conexion', { s }),
   });
   recordarPagos();
+  revisarPin();
   pintarMarcaMesa();
   pintarBarraCarrito();
   pintarVista();
+  if ($('#dlg-carrito').open) pintarCarrito();
 }
 
 function pintarVista() {
@@ -400,7 +429,7 @@ function pintarCarta() {
     ),
   );
 
-  pintar(v, nav, h('div', { class: 'contenedor carta' }, h('p', { class: 'carta__impuesto' }, T('preciosIncluyen')), secciones));
+  pintar(v, nav, h('div', { class: 'contenedor carta' }, h('p', { class: 'carta__impuesto' }, textoPrecios(ui.idioma, cliente.resumen?.ajustes?.tipoLocal)), avisoCartaDesfasada(), secciones));
   vigilarCategorias();
 }
 
@@ -534,6 +563,7 @@ function abrirCarrito() {
   const dlg = $('#dlg-carrito');
   pintarCarrito();
   if (!dlg.open) dlg.showModal();
+  if (ui.pinFallo) $('#pin-mesa')?.focus();
 }
 
 function pintarCarrito() {
@@ -542,9 +572,13 @@ function pintarCarrito() {
   const aprobacion = ajustes?.aprobacion ?? 'todos';
   const yaAceptado = (cliente.resumen?.cuenta?.pedidos ?? []).some((p) => !['por-aceptar', 'rechazado'].includes(p.estado));
   const esperaMesero = aprobacion === 'todos' || (aprobacion === 'primero' && !yaAceptado);
-  const necesitaPin = Boolean(ajustes?.pin) && !leerSesion(`pin:${sala}:${mesa}`);
-  const pin = necesitaPin ? h('input', { id: 'pin-mesa', inputmode: 'numeric', pattern: '[0-9]*', maxlength: '3', autocomplete: 'off', 'aria-describedby': 'pin-ayuda', 'data-foco': 'pin' }) : null;
-  const error = h('p', { class: 'mensaje-error', role: 'alert' });
+  const necesitaPin = Boolean(ajustes?.pin) && !pinGuardado();
+  const pin = necesitaPin ? h('input', { id: 'pin-mesa', inputmode: 'numeric', pattern: '[0-9]*', maxlength: '3', autocomplete: 'off', 'aria-describedby': 'pin-ayuda', 'aria-invalid': ui.pinFallo ? 'true' : 'false', 'data-foco': 'pin' }) : null;
+  const error = h('p', { class: 'mensaje-error', role: 'alert' }, pin && ui.pinFallo ? T('pinNoCoincide') : '');
+  // Un plato que se agotó (o que el local quitó) con el carrito ya lleno: se marca aquí y no se deja enviar.
+  const platosHoy = indexar(cartaVista()).platos;
+  const noDisponible = (x) => !platosHoy.get(x.plato) || platosHoy.get(x.plato).agotado;
+  const hayAgotados = ui.carrito.some(noDisponible);
 
   const cuerpo = ui.carrito.length
     ? h(
@@ -560,6 +594,7 @@ function pintarCarrito() {
                 { class: 'renglon-carrito' },
                 h('div', { class: 'renglon' }, h('span', { class: 'renglon__nombre' }, h('strong', { class: 'renglon__cant' }, `${x.cant} ×`), ' ', nombrePlato(x.plato)), h('span', { class: 'renglon__puntos', 'aria-hidden': 'true' }), h('span', { class: 'renglon__monto' }, dinero(precioUnitario(x.plato, x.mods) * x.cant))),
                 lineaMods(x.mods, x.nota) ? h('p', { class: 'renglon__detalle' }, lineaMods(x.mods, x.nota)) : null,
+                noDisponible(x) ? h('p', { class: 'estado estado--alerta' }, icono('x'), T('agotadoQuitalo')) : null,
                 h(
                   'div',
                   { class: 'renglon-carrito__controles' },
@@ -573,7 +608,7 @@ function pintarCarrito() {
           ),
           h('div', { class: 'ticket__pie' },
             h('div', { class: 'renglon ticket__total' }, h('span', { class: 'renglon__nombre' }, T('total')), h('span', { class: 'renglon__puntos', 'aria-hidden': 'true' }), h('span', { class: 'renglon__monto' }, dinero(totalCarrito()))),
-            h('p', { class: 'renglon--menor' }, T('preciosIncluyen')),
+            h('p', { class: 'renglon--menor' }, textoPrecios(ui.idioma, cliente.resumen?.ajustes?.tipoLocal)),
           ),
         ),
       )
@@ -587,6 +622,7 @@ function pintarCarrito() {
       { class: 'hoja__cuerpo' },
       cuerpo,
       ui.carrito.length && pin ? h('div', { class: 'campo' }, h('label', { for: 'pin-mesa' }, T('pinTitulo')), pin, h('p', { id: 'pin-ayuda', class: 'ayuda' }, T('pinAyuda'))) : null,
+      ui.carrito.length ? avisoCartaDesfasada() : null,
       ui.carrito.length ? h('p', { class: 'nota' }, icono('info'), h('span', {}, esperaMesero ? T('aprobacionNota') : T('sinAprobacionNota'))) : null,
       ui.carrito.length ? h('p', { class: 'ayuda aviso-relevo' }, T('avisoRelevo')) : null,
     ),
@@ -595,12 +631,15 @@ function pintarCarrito() {
           'div',
           { class: 'hoja__pie' },
           error,
+          hayAgotados ? h('p', { class: 'ayuda', id: 'enviar-bloqueado' }, T('agotadoNoEnvia')) : null,
           h(
             'button',
             {
               type: 'button',
               class: 'boton boton--primario boton--grande boton--ancho',
               'data-foco': 'enviar',
+              disabled: hayAgotados,
+              'aria-describedby': hayAgotados ? 'enviar-bloqueado' : false,
               onclick: () => {
                 const datos = { renglones: ui.carrito.map(({ plato, cant, mods, nota }) => ({ plato, cant, mods, nota })) };
                 if (pin) {
@@ -611,12 +650,13 @@ function pintarCarrito() {
                     pin.focus();
                     return;
                   }
-                  escribirSesion(`pin:${sala}:${mesa}`, v);
+                  datos.pin = v;
+                } else if (pinGuardado()) {
+                  datos.pin = pinGuardado().v;
                 }
-                const guardado = leerSesion(`pin:${sala}:${mesa}`);
-                if (guardado) datos.pin = guardado;
                 const id = cliente.enviar('pedido', datos);
-                escribir(`enviado:${id}`, ui.carrito);
+                if (datos.pin) escribirSesion(clavePin(), { v: datos.pin, id });
+                ui.pinFallo = false;
                 ui.carrito = [];
                 guardarCarrito();
                 dlg.close();
@@ -624,8 +664,8 @@ function pintarCarrito() {
                 irA('mesa');
               },
             },
-            icono('cocina'),
-            T('enviarCocina'),
+            icono(esperaMesero ? 'persona' : 'cocina'),
+            T(esperaMesero ? 'enviarMesero' : 'enviarCocina'),
           ),
         )
       : null,
@@ -711,7 +751,7 @@ function ticketPedido({ id, ronda, estado, disp, t, renglones, motivo, enviando 
       { class: 'ticket ticket--pedido', 'aria-labelledby': `p-${id}` },
       h('header', { class: 'ticket__cabeza' }, h('h3', { class: 'ticket__titulo', id: `p-${id}` }, ronda ? T('ronda', { n: ronda }) : T('tuPedido', { n: mesa })), h('p', { class: 'ticket__meta' }, `${t ? hora(t) : ''} · ${desde}`)),
       error
-        ? h('p', { class: 'nota nota--alerta', role: 'alert' }, icono('alerta'), h('span', {}, error === 'rechazado' ? (motivo ? T('rechazadoMotivo', { motivo }) : T('rechazadoSinMotivo')) : textoError(error, ui.idioma)))
+        ? h('p', { class: 'nota nota--alerta', role: 'alert' }, icono('alerta'), h('span', {}, error === 'rechazado' ? (motivo ? T('rechazadoMotivo', { motivo }) : T('rechazadoSinMotivo')) : error === 'agotado' && motivo ? T('agotadoPlato', { plato: nombrePlato(motivo) }) : textoError(error, ui.idioma)))
         : h('p', { class: `estado ${estadoPedidoClase(actual)}` }, icono(actual === 'listo' || actual === 'servido' ? 'check' : actual === 'rechazado' ? 'x' : 'reloj'), T(`pedido.${actual}`)),
       !enviando && !error && idx >= 0
         ? h('ol', { class: 'avance', 'aria-label': T('pasos') }, PASOS.map((p, i) => h('li', { class: i <= idx ? 'avance__paso avance__paso--hecho' : 'avance__paso', 'aria-current': i === idx ? 'step' : false }, h('span', { class: 'visualmente-oculto' }, T(`pedido.${p}`)))))
@@ -729,16 +769,19 @@ function ticketPedido({ id, ronda, estado, disp, t, renglones, motivo, enviando 
           ),
         ),
       ),
-      error ? h('div', { class: 'ticket__pie' }, h('button', { type: 'button', class: 'boton boton--secundario', onclick: () => devolverAlCarrito(id) }, icono('bolsa'), T('verPedido'))) : null,
+      error
+        ? h('div', { class: 'ticket__pie ticket__acciones' },
+            h('button', { type: 'button', class: 'boton boton--secundario', 'data-foco': `ver-${id}`, onclick: () => devolverAlCarrito(id) }, icono('bolsa'), T('verPedido')),
+            h('button', { type: 'button', class: 'boton boton--texto', 'data-foco': `entendido-${id}`, onclick: () => cliente.olvidarIntento(id) }, T('entendido')),
+          )
+        : null,
     ),
   );
 }
 
 function devolverAlCarrito(id) {
   const it = cliente.intentos.get(id);
-  const guardado = leer(`enviado:${id}`) ?? (it?.datos?.renglones ?? []).map((r) => ({ ...r, clave: claveCarrito(r.plato, r.mods ?? [], r.nota ?? '') }));
-  for (const r of guardado) agregarAlCarrito(r.plato, r.cant, r.mods ?? [], r.nota ?? '');
-  borrar(`enviado:${id}`);
+  for (const r of it?.datos?.renglones ?? []) agregarAlCarrito(r.plato, r.cant, r.mods ?? [], r.nota ?? '');
   cliente.olvidarIntento(id);
   abrirCarrito();
 }

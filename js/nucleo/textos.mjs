@@ -19,6 +19,8 @@ export const T = {
     tabCuenta: 'Cuenta',
     navCategorias: 'Categorías de la carta',
     preciosIncluyen: 'Precios con ITBMS incluido. No hay cargos adicionales.',
+    preciosFonda: 'Precios finales, sin cargos adicionales. La comida y las bebidas sin alcohol no llevan ITBMS; las bebidas con alcohol incluyen el 10 %.',
+    cartaDesfasada: 'La carta del local cambió y a este teléfono no le llegó completa: algún precio o plato puede no estar al día. El precio que vale es el que ves en «Mi mesa» después de enviar; si tienes dudas, pregúntale al mesero.',
     contiene: 'Contiene: {lista}',
     agotado: 'Agotado hoy',
     agregar: 'Agregar al pedido',
@@ -39,6 +41,10 @@ export const T = {
     tuPedido: 'Tu pedido · mesa {n}',
     carritoVacio: 'Todavía no agregaste nada. Toca un plato de la carta para agregarlo.',
     enviarCocina: 'Enviar a cocina',
+    enviarMesero: 'Enviar al mesero',
+    agotadoQuitalo: 'Se agotó: quítalo para enviar el pedido.',
+    agotadoNoEnvia: 'Quita los platos agotados para poder enviar.',
+    agotadoPlato: 'Se agotó «{plato}» mientras pedías. Toca «Ver pedido», quítalo y vuelve a enviar.',
     aprobacionNota: 'Primero lo ve el mesero y él lo pasa a la cocina.',
     sinAprobacionNota: 'Pasa directo a la cocina.',
     quitar: 'Quitar',
@@ -165,6 +171,8 @@ export const T = {
     pinAyuda: 'Son los 3 números impresos en la placa de tu mesa.',
     pinContinuar: 'Enviar con este PIN',
     pinFormato: 'El PIN son 3 números.',
+    pinNoCoincide: 'Ese PIN no coincide con el de la placa. Revisa los 3 números y vuelve a enviar.',
+    entendido: 'Entendido',
     cuentaCerrada: 'Tu cuenta quedó cerrada. ¡Gracias por venir!',
     nuevaCuenta: 'Pedir otra vez en esta mesa',
     cargandoCarta: 'Cargando la carta…',
@@ -217,6 +225,8 @@ export const T = {
     tabCuenta: 'Bill',
     navCategorias: 'Menu sections',
     preciosIncluyen: 'Prices include ITBMS (sales tax). No extra charges.',
+    preciosFonda: 'Final prices, no extra charges. Food and non-alcoholic drinks carry no ITBMS (sales tax); alcoholic drinks include the 10 %.',
+    cartaDesfasada: "The restaurant changed its menu and this phone didn't get all of it: a price or dish may be out of date. The price that counts is the one under “My table” after you send; if in doubt, ask your server.",
     contiene: 'Contains: {lista}',
     agotado: 'Sold out today',
     agregar: 'Add to order',
@@ -237,6 +247,10 @@ export const T = {
     tuPedido: 'Your order · table {n}',
     carritoVacio: 'Nothing here yet. Tap a dish on the menu to add it.',
     enviarCocina: 'Send to kitchen',
+    enviarMesero: 'Send to your server',
+    agotadoQuitalo: 'Sold out: remove it to send your order.',
+    agotadoNoEnvia: 'Remove the sold-out dishes to send.',
+    agotadoPlato: '“{plato}” sold out while you were ordering. Tap “View order”, remove it and send again.',
     aprobacionNota: 'Your server checks it first and passes it to the kitchen.',
     sinAprobacionNota: 'It goes straight to the kitchen.',
     quitar: 'Remove',
@@ -363,6 +377,8 @@ export const T = {
     pinAyuda: 'The 3 digits printed on your table sign.',
     pinContinuar: 'Send with this PIN',
     pinFormato: 'The PIN is 3 digits.',
+    pinNoCoincide: "That PIN doesn't match the table sign. Check the 3 digits and send again.",
+    entendido: 'Got it',
     cuentaCerrada: 'Your bill is closed. Thank you for coming!',
     nuevaCuenta: 'Order again at this table',
     cargandoCarta: 'Loading the menu…',
@@ -408,15 +424,20 @@ export function t(idioma, clave, vars = {}) {
   return s.replace(/\{(\w+)\}/g, (_, k) => (k in vars ? String(vars[k]) : `{${k}}`));
 }
 
+/** La línea sobre los precios según el tipo de local (en una fonda la comida va sin ITBMS). */
+export function textoPrecios(idioma, tipoLocal) {
+  return t(idioma, tipoLocal === 'fonda' ? 'preciosFonda' : 'preciosIncluyen');
+}
+
 /** Errores que pueden llegarle al comensal (es/en). */
 export const ERRORES_COMENSAL = {
   es: {
     'mesa-inexistente': 'Esa mesa no existe en este local. Revisa el número de la placa.',
-    pin: 'El PIN no coincide con el de la placa de tu mesa.',
+    pin: 'El PIN no coincide con el de la placa de tu mesa. Toca «Ver pedido» y escríbelo otra vez.',
     'pedido-vacio': 'El pedido está vacío.',
     'pedido-largo': 'El pedido tiene demasiados renglones; envíalo en dos partes.',
     'plato-inexistente': 'Uno de los platos ya no está en la carta. Revisa tu pedido.',
-    agotado: 'Un plato se agotó mientras pedías. Quítalo y vuelve a enviar.',
+    agotado: 'Un plato se agotó mientras pedías. Toca «Ver pedido», quítalo y vuelve a enviar.',
     cantidad: 'La cantidad de un plato no es válida (de 1 a 20).',
     'faltan-modificadores': 'A un plato le falta elegir una opción, por ejemplo el acompañamiento.',
     modificadores: 'Una opción elegida ya no existe en la carta. Vuelve a elegirla.',
@@ -441,11 +462,11 @@ export const ERRORES_COMENSAL = {
   },
   en: {
     'mesa-inexistente': "That table doesn't exist here. Check the number on the sign.",
-    pin: "The PIN doesn't match the one on your table sign.",
+    pin: "The PIN doesn't match the one on your table sign. Tap “View order” and type it again.",
     'pedido-vacio': 'The order is empty.',
     'pedido-largo': 'The order has too many lines; send it in two parts.',
     'plato-inexistente': 'One of the dishes is no longer on the menu. Check your order.',
-    agotado: 'A dish sold out while you were ordering. Remove it and send again.',
+    agotado: 'A dish sold out while you were ordering. Tap “View order”, remove it and send again.',
     cantidad: 'A quantity is not valid (1 to 20).',
     'faltan-modificadores': 'A dish is missing a choice, such as the side.',
     modificadores: 'A chosen option is no longer on the menu. Please choose again.',

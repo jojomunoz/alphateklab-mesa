@@ -13,6 +13,7 @@ import { leer, escribir, borrar } from './almacen.js';
 import { crearMensaje } from '../nucleo/mensajes.mjs';
 import { resumenMesa, expandirResumen, esMasNuevo } from '../nucleo/resumen.mjs';
 import { generarId } from '../nucleo/url.mjs';
+import { resolverIntentos, datosParaGuardar } from '../nucleo/intentos.mjs';
 
 const ESPERA_RESPUESTA_MS = 9000;
 const REINTENTO_MS = 5000;
@@ -24,6 +25,7 @@ export function crearClienteMesa({ sala, mesa, cartaBase }) {
   const claveResumen = `resumen:${sala}:${mesa}`;
   const claveSalida = `salida:${sala}:${mesa}`;
   const claveIntentos = `intentos:${sala}:${mesa}`;
+  const clavePropios = `propios:${sala}:${mesa}`;
 
   let caja = null;
   let relevo = null;
@@ -32,7 +34,9 @@ export function crearClienteMesa({ sala, mesa, cartaBase }) {
   let conexion = local ? { estado: 'local', segundos: 0 } : { estado: 'conectando', segundos: 0 };
   let salida = local ? [] : leer(claveSalida, []);
   /** id → {tipo, datos, t, envio:'enviando'|'publicado'|'fallo', error?} */
-  let intentos = new Map(Object.entries(leer(claveIntentos, {})));
+  let intentos = new Map(Object.entries(leer(claveIntentos, {}) ?? {}));
+  /** id → {datos, t}: pedidos de este teléfono que ya entraron a la cuenta. */
+  let propios = new Map(Object.entries(leer(clavePropios, {}) ?? {}));
   let noResponde = false;
   let temporizadorRespuesta = null;
   let temporizadorSalida = null;
@@ -45,32 +49,13 @@ export function crearClienteMesa({ sala, mesa, cartaBase }) {
     for (const fn of oyentes) fn();
   }
 
-  /** Quita de «intentos» lo que el resumen ya muestra (o rechazó). */
-  function resolverIntentos() {
-    if (!resumen) return;
-    const c = resumen.cuenta;
-    const ids = new Set();
-    for (const p of c?.pedidos ?? []) ids.add(p.id);
-    for (const a of c?.avisos ?? []) {
-      ids.add(a.id);
-      for (const r of a.refs ?? []) ids.add(r);
+  /** Quita de «intentos» lo que el resumen ya muestra, marca lo que la caja rechazó y recuerda los pedidos
+   *  propios (ver nucleo/intentos.mjs: así el teléfono se entera aunque el rechazo cierre la cuenta). */
+  function resolver() {
+    if (resolverIntentos(intentos, propios, resumen)) {
+      guardarIntentos();
+      escribir(clavePropios, Object.fromEntries(propios));
     }
-    for (const p of c?.pagos ?? []) ids.add(p.id);
-    const errores = new Map((resumen.errores ?? []).map((e) => [e.ref, e]));
-    let cambio = false;
-    for (const [id, it] of intentos) {
-      // Si el resumen ya lo muestra (aunque sea rechazado), se pinta desde ahí.
-      if (ids.has(id) || (it.tipo === 'cuenta' && it.datos?.accion !== 'pedir' && it.envio === 'publicado' && !errores.has(id) && resumen.ts > it.t)) {
-        intentos.delete(id);
-        cambio = true;
-      } else if (errores.has(id)) {
-        if (it.envio !== 'error') {
-          intentos.set(id, { ...it, envio: 'error', error: errores.get(id).motivo, detalle: errores.get(id).detalle });
-          cambio = true;
-        }
-      }
-    }
-    if (cambio) guardarIntentos();
   }
 
   function aplicarCrudo(nuevo) {
@@ -80,7 +65,7 @@ export function crearClienteMesa({ sala, mesa, cartaBase }) {
     if (!local) escribir(claveResumen, crudo);
     noResponde = false;
     clearTimeout(temporizadorRespuesta);
-    resolverIntentos();
+    resolver();
     avisar();
   }
 
@@ -150,16 +135,16 @@ export function crearClienteMesa({ sala, mesa, cartaBase }) {
     const id = `${tipo === 'pedir-estado' ? 'pe' : tipo.slice(0, 3)}-${generarId(12)}`;
     const msg = crearMensaje({ tipo, mesa, datos, id, disp });
     if (tipo !== 'pedir-estado') {
-      intentos.set(id, { tipo, datos, t: Date.now(), envio: 'enviando' });
+      intentos.set(id, { tipo, datos: datosParaGuardar(datos), t: Date.now(), envio: 'enviando' });
       guardarIntentos();
     }
     if (local) {
       caja.despachar(msg).then((r) => {
         if (r.error && tipo !== 'pedir-estado') {
-          intentos.set(id, { ...intentos.get(id), envio: 'error', error: r.error });
+          intentos.set(id, { ...intentos.get(id), envio: 'error', error: r.error, detalle: typeof r.detalle === 'string' ? r.detalle : null });
           guardarIntentos();
         }
-        resolverIntentos();
+        resolver();
         avisar();
       });
     } else {
@@ -217,10 +202,12 @@ export function crearClienteMesa({ sala, mesa, cartaBase }) {
       borrar(claveResumen);
       borrar(claveSalida);
       borrar(claveIntentos);
+      borrar(clavePropios);
       crudo = null;
       resumen = null;
       salida = [];
       intentos = new Map();
+      propios = new Map();
       enviar('pedir-estado', {});
       avisar();
     },

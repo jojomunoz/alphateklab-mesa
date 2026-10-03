@@ -4,14 +4,13 @@
 // computadora.
 
 import { aplicar, ESQUEMA } from '../nucleo/caja.mjs';
-import { crearSemilla } from '../nucleo/semilla.mjs';
+import { crearSemilla, semillaVieja, cuentaComoUso } from '../nucleo/semilla.mjs';
 import { generarSala, generarId, esSala } from '../nucleo/url.mjs';
 import { leer, escribir, claveDeAlmacen, almacenDisponible } from './almacen.js';
 
 const CLAVE_ESTADO = 'estado';
 const CLAVE_SALA = 'sala';
 const CLAVE_DISP = 'disp';
-const REFRESCAR_SEMILLA_MS = 20 * 60_000;
 
 let cartaBasePromesa = null;
 /** La carta de ejemplo del propio sitio (la cachea el service worker). */
@@ -78,8 +77,7 @@ export function abrirCaja(cartaBase) {
   }
 
   let estado = leerEstado();
-  const refrescar = estado?.semilla && !estado.semilla.tocado && Date.now() - estado.semilla.t > REFRESCAR_SEMILLA_MS;
-  if (!estado || refrescar) {
+  if (!estado || semillaVieja(estado, Date.now())) {
     // Primera visita, esquema viejo o datos de ejemplo sin tocar desde hace rato: el ejemplo vuelve con horas
     // de ahora (si no, la cocina mostraría tickets de ayer).
     estado = nuevaSemilla();
@@ -100,10 +98,16 @@ export function abrirCaja(cartaBase) {
 
   canal?.addEventListener('message', (ev) => {
     if (ev.data?.tipo === 'cambio') {
-      if (!almacenDisponible() && ev.data.estado) {
-        // Sin localStorage, el estado viaja completo por el canal.
-        estado = ev.data.estado;
-        avisar('otra-pestana');
+      if (!almacenDisponible()) {
+        // Sin localStorage, el estado viaja completo por el canal, pero solo entre pestañas de la misma sala y la
+        // misma época. Sin almacenamiento cada pestaña arranca con su propia sala y su propio ejemplo: si adoptara
+        // el de otra, abrir la cocina borraría lo hecho en el salón (pasó). Así cada pestaña va por su cuenta, que
+        // es lo que dice el aviso.
+        const otro = ev.data.estado;
+        if (otro && otro.sala === estado.sala && otro.epoca === estado.epoca && otro.rev > estado.rev) {
+          estado = otro;
+          avisar('otra-pestana');
+        }
       } else {
         alCambiarFuera();
       }
@@ -114,17 +118,18 @@ export function abrirCaja(cartaBase) {
   });
 
   /**
-   * Aplica una acción. `remoto`: llegó por el relevo (solo acciones de comensal). `automatico`: no la hizo una
-   * persona (acuse de la cocina, relevo), así que no cuenta como «tocar» los datos de ejemplo.
+   * Aplica una acción. `remoto`: llegó por el relevo (solo acciones de comensal). Toda acción que cambia algo
+   * cuenta como «tocar» los datos de ejemplo (también el pedido de un teléfono), salvo el acuse automático de la
+   * cocina y el «pedir-estado» (ver `cuentaComoUso`): así abrir otra pantalla no borra lo que pidió alguien.
    */
-  async function despachar(accion, { remoto = false, automatico = false } = {}) {
+  async function despachar(accion, { remoto = false } = {}) {
     const completa = { v: 1, mesa: null, datos: {}, t: Date.now(), disp, id: generarId(12), ...accion };
     const r = await conCerrojo(() => {
       const actual = leerEstado() ?? estado;
       const res = aplicar(actual, completa, { ahora: Date.now(), remoto });
       if (res.cambio) {
         let nuevo = res.estado;
-        if (!automatico && nuevo.semilla && !nuevo.semilla.tocado) nuevo = { ...nuevo, semilla: { ...nuevo.semilla, tocado: true } };
+        if (cuentaComoUso(completa.tipo) && nuevo.semilla && !nuevo.semilla.tocado) nuevo = { ...nuevo, semilla: { ...nuevo.semilla, tocado: true } };
         escribir(CLAVE_ESTADO, nuevo);
         estado = nuevo;
         res.estado = nuevo;

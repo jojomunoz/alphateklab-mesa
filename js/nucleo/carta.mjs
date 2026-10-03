@@ -147,20 +147,84 @@ export function validarCarta(carta) {
   return { ok: errores.length === 0, errores };
 }
 
-/** Diferencias de precio y agotados contra la carta base (para mandarlas al teléfono en pocos bytes). */
+// ——— La carta del teléfono remoto ———
+// El teléfono que escaneó el QR tiene la carta de ejemplo del sitio (datos/carta.json); la caja tiene la que editó
+// el dueño. Por el relevo viaja solo la diferencia, más una huella de la carta de la caja: si al aplicar la
+// diferencia el teléfono no llega a la misma huella (porque el resumen se recortó para caber en ntfy), lo dice en
+// pantalla en vez de mostrar precios viejos como si fueran los de hoy.
+
+const canonPlato = (p) => ({ id: p.id, cat: p.cat, nombre: p.nombre, desc: p.desc ?? null, precio: p.precio, itbms: p.itbms, estacion: p.estacion, alergenos: p.alergenos ?? [], grupos: p.grupos ?? [], agotado: Boolean(p.agotado) });
+const canonGrupo = (g) => ({ id: g.id, nombre: g.nombre, tipo: g.tipo, obligatorio: Boolean(g.obligatorio), opciones: (g.opciones ?? []).map((o) => ({ id: o.id, nombre: o.nombre, precio: o.precio ?? 0, alergenos: o.alergenos ?? [] })) });
+const canonCat = (c) => ({ id: c.id, nombre: c.nombre });
+
+/** JSON con las claves ordenadas: dos cartas iguales dan el mismo texto aunque sus objetos se armaran distinto. */
+function estable(x) {
+  if (Array.isArray(x)) return `[${x.map(estable).join(',')}]`;
+  if (x && typeof x === 'object') return `{${Object.keys(x).sort().map((k) => `${JSON.stringify(k)}:${estable(x[k])}`).join(',')}}`;
+  return JSON.stringify(x ?? null);
+}
+const igual = (a, b) => estable(a) === estable(b);
+
+/** Huella de lo que ve el comensal (FNV-1a de 32 bits sobre la forma canónica). */
+export function huellaCarta(carta) {
+  const s = estable({ al: carta.alergenos ?? [], ca: (carta.categorias ?? []).map(canonCat), gr: (carta.grupos ?? []).map(canonGrupo), pl: (carta.platos ?? []).map(canonPlato) });
+  let h = 0x811c9dc5;
+  for (let i = 0; i < s.length; i++) {
+    h ^= s.charCodeAt(i);
+    h = Math.imul(h, 0x01000193) >>> 0;
+  }
+  return h.toString(36);
+}
+
+/**
+ * Diferencia entre la carta base y la de la caja, para mandarla al teléfono en pocos bytes:
+ * agotados, precios, platos quitados (como antes), y además los demás campos cambiados de cada plato, los platos
+ * nuevos, los grupos de opciones cambiados o nuevos (con los precios de sus opciones), las categorías y los
+ * alérgenos si cambiaron, el orden de los platos si cambió y la huella de la carta completa.
+ */
 export function parcheCarta(base, actual) {
-  const b = indexar(base).platos;
+  const b = new Map((base.platos ?? []).map((p) => [p.id, canonPlato(p)]));
   const agotados = [];
   const precios = {};
-  const ocultos = [];
+  const campos = {};
+  const nuevos = [];
   for (const p of actual.platos ?? []) {
-    if (p.agotado) agotados.push(p.id);
-    const original = b.get(p.id);
-    if (original && original.precio !== p.precio) precios[p.id] = p.precio;
+    const c = canonPlato(p);
+    if (c.agotado) agotados.push(p.id);
+    const o = b.get(p.id);
+    if (!o) {
+      const { agotado: _a, ...sinAgotado } = c;
+      nuevos.push(sinAgotado);
+      continue;
+    }
+    if (o.precio !== c.precio) precios[p.id] = c.precio;
+    const dif = {};
+    for (const k of ['cat', 'nombre', 'desc', 'itbms', 'estacion', 'alergenos', 'grupos']) if (!igual(o[k], c[k])) dif[k] = c[k];
+    if (Object.keys(dif).length) campos[p.id] = dif;
   }
   const actuales = new Set((actual.platos ?? []).map((p) => p.id));
-  for (const id of b.keys()) if (!actuales.has(id)) ocultos.push(id);
-  return { agotados, precios, ocultos };
+  const ocultos = [...b.keys()].filter((id) => !actuales.has(id));
+  const parche = { agotados, precios, ocultos, h: huellaCarta(actual) };
+  if (Object.keys(campos).length) parche.campos = campos;
+  if (nuevos.length) parche.nuevos = nuevos;
+  // Orden: el que daría aplicar el parche (base sin los quitados, luego los nuevos) contra el de la caja.
+  const ordenAplicado = [...[...b.keys()].filter((id) => actuales.has(id)), ...nuevos.map((p) => p.id)];
+  const ordenActual = (actual.platos ?? []).map((p) => p.id);
+  if (!igual(ordenAplicado, ordenActual)) parche.orden = ordenActual;
+  const bg = new Map((base.grupos ?? []).map((g) => [g.id, canonGrupo(g)]));
+  const grupos = {};
+  for (const g of actual.grupos ?? []) {
+    const c = canonGrupo(g);
+    if (!bg.has(g.id) || !igual(bg.get(g.id), c)) grupos[g.id] = c;
+  }
+  if (Object.keys(grupos).length) parche.grupos = grupos;
+  const gruposActuales = new Set((actual.grupos ?? []).map((g) => g.id));
+  const gruposQuitados = [...bg.keys()].filter((id) => !gruposActuales.has(id));
+  if (gruposQuitados.length) parche.gruposQuitados = gruposQuitados;
+  const cats = (actual.categorias ?? []).map(canonCat);
+  if (!igual((base.categorias ?? []).map(canonCat), cats)) parche.categorias = cats;
+  if (!igual(base.alergenos ?? [], actual.alergenos ?? [])) parche.alergenos = actual.alergenos ?? [];
+  return parche;
 }
 
 /** Aplica el parche sobre la carta base (en el teléfono). No muta. */
@@ -168,10 +232,22 @@ export function aplicarParche(base, parche) {
   if (!parche) return base;
   const ag = new Set(parche.agotados ?? []);
   const oc = new Set(parche.ocultos ?? []);
-  return {
-    ...base,
-    platos: (base.platos ?? [])
-      .filter((p) => !oc.has(p.id))
-      .map((p) => ({ ...p, agotado: ag.has(p.id), precio: parche.precios?.[p.id] ?? p.precio })),
-  };
+  let platos = (base.platos ?? [])
+    .filter((p) => !oc.has(p.id))
+    .map((p) => ({ ...p, ...(parche.campos?.[p.id] ?? {}), agotado: ag.has(p.id), precio: parche.precios?.[p.id] ?? p.precio }))
+    .concat((parche.nuevos ?? []).map((p) => ({ ...p, agotado: ag.has(p.id) })));
+  if (Array.isArray(parche.orden)) {
+    const pos = new Map(parche.orden.map((id, i) => [id, i]));
+    platos = platos.sort((a, b) => (pos.get(a.id) ?? 1e9) - (pos.get(b.id) ?? 1e9));
+  }
+  const gq = new Set(parche.gruposQuitados ?? []);
+  const gruposNuevos = Object.values(parche.grupos ?? {}).filter((g) => !(base.grupos ?? []).some((x) => x.id === g.id));
+  const grupos = (base.grupos ?? []).filter((g) => !gq.has(g.id)).map((g) => parche.grupos?.[g.id] ?? g).concat(gruposNuevos);
+  return { ...base, platos, grupos, categorias: parche.categorias ?? base.categorias, alergenos: parche.alergenos ?? base.alergenos };
+}
+
+/** ¿La carta que armó el teléfono es la misma que la de la caja? (sin huella en el parche: no se sabe, se asume que sí) */
+export function cartaAlDia(cartaTelefono, parche) {
+  if (!parche?.h) return true;
+  return huellaCarta(cartaTelefono) === parche.h;
 }

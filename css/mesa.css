@@ -746,3 +746,11 @@
   flex: 1 0 auto;
   white-space: nowrap;
 }
+
+/* Pedido con error: «Ver pedido» y «Entendido» en una fila. */
+.ticket__acciones {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}

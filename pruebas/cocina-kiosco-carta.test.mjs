@@ -3,7 +3,8 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { semaforo, minutosDesde, ticketsCocina, listosParaServir, sinAcusar } from '../js/nucleo/cocina.mjs';
 import { faseInactividad, sugerencia, formatoOrden } from '../js/nucleo/kiosco.mjs';
-import { validarCarta, armarRenglon, alergenosDe, parcheCarta, aplicarParche, validarSeleccion, texto } from '../js/nucleo/carta.mjs';
+import { validarCarta, armarRenglon, alergenosDe, parcheCarta, aplicarParche, validarSeleccion, texto, huellaCarta, cartaAlDia } from '../js/nucleo/carta.mjs';
+import { textoPrecios } from '../js/nucleo/textos.mjs';
 import { crearSemilla } from '../js/nucleo/semilla.mjs';
 
 const CARTA = JSON.parse(readFileSync(new URL('../datos/carta.json', import.meta.url)));
@@ -113,4 +114,41 @@ test('parche de carta: agotados, precios cambiados y platos quitados viajan en p
   assert.equal(enTelefono.platos.find((p) => p.id === 'cerveza').agotado, true);
   assert.equal(enTelefono.platos.some((p) => p.id === 'agua'), false);
   assert.equal(CARTA.platos.find((p) => p.id === 'cerveza').agotado, false, 'no muta la base');
+});
+
+test('parche de carta: el teléfono remoto ve los precios de las opciones, los platos nuevos y los nombres de la caja', () => {
+  const actual = structuredClone(CARTA);
+  const extra = actual.grupos.find((g) => g.opciones.some((o) => o.precio > 0));
+  const opcion = extra.opciones.find((o) => o.precio > 0);
+  opcion.precio += 100; // «Huevo frito» de 1.00 a 2.00
+  actual.platos.push({ id: 'pescado-especial', cat: actual.platos[0].cat, precio: 1650, itbms: 7, estacion: 'caliente', nombre: { es: 'Pescado al ajillo especial', en: 'Special garlic fish' }, desc: { es: '', en: '' }, alergenos: ['pescado'], grupos: [], agotado: false });
+  actual.categorias[0].nombre = { es: 'Para empezar', en: 'To start' };
+  actual.platos[1].nombre = { es: 'Patacones con ceviche', en: 'Tostones with ceviche' };
+  actual.platos[2].itbms = 10;
+  const parche = JSON.parse(JSON.stringify(parcheCarta(CARTA, actual)));
+  const tel = aplicarParche(CARTA, parche);
+  assert.equal(huellaCarta(tel), huellaCarta(actual), 'el teléfono llega a la misma carta que la caja');
+  assert.equal(cartaAlDia(tel, parche), true);
+  assert.equal(tel.grupos.find((g) => g.id === extra.id).opciones.find((o) => o.id === opcion.id).precio, opcion.precio);
+  assert.ok(tel.platos.some((p) => p.id === 'pescado-especial'));
+  assert.equal(tel.categorias[0].nombre.es, 'Para empezar');
+  assert.equal(tel.platos[2].itbms, 10);
+  // Lo mismo que cobra la caja: el precio de un renglón con la opción, armado con la carta del teléfono.
+  const plato = actual.platos.find((p) => (p.grupos ?? []).includes(extra.id));
+  const sel = [{ grupo: extra.id, opcion: opcion.id }];
+  const conDatos = (carta) => armarRenglon(carta, { plato: plato.id, cant: 1, mods: [...sel, ...(plato.grupos ?? []).filter((g) => g !== extra.id).map((g) => ({ grupo: g, opcion: carta.grupos.find((x) => x.id === g).opciones[0].id }))] });
+  assert.equal(conDatos(tel).renglon.unit, conDatos(actual).renglon.unit);
+  // Sin cambios, el parche no trae nada más que lo de siempre.
+  const vacio = parcheCarta(CARTA, structuredClone(CARTA));
+  assert.deepEqual(Object.keys(vacio).sort(), ['agotados', 'h', 'ocultos', 'precios']);
+  // Si la diferencia no llega entera (resumen recortado), el teléfono lo sabe.
+  const recortado = { agotados: parche.agotados, precios: {}, ocultos: [], h: parche.h };
+  assert.equal(cartaAlDia(aplicarParche(CARTA, recortado), recortado), false);
+});
+
+test('la línea de los precios dice la verdad en una fonda', () => {
+  assert.match(textoPrecios('es', 'restaurante'), /ITBMS incluido/);
+  assert.doesNotMatch(textoPrecios('es', 'fonda'), /ITBMS incluido/);
+  assert.match(textoPrecios('es', 'fonda'), /no llevan ITBMS/);
+  assert.match(textoPrecios('en', 'fonda'), /no ITBMS/);
 });

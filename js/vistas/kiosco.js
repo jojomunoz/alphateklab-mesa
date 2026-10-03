@@ -5,7 +5,7 @@ import { $, $$, h, icono, pintar } from '../ui/dom.js';
 import { anunciar } from '../ui/comun.js';
 import { arrancarCaja } from '../ui/arranque.js';
 import { leer, escribir } from '../ui/almacen.js';
-import { t as tr, textoError } from '../nucleo/textos.mjs';
+import { t as tr, textoError, textoPrecios } from '../nucleo/textos.mjs';
 import { formatear } from '../nucleo/dinero.mjs';
 import { texto, indexar, validarSeleccion, alergenosDe, MAX_CANT } from '../nucleo/carta.mjs';
 import { faseInactividad, sugerencia, formatoOrden } from '../nucleo/kiosco.mjs';
@@ -169,7 +169,7 @@ function pantallaPedido() {
         : h('p', { class: 'k-carrito__vacio' }, T('kioscoVacio')),
       h('div', { class: 'k-carrito__pie' },
         h('p', { class: 'k-carrito__total' }, h('span', {}, T('total')), h('strong', { class: 'cifra' }, dinero(total()))),
-        h('p', { class: 'ayuda' }, T('preciosIncluyen')),
+        h('p', { class: 'ayuda' }, textoPrecios(k.idioma, caja?.estado?.ajustes?.tipoLocal)),
         h('button', { type: 'button', class: 'boton boton--primario boton-k boton-k--grande', 'data-foco': 'ir-pagar', disabled: !k.carrito.length, onclick: () => ir('pagar') }, T('irAPagar')),
       ),
     ),
@@ -252,7 +252,7 @@ function pantallaPagar() {
       h('div', { class: 'ticket-sombra' },
         h('div', { class: 'ticket' },
           h('ul', { class: 'renglones' }, k.carrito.map((x) => h('li', {}, h('div', { class: 'renglon' }, h('span', { class: 'renglon__nombre' }, h('strong', { class: 'renglon__cant' }, `${x.cant} ×`), ' ', nombre(x.plato)), h('span', { class: 'renglon__puntos', 'aria-hidden': 'true' }), h('span', { class: 'renglon__monto' }, dinero(precioUnit(x.plato, x.mods) * x.cant))), x.mods.length ? h('p', { class: 'renglon__detalle' }, x.mods.map((m) => nombreOpcion(m.grupo, m.opcion)).join(', ')) : null))),
-          h('div', { class: 'ticket__pie' }, h('div', { class: 'renglon ticket__total' }, h('span', { class: 'renglon__nombre' }, T('total')), h('span', { class: 'renglon__puntos', 'aria-hidden': 'true' }), h('span', { class: 'renglon__monto' }, dinero(total()))), h('p', { class: 'renglon--menor' }, T('preciosIncluyen'))),
+          h('div', { class: 'ticket__pie' }, h('div', { class: 'renglon ticket__total' }, h('span', { class: 'renglon__nombre' }, T('total')), h('span', { class: 'renglon__puntos', 'aria-hidden': 'true' }), h('span', { class: 'renglon__monto' }, dinero(total()))), h('p', { class: 'renglon--menor' }, textoPrecios(k.idioma, caja?.estado?.ajustes?.tipoLocal))),
         ),
       ),
       sug

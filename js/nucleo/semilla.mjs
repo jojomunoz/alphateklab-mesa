@@ -132,3 +132,32 @@ export function crearSemilla({ sala, carta, ahora = Date.now(), epoca = 'e0', ge
   e.semilla = { t: ahora, tocado: false };
   return e;
 }
+
+/** Pasado este tiempo sin que nadie use los datos de ejemplo, vuelven con horas de ahora. */
+export const REFRESCAR_SEMILLA_MS = 20 * 60_000;
+
+/** Acciones que no cuentan como «usar la demo»: el acuse automático de la cocina y el teléfono que pide el estado. */
+const SIN_USO = new Set(['cocina-recibir', 'pedir-estado']);
+
+/** ¿Esta acción cuenta como que alguien usó los datos de ejemplo? (también si llegó de un teléfono por el relevo) */
+export function cuentaComoUso(tipo) {
+  return !SIN_USO.has(tipo);
+}
+
+/**
+ * ¿Se pueden reemplazar los datos de ejemplo por unos con horas de ahora? Solo si nadie los tocó, pasaron 20 min y
+ * no hay nada nuevo desde la semilla (una cuenta abierta o una orden del kiosco después de crearla): borrar eso
+ * sería perder el pedido de alguien.
+ */
+export function semillaVieja(estado, ahora = Date.now()) {
+  const s = estado?.semilla;
+  if (!s || s.tocado || ahora - s.t <= REFRESCAR_SEMILLA_MS) return false;
+  for (const m of Object.values(estado.mesas ?? {})) {
+    const c = m.cuenta;
+    if (!c) continue;
+    if (c.abierta > s.t) return false;
+    if ((c.pedidos ?? []).some((p) => (p.t ?? 0) > s.t) || (c.avisos ?? []).some((a) => (a.t ?? 0) > s.t) || (c.pagos ?? []).some((p) => (p.t ?? 0) > s.t)) return false;
+  }
+  if ((estado.kiosco?.ordenes ?? []).some((o) => o.t > s.t)) return false;
+  return true;
+}
