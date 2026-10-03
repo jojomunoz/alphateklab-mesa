@@ -962,7 +962,7 @@ function formularioPago(c, res) {
         h('legend', { class: 'paso__titulo' }, T('elegirParte')),
         h('div', { class: 'grupo__opciones' },
           div.partes.map((x) =>
-            h('label', { class: 'opcion' },
+            h('label', { class: 'opcion opcion--parte' },
               h('input', { type: 'radio', name: 'parte', value: String(x.idx), checked: pago.parte === x.idx, disabled: x.estado !== 'libre', 'data-foco': `parte-${x.idx}`, onchange: () => { pago.parte = x.idx; pintarCuenta(); } }),
               h('span', { class: 'opcion__texto' }, T('parteDe', { n: x.idx + 1, total: div.n }), div.tipo === 'platos' ? h('span', { class: 'ayuda opcion__sub' }, platosDeParte(c, div, x.idx)) : null),
               h('span', { class: 'opcion__extra' }, dinero(x.monto)),

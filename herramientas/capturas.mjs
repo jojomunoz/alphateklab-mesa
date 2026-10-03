@@ -131,6 +131,8 @@ try {
       await capturar(page, 'mesa-cuenta', suf, { completa: true });
       await page.click('[data-foco=pagar]');
       await page.waitForSelector('.ticket--comprobante');
+      // La vista se repinta cuando llega el estado de la caja: esperar a que se asiente antes de desplazar.
+      await page.waitForTimeout(400);
       await page.locator('.ticket--comprobante').first().scrollIntoViewIfNeeded();
       await capturar(page, 'mesa-comprobante', suf);
 

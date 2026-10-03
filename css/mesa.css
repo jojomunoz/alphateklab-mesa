@@ -735,3 +735,14 @@
 .pie-mesa .boton--texto {
   padding-inline: 0;
 }
+
+/* «Parte 1 de 3 · B/. 7.00 · Pago por confirmar»: en un teléfono angosto el estado baja a su propia línea antes
+   de partir «Parte 1 de 3» en dos. */
+.opcion--parte {
+  flex-wrap: wrap;
+  row-gap: 4px;
+}
+.opcion--parte .opcion__texto {
+  flex: 1 0 auto;
+  white-space: nowrap;
+}
