@@ -1,6 +1,6 @@
 // La carta: lectura, validación y precio de un renglón (con modificadores).
 
-import { TASAS_ITBMS } from './dinero.mjs';
+import { TASAS_ITBMS, tasaAplicable } from './dinero.mjs';
 
 export const IDIOMAS = ['es', 'en'];
 export const MAX_CANT = 20;
@@ -68,7 +68,7 @@ export function validarSeleccion(carta, platoId, seleccion = []) {
  * Precio de un renglón pedido: {plato, cant, mods:[{grupo, opcion}], nota}. La caja lo calcula con SU carta,
  * no con lo que mande el teléfono. Devuelve {ok, error?, renglon}.
  */
-export function armarRenglon(carta, pedido) {
+export function armarRenglon(carta, pedido, { tipoLocal = 'restaurante' } = {}) {
   const { platos } = indexar(carta);
   const plato = platos.get(pedido?.plato);
   if (!plato) return { ok: false, error: 'plato-inexistente' };
@@ -89,7 +89,7 @@ export function armarRenglon(carta, pedido) {
       nota,
       unit,
       monto: unit * cant,
-      tasa: plato.itbms,
+      tasa: tasaAplicable(plato.itbms, tipoLocal),
       estacion: plato.estacion,
     },
   };

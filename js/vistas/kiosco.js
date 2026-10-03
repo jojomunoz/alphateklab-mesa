@@ -100,7 +100,7 @@ function cabeza() {
   return h(
     'header',
     { class: 'kiosco__cabeza' },
-    h('p', { class: 'kiosco__local' }, icono('pixbae', 'kiosco__marca'), 'Fonda Pixbae', h('span', {}, ` · ${T('ejemplo')}`)),
+    h('p', { class: 'kiosco__local' }, icono('pixbae', 'kiosco__marca'), 'Pixbae', h('span', {}, ` · ${T('ejemplo')}`)),
     h('div', { class: 'kiosco__cabeza-botones' },
       h('button', { type: 'button', class: 'boton boton--secundario boton-k', 'data-foco': 'idioma', lang: k.idioma === 'es' ? 'en' : 'es', onclick: () => { k.idioma = k.idioma === 'es' ? 'en' : 'es'; escribir('kiosco-idioma', k.idioma); aplicarTextos(); pintarPantalla(); } }, icono('idioma'), T('idiomaBoton')),
       h('button', { type: 'button', class: 'boton boton--secundario boton-k', 'data-foco': 'reiniciar', onclick: reiniciar }, T('empezarDeNuevo')),

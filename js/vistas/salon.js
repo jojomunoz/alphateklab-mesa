@@ -415,8 +415,8 @@ function resumenCuentaSalon(c, res, n) {
   return h(
     'div',
     { class: 'cuenta-salon' },
-    h('div', { class: 'renglon ticket__total' }, h('span', { class: 'renglon__nombre' }, 'Total con ITBMS'), h('span', { class: 'renglon__puntos', 'aria-hidden': 'true' }), h('span', { class: 'renglon__monto' }, dinero(res.total))),
-    res.itbms.porTasa.map((x) => h('div', { class: 'renglon renglon--menor' }, h('span', { class: 'renglon__nombre' }, `ITBMS ${x.tasa} % de ${dinero(x.base)}`), h('span', { class: 'renglon__puntos', 'aria-hidden': 'true' }), h('span', { class: 'renglon__monto' }, dinero(x.impuesto)))),
+    h('div', { class: 'renglon ticket__total' }, h('span', { class: 'renglon__nombre' }, res.itbms.impuesto > 0 ? 'Total con ITBMS' : 'Total'), h('span', { class: 'renglon__puntos', 'aria-hidden': 'true' }), h('span', { class: 'renglon__monto' }, dinero(res.total))),
+    res.itbms.porTasa.map((x) => h('div', { class: 'renglon renglon--menor' }, h('span', { class: 'renglon__nombre' }, x.tasa === 0 ? `Sin ITBMS: ${dinero(x.base)}` : `ITBMS ${x.tasa} % de ${dinero(x.base)}`), h('span', { class: 'renglon__puntos', 'aria-hidden': 'true' }), h('span', { class: 'renglon__monto' }, dinero(x.impuesto)))),
     res.division ? h('p', { class: 'ayuda' }, `Dividida ${res.division.tipo === 'iguales' ? 'en partes iguales' : 'por platos'} entre ${res.division.n}: ${res.division.partes.map((x) => `${dinero(x.monto)} (${x.estado === 'pagada' ? 'pagada' : x.estado === 'pendiente' ? 'por confirmar' : 'por pagar'})`).join(', ')}.${res.division.desfasada ? ' Se agregaron platos después de dividir.' : ''}`) : null,
     pagos.length
       ? h(
@@ -566,7 +566,7 @@ function abrirFactura(n) {
             'div',
             { class: 'ticket__pie' },
             itbms.porTasa.map((x) => [
-              h('div', { class: 'renglon renglon--menor' }, h('span', { class: 'renglon__nombre' }, `Base gravada al ${x.tasa} %`), h('span', { class: 'renglon__puntos', 'aria-hidden': 'true' }), h('span', { class: 'renglon__monto' }, dinero(x.base))),
+              h('div', { class: 'renglon renglon--menor' }, h('span', { class: 'renglon__nombre' }, x.tasa === 0 ? 'No gravado (fonda)' : `Base gravada al ${x.tasa} %`), h('span', { class: 'renglon__puntos', 'aria-hidden': 'true' }), h('span', { class: 'renglon__monto' }, dinero(x.base))),
               h('div', { class: 'renglon renglon--menor' }, h('span', { class: 'renglon__nombre' }, `ITBMS ${x.tasa} %`), h('span', { class: 'renglon__puntos', 'aria-hidden': 'true' }), h('span', { class: 'renglon__monto' }, dinero(x.impuesto))),
             ]),
             h('div', { class: 'renglon ticket__total' }, h('span', { class: 'renglon__nombre' }, 'Total'), h('span', { class: 'renglon__puntos', 'aria-hidden': 'true' }), h('span', { class: 'renglon__monto' }, dinero(itbms.total))),

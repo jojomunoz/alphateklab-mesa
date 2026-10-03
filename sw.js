@@ -3,7 +3,7 @@
 // siguiente carga y nunca se mezclan archivos de dos versiones. No toca nada de otros dominios (el relevo
 // ntfy.sh y la librería del QR pasan directo).
 
-const VERSION = 'atk-mesa-v1';
+const VERSION = 'atk-mesa-v2';
 const PRECARGA = [
   'mesa.html',
   'manifest.webmanifest',
@@ -34,6 +34,8 @@ const PRECARGA = [
   'img/iconos.svg',
   'img/favicon.svg',
   'img/yappy-ejemplo.svg',
+  'img/marca/logo-claro.svg',
+  'img/marca/logo-oscuro.svg',
   'fuentes/bricolage-700-latin.woff2',
   'fuentes/atkinson-next-latin.woff2',
 ];

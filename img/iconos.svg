@@ -28,6 +28,6 @@
   <symbol id="efectivo" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="2.5" y="6.5" width="19" height="11" rx="1"/><circle cx="12" cy="12" r="2.5"/><path d="M6 9.5v5M18 9.5v5"/></g></symbol>
   <symbol id="telefono" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="6.5" y="2.5" width="11" height="19" rx="2"/><path d="M10.5 18.5h3" stroke-linecap="round"/></g></symbol>
   <symbol id="persona" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="8" r="3.5"/><path d="M5 20a7 7 0 0 1 14 0"/></g></symbol>
-  <!-- La marca de la fonda ficticia: tres frutos de pixbae en su racimo. -->
+  <!-- La marca del restaurante ficticia: tres frutos de pixbae en su racimo. -->
   <symbol id="pixbae" viewBox="0 0 32 32"><g><path d="M16 2.5c0 3-1 4.5-3 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><ellipse cx="11" cy="14" rx="5.2" ry="6"/><ellipse cx="21" cy="14.5" rx="5.2" ry="6"/><ellipse cx="16" cy="23" rx="5.6" ry="6.4"/></g></symbol>
 </svg>

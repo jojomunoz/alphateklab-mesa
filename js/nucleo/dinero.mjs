@@ -11,6 +11,20 @@
 export const MONEDA = 'B/.';
 export const TASAS_ITBMS = [0, 7, 10];
 
+/**
+ * Tipo de local, que decide el impuesto de la comida (DGI, https://dgi.mef.gob.pa/itbms/Generalidades):
+ * «restaurantes con comida preparada» cobran 7 %, y «fondas y restaurantes de comida rápida no deben cobrar ITBMS».
+ * Las bebidas alcohólicas llevan 10 % en los dos casos (la DGI lo pone por producto, no por local).
+ */
+export const TIPOS_LOCAL = ['restaurante', 'fonda'];
+
+/** Tasa que se aplica a un plato según el tipo de local: en una fonda, lo que iría al 7 % va sin ITBMS. */
+export function tasaAplicable(tasaPlato, tipoLocal = 'restaurante') {
+  if (!TASAS_ITBMS.includes(tasaPlato)) throw new RangeError(`tasa de ITBMS no válida: ${tasaPlato}`);
+  if (!TIPOS_LOCAL.includes(tipoLocal)) throw new RangeError(`tipo de local desconocido: ${tipoLocal}`);
+  return tipoLocal === 'fonda' && tasaPlato === 7 ? 0 : tasaPlato;
+}
+
 export function esCentesimos(n) {
   return Number.isSafeInteger(n);
 }

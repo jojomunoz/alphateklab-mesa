@@ -326,3 +326,29 @@ test('semilla: se arma con acciones válidas; la mesa 7 queda libre y hay ticket
   assert.ok(minutos.some((m) => m < 10) && minutos.some((m) => m >= 10 && m <= 20) && minutos.some((m) => m > 20), minutos.join(','));
   assert.deepEqual(e.errores, []);
 });
+
+test('tipo de local: un restaurante cobra 7 % en la comida; una fonda no cobra ITBMS en la comida y sí 10 % en el alcohol', () => {
+  const pedido = { renglones: [{ plato: 'ropa-vieja', cant: 1, mods: [] }, { plato: 'chicha-tamarindo', cant: 1, mods: [] }, { plato: 'cerveza', cant: 1, mods: [] }] };
+  // Restaurante (por omisión).
+  let r = nueva();
+  assert.equal(r.ajustes.tipoLocal, 'restaurante');
+  r = ok(r, 'pedido', 3, pedido);
+  const tasasR = mesaRt(r, 3).cuenta.pedidos[0].renglones.map((x) => x.tasa);
+  assert.deepEqual(tasasR, [7, 7, 10]);
+
+  // Fonda: la comida y la chicha pasan a 0 %; la cerveza sigue en 10 %.
+  let f = ok(nueva(), 'guardar-ajustes', null, { ajustes: { tipoLocal: 'fonda' } });
+  assert.equal(f.ajustes.tipoLocal, 'fonda');
+  f = ok(f, 'pedido', 3, pedido);
+  const ren = mesaRt(f, 3).cuenta.pedidos[0].renglones;
+  assert.deepEqual(ren.map((x) => x.tasa), [0, 0, 10]);
+  // El precio que paga el comensal no cambia (es el de la carta); cambia el impuesto que lleva adentro.
+  assert.deepEqual(ren.map((x) => x.monto), mesaRt(r, 3).cuenta.pedidos[0].renglones.map((x) => x.monto));
+  const cerveza = ren[2].monto;
+  f = ok(f, 'aceptar-pedido', null, { pedido: mesaRt(f, 3).cuenta.pedidos[0].id });
+  const res = resumenCuenta(mesaRt(f, 3).cuenta);
+  assert.equal(res.itbms.impuesto, Math.floor((2 * cerveza * 10 + 110) / 220));
+  assert.equal(res.itbms.porTasa.find((x) => x.tasa === 7), undefined);
+
+  assert.equal(hacer(nueva(), 'guardar-ajustes', null, { ajustes: { tipoLocal: 'bar' } }).error, 'ajustes');
+});

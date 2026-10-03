@@ -4,8 +4,9 @@ QR y NFC en cada mesa de un restaurante: el comensal ve la carta con el precio f
 la cuenta, la divide, elige la propina y paga. La cocina recibe las comandas por estación, el salón ve el estado de
 cada mesa, cobra y arma el borrador de factura, hay una pantalla táctil de autopedido y un panel para el dueño.
 
-Es una demo con un restaurante **ficticio**, la Fonda Pixbae (cocina panameña, Ciudad de Panamá). Publicada en
-`https://jojomunoz.github.io/alphateklab-mesa/`.
+Es una demo con un restaurante **ficticio**, «Pixbae · cocina panameña» (restaurante de ejemplo, Ciudad de Panamá).
+Publicada en `https://jojomunoz.github.io/alphateklab-mesa/`. La única marca de alphateklab es el logo de la barra
+de la demo (`img/marca/`, copia de `alphateklab/assets/marca/`); lo demás es del restaurante de ejemplo.
 
 ## Las vistas
 
@@ -40,6 +41,8 @@ python3 -m http.server 4870 -d ~/alphateklab/repos
 node --test pruebas/                       # lógica pura
 node herramientas/recorrido.mjs            # recorrido con Playwright (servidor en marcha)
 node herramientas/recorrido.mjs --relevo   # además, dos navegadores por el relevo ntfy.sh real
+node herramientas/capturas.mjs [carpeta]   # capturas de cada vista a 390 y 1280, claro y oscuro, y el kiosco a 1080×1920
+python3 herramientas/mutaciones.py         # rompe cada regla a propósito y comprueba que alguna prueba falla
 ```
 
 Desde `localhost` el QR apunta a `localhost` y un teléfono no puede abrirlo; la página lo avisa. Publicada en
@@ -68,6 +71,11 @@ GitHub Pages sí funciona.
   19-jun-2026); la cuenta desglosa el impuesto contenido por tasa, `monto × tasa / (100 + tasa)`, redondeado al
   centésimo «mitad hacia arriba» una vez por renglón: 7 % comida y bebidas sin alcohol, 10 % bebidas alcohólicas
   (DGI). Ningún cargo extra para el comensal. → `pruebas/dinero.test.mjs`
+- **Tipo de local** (Ajustes): «Restaurante (ITBMS 7 % y 10 % en alcohol)» o «Fonda o comida rápida (sin ITBMS en
+  la comida)», según la tabla de la DGI (https://dgi.mef.gob.pa/itbms/Generalidades: «Fondas y restaurantes de
+  comida rápida no deben cobrar ITBMS»). En una fonda lo que iría al 7 % va al 0 % y el alcohol sigue al 10 % (la
+  DGI lo pone por producto; el panel pide confirmarlo con el contador). El precio de la carta no cambia; cambia el
+  impuesto que lleva adentro, y solo en los pedidos nuevos. → `pruebas/caja.test.mjs` («tipo de local»)
 - Propina voluntaria (ACODECO, mayo de 2026): 10, 15, 20 %, otra cifra o sin propina, **ninguna marcada**; sin
   elegir no se puede pagar. Se calcula sobre lo consumido y la pantalla lo dice («10 % de B/. 45.00 = B/. 4.50»).
   → `pruebas/propina-division.test.mjs`
@@ -89,8 +97,8 @@ GitHub Pages sí funciona.
 1. **Servidor propio** con la cola de pedidos y avisos en tiempo real (por ejemplo PocketBase con SSE), en el
    dominio del restaurante. El relevo público y el `localStorage` son solo para la demo.
 2. **Pasarela con webhook.** Sin servidor: el QR estático de Yappy Comercial del local (1 % + ITBMS) y el cajero
-   confirma lo que ve en su app. Con servidor: botón de pago de Yappy por API o enlace de pago de una pasarela
-   panameña; la mesa pasa a «pagada» cuando llega el webhook de confirmación, nunca antes.
+   confirma lo que ve en su app. Con servidor: botón de pago de Yappy por API o enlace de pago de Tilopay
+   (3,75 % + B/. 0.50 por tarjeta, con `webhook_url`); la mesa pasa a «pagada» cuando llega el webhook de confirmación, nunca antes.
 3. **Factura electrónica** con el PAC del restaurante (obligatoria desde el 1-ene-2026 para quien factura más de
    B/. 36,000 al año o más de 100 documentos al mes): el borrador del salón es lo que se le enviaría.
 4. **Placas** atornilladas o en acrílico, QR al dominio propio, revisión en cada turno; etiquetas NFC NTAG 424 DNA

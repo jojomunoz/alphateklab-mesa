@@ -433,7 +433,24 @@ legend {
 }
 
 .barra-demo__marca {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 10px;
   margin-right: auto;
+}
+
+/* El logo de alphateklab: la única marca de la agencia en la demo; el resto es del restaurante de ejemplo. */
+.barra-demo__logo {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+}
+
+.barra-demo__logo img {
+  display: block;
+  width: 89px;
+  height: 20px;
 }
 
 .barra-demo__marca strong {

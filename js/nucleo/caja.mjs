@@ -9,8 +9,9 @@ import { armarRenglon, validarCarta } from './carta.mjs';
 import { transicion, PEDIDO, PEDIDO_DESHACER, AVISO, MESA, PAGO } from './estados.mjs';
 import { resumenCuenta, estaPagada, calcularDivision, pedidoCobrable } from './cuenta.mjs';
 import { validarPlano } from './plano.mjs';
+import { TIPOS_LOCAL } from './dinero.mjs';
 
-export const ESQUEMA = 3;
+export const ESQUEMA = 4;
 export const MAX_VISTOS = 600;
 export const MAX_RENGLONES = 30;
 export const MAX_POR_ACEPTAR = 3;
@@ -23,7 +24,8 @@ export const APROBACION = ['todos', 'primero', 'ninguno'];
 export const TIPOS_COMENSAL = new Set(['pedido', 'llamada', 'cuenta', 'pago', 'cancelar-aviso', 'pedir-estado']);
 
 export const AJUSTES_BASE = {
-  nombre: 'Fonda Pixbae',
+  nombre: 'Pixbae · cocina panameña',
+  tipoLocal: 'restaurante',
   propinas: [10, 15, 20],
   aprobacion: 'todos',
   pin: false,
@@ -133,7 +135,7 @@ const MANEJADORES = {
     if (lista.length > MAX_RENGLONES) return fallo('pedido-largo');
     const renglones = [];
     for (const [i, r] of lista.entries()) {
-      const res = armarRenglon(e.carta, r);
+      const res = armarRenglon(e.carta, r, { tipoLocal: e.ajustes.tipoLocal });
       if (!res.ok) return fallo(res.error, res.plato ?? r?.plato);
       renglones.push({ id: String(i + 1), ...res.renglon, hecho: false });
     }
@@ -468,6 +470,10 @@ const MANEJADORES = {
       if (!APROBACION.includes(n.aprobacion)) return fallo('ajustes', ['Opción de aprobación desconocida.']);
       nuevo.aprobacion = n.aprobacion;
     }
+    if ('tipoLocal' in n) {
+      if (!TIPOS_LOCAL.includes(n.tipoLocal)) return fallo('ajustes', ['Tipo de local desconocido.']);
+      nuevo.tipoLocal = n.tipoLocal;
+    }
     if ('pin' in n) nuevo.pin = Boolean(n.pin);
     if ('resena' in n) {
       const s = String(n.resena).trim();
@@ -485,7 +491,7 @@ const MANEJADORES = {
     if (lista.length > MAX_RENGLONES) return fallo('pedido-largo');
     const renglones = [];
     for (const [i, r] of lista.entries()) {
-      const res = armarRenglon(e.carta, r);
+      const res = armarRenglon(e.carta, r, { tipoLocal: e.ajustes.tipoLocal });
       if (!res.ok) return fallo(res.error, res.plato ?? r?.plato);
       renglones.push({ id: String(i + 1), ...res.renglon, hecho: false });
     }

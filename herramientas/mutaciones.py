@@ -32,6 +32,9 @@ MUT=[
  ('pixbae más claro (contraste)','css/tokens.css','--sobre-pixbae: #fbfcfa;','--sobre-pixbae: #f0a090;'),
  ('mensaje sin validar mesa','js/nucleo/mensajes.mjs',"if (m.mesa !== null && m.mesa !== undefined && !(Number.isInteger(m.mesa) && m.mesa >= 1 && m.mesa <= 999)) return { ok: false, error: 'mesa' };",""),
  ('plano deja salir mesas','js/nucleo/plano.mjs','return { x: limitar(Math.round(x), 0, ANCHO - w), y: limitar(Math.round(y), 0, Math.max(0, alto - h)) };','return { x: Math.round(x), y: Math.round(y) };'),
+ ('la fonda cobra 7 %','js/nucleo/dinero.mjs',"return tipoLocal === 'fonda' && tasaPlato === 7 ? 0 : tasaPlato;","return tasaPlato;"),
+ ('la fonda tampoco cobra el alcohol','js/nucleo/dinero.mjs',"return tipoLocal === 'fonda' && tasaPlato === 7 ? 0 : tasaPlato;","return tipoLocal === 'fonda' ? 0 : tasaPlato;"),
+ ('la caja ignora el tipo de local','js/nucleo/caja.mjs',"const res = armarRenglon(e.carta, r, { tipoLocal: e.ajustes.tipoLocal });","const res = armarRenglon(e.carta, r);"),
  ('quitar mesa ocupada','js/nucleo/plano.mjs',"if (ocupadas.has(m.numero)) return { ok: false, error: `La mesa ${m.numero} tiene una cuenta abierta. Cóbrala y libérala antes de quitarla.` };",""),
 ]
 atrapadas=0

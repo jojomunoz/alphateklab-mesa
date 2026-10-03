@@ -70,7 +70,7 @@ export function prepararBarra({ sala = null, alRestablecer = null, textoRestable
     boton.addEventListener('click', async () => {
       const ok = await confirmar({
         titulo: '¿Restablecer los datos de ejemplo?',
-        texto: textoRestablecer ?? 'Se borran los pedidos, cuentas y cambios guardados en este navegador y vuelve el servicio de ejemplo de la Fonda Pixbae. El código de sala no cambia.',
+        texto: textoRestablecer ?? 'Se borran los pedidos, cuentas y cambios guardados en este navegador y vuelve el servicio de ejemplo de Pixbae. El código de sala no cambia.',
         aceptar: 'Restablecer',
         peligro: true,
       });

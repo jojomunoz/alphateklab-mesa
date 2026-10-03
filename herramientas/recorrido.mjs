@@ -22,7 +22,7 @@ async function paso(nombre, fn) {
     console.log(`  ok   ${nombre}`);
   } catch (e) {
     fallan++;
-    console.log(`  FALLA ${nombre}\n        ${String(e.message).split('\n')[0]}`);
+    console.log(`  FALLA ${nombre}\n        ${String(e.message).split("\n")[0]}\n        ${String(e.stack).split("\n").find((l) => l.includes("recorrido.mjs")) ?? ""}`);
     if (DIR_FALLAS) for (const [quien, p] of paginas) await p.screenshot({ path: `${DIR_FALLAS}/falla-${quien.replace(/\W+/g, '-')}.png` }).catch(() => {});
     throw e;
   }
@@ -38,7 +38,7 @@ function vigilar(page, quien) {
 
 const texto = (page, sel) => page.locator(sel).first().innerText();
 const esperarTexto = (page, sel, contiene, timeout = 8000) =>
-  page.waitForFunction(([s, t]) => [...document.querySelectorAll(s)].some((el) => el.textContent.includes(t)), [sel, contiene], { timeout });
+  page.waitForFunction(([s, t]) => [...document.querySelectorAll(s)].some((el) => el.textContent.replace(/\u00a0/g, ' ').includes(t)), [sel, contiene], { timeout, polling: 200 });
 
 async function pedirDesdeTelefono(tel) {
   await tel.click('[data-plato=ropa-vieja]');
@@ -195,6 +195,33 @@ async function mismoNavegador(browser) {
     await salon.click('.dialogo-confirmar .boton--primario');
     await salon.waitForSelector('.mesa-tile.est-libre[data-id=m7]', { timeout: 5000 });
     await esperarTexto(tel, '#vista-cuenta', 'Tu cuenta quedó cerrada');
+  });
+  await paso('Ajustes «Fonda o comida rápida»: la comida va sin ITBMS y la cerveza sigue al 10 %', async () => {
+    const admin = await ctx.newPage();
+    vigilar(admin, 'panel');
+    await admin.setViewportSize({ width: 1280, height: 800 });
+    await admin.goto(`${BASE}admin.html#ajustes`);
+    await admin.locator('input[name=tipo-local][value=fonda]').check();
+    await admin.click('#panel-ajustes button[type=submit]:has-text("Guardar ajustes")');
+    await admin.waitForFunction(() => JSON.parse(localStorage.getItem('atk-mesa:estado')).ajustes.tipoLocal === 'fonda', null, { polling: 200 });
+    await tel.goto(`${BASE}mesa.html?sala=${sala}&m=7`);
+    await tel.waitForSelector('[data-plato=ropa-vieja]');
+    await tel.click('[data-plato=ropa-vieja]');
+    await tel.click('#dlg-plato button[type=submit]');
+    await tel.click('[data-plato=cerveza]');
+    await tel.click('#dlg-plato button[type=submit]');
+    await tel.click('#boton-carrito');
+    await tel.click('#dlg-carrito [data-foco=enviar]');
+    await salon.click('.mesa-tile[data-id=m7]');
+    await salon.click('#panel-mesa button:has-text("Aceptar y enviar a cocina")');
+    await tel.click('#boton-cuenta');
+    await esperarTexto(tel, '.ticket--cuenta', 'Sin ITBMS: B/. 12.00');
+    const t = (await texto(tel, '.ticket--cuenta')).replace(/\u00a0/g, ' ');
+    for (const esperado of ['B/. 15.00', 'Sin ITBMS: B/. 12.00', 'ITBMS 10 %', 'B/. 0.27']) if (!t.includes(esperado)) throw new Error(`falta «${esperado}» en la cuenta`);
+    if (t.includes('ITBMS 7 %')) throw new Error('la fonda cobró 7 %');
+    await admin.locator('input[name=tipo-local][value=restaurante]').check();
+    await admin.click('#panel-ajustes button[type=submit]:has-text("Guardar ajustes")');
+    await admin.waitForFunction(() => JSON.parse(localStorage.getItem('atk-mesa:estado')).ajustes.tipoLocal === 'restaurante', null, { polling: 200 });
   });
   await ctx.close();
 }

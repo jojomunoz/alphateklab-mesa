@@ -193,7 +193,7 @@ function arrancarMesa(n) {
       ? undefined
       : 'Se borra lo que este teléfono guardó de la mesa (pedido sin enviar y último estado). Lo que ya está en el restaurante no cambia.',
   });
-  document.title = `${T('mesaTitulo', { n })} · Fonda Pixbae (${T('ejemplo')})`;
+  document.title = `${T('mesaTitulo', { n })} · Pixbae (${T('ejemplo')})`;
   $('#acciones-mesa').hidden = false;
   $('#pestanas').hidden = false;
   $('#boton-idioma').hidden = false;
@@ -226,7 +226,7 @@ function cambiarIdioma() {
   ui.idioma = ui.idioma === 'es' ? 'en' : 'es';
   escribir('idioma', ui.idioma);
   aplicarTextos();
-  document.title = `${T('mesaTitulo', { n: mesa })} · Fonda Pixbae (${T('ejemplo')})`;
+  document.title = `${T('mesaTitulo', { n: mesa })} · Pixbae (${T('ejemplo')})`;
   pintarTodo();
   anunciar(ui.idioma === 'en' ? 'Menu in English' : 'Carta en español');
 }
@@ -283,7 +283,7 @@ function pintarTodo() {
     return;
   }
   $('#titulo-mesa').textContent = T('mesaTitulo', { n: mesa });
-  $('#local-nombre').textContent = r?.local ?? 'Fonda Pixbae';
+  $('#local-nombre').textContent = r?.local ?? 'Pixbae · cocina panameña';
   pintarConexion($('#conexion'), cliente.conexion, {
     local: T('conexion.local'),
     conectando: T('conexion.conectando'),
@@ -828,7 +828,7 @@ function ticketCuenta(res) {
     h(
       'article',
       { class: 'ticket ticket--cuenta', 'aria-labelledby': 'h-cuenta' },
-      h('header', { class: 'ticket__cabeza' }, h('h2', { class: 'ticket__titulo', id: 'h-cuenta' }, T('tituloCuenta', { n: mesa })), h('p', { class: 'ticket__meta' }, cliente.resumen?.local ?? 'Fonda Pixbae')),
+      h('header', { class: 'ticket__cabeza' }, h('h2', { class: 'ticket__titulo', id: 'h-cuenta' }, T('tituloCuenta', { n: mesa })), h('p', { class: 'ticket__meta' }, cliente.resumen?.local ?? 'Pixbae')),
       h(
         'ul',
         { class: 'renglones' },
@@ -840,8 +840,8 @@ function ticketCuenta(res) {
         'div',
         { class: 'ticket__pie' },
         renglonTicket(T('total'), dinero(res.total), 'ticket__total'),
-        h('p', { class: 'renglon--menor' }, T('incluyeItbms')),
-        res.itbms.porTasa.map((x) => renglonTicket(T('itbmsTasa', { tasa: x.tasa, base: dinero(x.base) }), dinero(x.impuesto), 'renglon--menor')),
+        h('p', { class: 'renglon--menor' }, res.itbms.impuesto > 0 ? T('incluyeItbms') : T('sinItbms')),
+        res.itbms.porTasa.map((x) => renglonTicket(x.tasa === 0 ? T('itbmsCero', { base: dinero(x.base) }) : T('itbmsTasa', { tasa: x.tasa, base: dinero(x.base) }), dinero(x.impuesto), 'renglon--menor')),
         res.confirmado ? renglonTicket(T('cuentaPagadaTotal'), dinero(res.confirmado), 'renglon--menor') : null,
         res.pendiente ? renglonTicket(T('pagosPendientes'), dinero(res.pendiente), 'renglon--menor') : null,
         res.confirmado || res.pendiente ? renglonTicket(T('faltaPagar'), dinero(res.saldo), 'renglon--falta') : null,
@@ -857,7 +857,12 @@ function pintarCuenta() {
   const c = r?.cuenta;
   const partes = [];
 
-  // Cuenta cerrada: este teléfono pagó y la cuenta ya no está.
+  // Cuenta cerrada: este teléfono pagó y la cuenta ya no está. Si después pidió otra vez en esta mesa (cuenta
+  // nueva con un pedido suyo), los pagos viejos se olvidan y se ve la cuenta nueva.
+  if (c && ui.misPagos.length && ui.misPagos.every((p) => p.cid !== c.id) && (c.pedidos ?? []).some((p) => p.disp === cliente.disp)) {
+    ui.misPagos = [];
+    borrar(`mispagos:${sala}:${mesa}`);
+  }
   const pagadosAntes = ui.misPagos.filter((p) => p.estado === 'confirmado');
   if (r && pagadosAntes.length && (!c || pagadosAntes.every((p) => p.cid !== c.id))) {
     partes.push(
@@ -895,7 +900,7 @@ function pintarCuenta() {
   const pidiendo = [...cliente.intentos.values()].some((i) => i.tipo === 'cuenta' && i.datos?.accion === 'pedir' && i.envio !== 'error');
   if (pidiendo || avisoCuenta) {
     const est = pidiendo && !avisoCuenta ? 'enviando' : avisoCuenta.estado;
-    partes.push(h('p', { class: `estado ${est === 'atendida' ? 'estado--ok' : 'estado--espera'} estado--bloque` }, icono(est === 'atendida' ? 'check' : 'recibo'), `${T('aviso.cuenta')}: ${T(`aviso.${est}`)}`));
+    partes.push(h('p', { class: `estado ${est === 'atendida' ? 'estado--ok' : 'estado--espera'} estado--bloque` }, icono(est === 'atendida' ? 'check' : 'recibo'), `${T('aviso.cuenta')}. ${T(`aviso.${est}`)}.`));
   } else if (res.saldo > 0) {
     partes.push(h('button', { type: 'button', class: 'boton boton--secundario', onclick: () => cliente.enviar('cuenta', { accion: 'pedir' }) }, icono('recibo'), T('pedirCuenta')));
   }

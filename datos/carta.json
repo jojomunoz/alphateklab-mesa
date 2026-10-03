@@ -1,7 +1,7 @@
 {
   "v": 1,
   "local": {
-    "nombre": "Fonda Pixbae",
+    "nombre": "Pixbae · cocina panameña",
     "ejemplo": true,
     "ciudad": "Ciudad de Panamá",
     "cocina": { "es": "cocina panameña", "en": "Panamanian food" }

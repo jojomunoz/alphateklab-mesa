@@ -485,7 +485,7 @@ function pintarAjustes() {
         ev.preventDefault();
         const f = ev.target;
         const propinas = [0, 1, 2].map((i) => Number(f.querySelector(`#propina-${i}`).value));
-        const r = await caja.despachar({ tipo: 'guardar-ajustes', datos: { ajustes: { nombre: f.querySelector('#aj-nombre').value, propinas, aprobacion: f.querySelector('[name="aprobacion"]:checked')?.value, pin: f.querySelector('#aj-pin').checked, resena: f.querySelector('#aj-resena').value } } });
+        const r = await caja.despachar({ tipo: 'guardar-ajustes', datos: { ajustes: { nombre: f.querySelector('#aj-nombre').value, propinas, aprobacion: f.querySelector('[name="aprobacion"]:checked')?.value, tipoLocal: f.querySelector('[name="tipo-local"]:checked')?.value, pin: f.querySelector('#aj-pin').checked, resena: f.querySelector('#aj-resena').value } } });
         ui.ajustesError = r.error ? textoError(r.error, 'es', r.detalle) : '';
         pintarAjustes();
         if (!r.error) anunciar('Ajustes guardados. Los teléfonos de las mesas los ven al momento.');
@@ -501,9 +501,15 @@ function pintarAjustes() {
       h('p', { class: 'ayuda' }, 'Aparecen en este orden y ninguna va marcada: el comensal elige, o pone otra cifra, o ninguna. La primera es la costumbre panameña (10 %). La propina es voluntaria (ACODECO, mayo de 2026).'),
       h('div', { class: 'propinas-ajuste' }, [0, 1, 2].map((i) => h('div', { class: 'campo' }, h('label', { for: `propina-${i}` }, `Opción ${i + 1}`), h('input', { id: `propina-${i}`, type: 'number', min: '1', max: '50', value: String(a.propinas[i]) })))),
     ),
-    h('div', { class: 'campo' },
-      h('span', { class: 'etiqueta' }, 'Tasas de ITBMS'),
-      h('p', {}, '7 % para comida y bebidas sin alcohol; 10 % para bebidas alcohólicas (DGI). Cada plato lleva su tasa en la carta. Las tasas las fija la ley, no el local, por eso aquí no se editan.'),
+    h('fieldset', { class: 'ajustes__grupo' },
+      h('legend', {}, 'Tipo de local (decide el ITBMS)'),
+      h('p', { class: 'ayuda', id: 'aj-tipo-ayuda' }, 'Según la DGI, los restaurantes con comida preparada cobran 7 % y las bebidas alcohólicas 10 %; las fondas y los restaurantes de comida rápida no cobran ITBMS. ', h('a', { href: 'https://dgi.mef.gob.pa/itbms/Generalidades', rel: 'noopener', target: '_blank' }, 'Ver la tabla de la DGI'), '. El precio de la carta no cambia: cambia el impuesto que lleva adentro. Aplica a los pedidos nuevos.'),
+      h('div', { class: 'grupo__opciones' },
+        [
+          ['restaurante', 'Restaurante (ITBMS 7 % y 10 % en alcohol)', 'Comida y bebidas sin alcohol al 7 %; cerveza, ron y demás al 10 %.'],
+          ['fonda', 'Fonda o comida rápida (sin ITBMS en la comida)', 'La comida y las bebidas sin alcohol van sin ITBMS. Las alcohólicas siguen al 10 %: confírmalo con tu contador.'],
+        ].map(([v, t, d]) => h('label', { class: 'opcion opcion--doble' }, h('input', { type: 'radio', name: 'tipo-local', value: v, checked: (a.tipoLocal ?? 'restaurante') === v, 'aria-describedby': 'aj-tipo-ayuda' }), h('span', { class: 'opcion__texto' }, h('strong', {}, t), h('span', { class: 'ayuda' }, d)))),
+      ),
     ),
     h('fieldset', { class: 'ajustes__grupo' },
       h('legend', {}, 'Pedidos por QR'),
@@ -526,8 +532,8 @@ function pintarAjustes() {
       h('h3', { id: 'h-pago' }, 'Cómo se cobra de verdad'),
       h('p', {}, 'En esta demo no hay pasarela: el pago es simulado y la caja lo confirma a mano. Con un cliente real hay dos caminos:'),
       h('ul', { class: 'lista' },
-        h('li', {}, h('strong', {}, 'Sin servidor: '), 'la cuenta muestra el QR estático de Yappy Comercial del local y el monto exacto. El cajero ve cada pago en su app y pulsa «Pago recibido». Comisión: 1 % + ITBMS.'),
-        h('li', {}, h('strong', {}, 'Con servidor: '), 'botón de pago de Yappy por API o enlace de pago de una pasarela panameña (tarjeta) con webhook. La mesa pasa a «pagada» cuando llega la confirmación de la pasarela, nunca antes.'),
+        h('li', {}, h('strong', {}, 'Sin servidor: '), 'la cuenta muestra el QR estático de Yappy Comercial del local y el monto exacto. El cajero ve cada pago en su app y pulsa «Pago recibido». Yappy le cobra al local 1 % + ITBMS; al comensal, nada.'),
+        h('li', {}, h('strong', {}, 'Con servidor: '), 'botón de pago de Yappy por API, o enlace de pago de Tilopay para tarjeta (3,75 % + B/. 0.50 por cobro) con webhook. La mesa pasa a «pagada» cuando llega la confirmación de la pasarela, nunca antes.'),
       ),
     ),
     h('section', { class: 'admin__bloque', 'aria-labelledby': 'h-sala' },
@@ -571,13 +577,13 @@ async function iniciar() {
   });
   let antes = firma(est());
   caja.suscribir((estado) => {
-    $('#nombre-local').textContent = `${estado.ajustes.nombre} · ejemplo`;
+    $('#nombre-local').textContent = `${estado.ajustes.nombre} (ejemplo)`;
     const ahora = firma(estado);
     const cambio = ahora[ui.tab] !== antes[ui.tab];
     antes = ahora;
     if (cambio && !$('#dlg-plato').open) pintarPestana();
   });
-  $('#nombre-local').textContent = `${est().ajustes.nombre} · ejemplo`;
+  $('#nombre-local').textContent = `${est().ajustes.nombre} (ejemplo)`;
   irA(location.hash.slice(1) || 'carta');
 }
 

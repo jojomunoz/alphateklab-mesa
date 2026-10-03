@@ -1,4 +1,4 @@
-// Datos de ejemplo: el plano de la Fonda Pixbae (restaurante ficticio) y un servicio en curso.
+// Datos de ejemplo: el plano de Pixbae (restaurante ficticio) y un servicio en curso.
 //
 // El servicio se arma pasando acciones reales por `aplicar`, con horas en el pasado, así que no puede quedar en
 // un estado que la caja no permitiría. La mesa 7 queda libre a propósito: es la del QR de la portada.
