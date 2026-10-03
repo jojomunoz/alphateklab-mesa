@@ -186,16 +186,54 @@
 }
 
 .muestra {
-  width: 18px;
-  height: 18px;
+  display: inline-grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
   border-radius: 4px;
   border: 2px solid var(--borde);
   background: var(--superficie);
 }
 
+/* El mismo ícono que lleva la mesa: Ocupada y Pagada no se distinguen solo por un tono de verde. */
+.muestra__icono {
+  width: 12px;
+  height: 12px;
+}
+
+.muestra--llama .muestra__icono {
+  color: var(--alerta);
+}
+
+.muestra--pagada .muestra__icono {
+  color: var(--ok);
+}
+
 .plano {
   display: grid;
+  grid-template-columns: minmax(36rem, 1fr);
   gap: 18px;
+  /* En el teléfono el plano conserva un ancho mínimo y se desliza de lado: a 390 px las mesas quedaban de 32 px y
+     sin el texto del estado. Con 36rem la mesa más chica mide unos 50 px y el estado se lee. */
+  overflow-x: auto;
+  padding: 6px;
+  margin: -6px;
+}
+
+/* Que el ancho mínimo del plano no empuje la página: el desplazamiento queda dentro del plano. */
+.mapa,
+#mesas {
+  min-width: 0;
+}
+
+.plano__pista {
+  display: none;
+}
+
+@media (max-width: 640px) {
+  .plano__pista {
+    display: block;
+  }
 }
 
 .zona__titulo {
@@ -238,6 +276,20 @@
 
 .mesa-tile.forma-redonda {
   border-radius: 50%;
+}
+
+/* En un círculo cabe menos: número, ícono y estado más chicos para que no se salgan del borde. */
+.mesa-tile.forma-redonda .mesa-tile__num {
+  font-size: clamp(0.9375rem, 2.6cqi, 1.5rem);
+}
+
+.mesa-tile.forma-redonda .mesa-tile__estado {
+  font-size: clamp(0.625rem, 1.35cqi, 0.8125rem);
+}
+
+.mesa-tile.forma-redonda .mesa-tile__icono {
+  width: clamp(12px, 2cqi, 18px);
+  height: clamp(12px, 2cqi, 18px);
 }
 
 .mesa-tile__num {
@@ -305,9 +357,15 @@
   color: var(--ok);
 }
 
+/* La mesa abierta en el panel: contorno doble, distinto del anillo de foco (sólido, color de foco). */
 .mesa-tile--sel {
-  outline: 3px solid var(--tinta);
+  outline: 5px double var(--tinta);
   outline-offset: 3px;
+}
+
+.mesa-tile--sel:focus-visible {
+  outline: 3px solid var(--foco);
+  box-shadow: 0 0 0 8px var(--fondo), 0 0 0 11px var(--tinta);
 }
 
 .mesa-tile.est-editar {
@@ -392,7 +450,7 @@
 }
 
 .fila-mesa--sel {
-  outline: 3px solid var(--tinta);
+  outline: 5px double var(--tinta);
   outline-offset: 1px;
 }
 
@@ -774,7 +832,7 @@
 
 .edicion__campos {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 9rem), 1fr));
   gap: 10px;
 }
 
@@ -790,7 +848,7 @@
 }
 
 .campo--en-linea {
-  min-width: 12rem;
+  min-width: min(12rem, 100%);
 }
 
 .edicion__zonas > summary {
@@ -803,7 +861,7 @@
 
 .zona-edicion {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 10rem), 1fr));
   gap: 8px;
   align-items: end;
   padding: 10px;

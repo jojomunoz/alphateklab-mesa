@@ -287,7 +287,7 @@ function pantallaPagar() {
         disabled: !listo || k.enviando,
         onclick: confirmarOrden,
       }, k.pago === 'tarjeta' ? T('simularPago') : T('enviarPedidoKiosco')),
-      !listo ? h('p', { class: 'ayuda k-pagar__falta' }, k.llevar === null ? T('dondeComes') : T('comoPagasKiosco')) : null,
+      !listo ? h('p', { class: 'ayuda k-pagar__falta' }, k.llevar === null ? T('eligeDonde') : T('eligePago')) : null,
     ),
   );
 }

@@ -68,6 +68,7 @@
 
 .panel-admin {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 20px;
 }
 
@@ -217,13 +218,13 @@
 
 .fila-editor {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 11rem), 1fr));
   gap: 8px 12px;
   align-items: end;
 }
 
 .fila-editor--opcion {
-  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 9rem), 1fr));
 }
 
 .campo--corto input {
@@ -268,7 +269,7 @@
 
 .casillas__lista {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 11rem), 1fr));
   gap: 6px;
 }
 
@@ -284,7 +285,7 @@
 
 /* ——— Mesas y placas ——— */
 .campo--en-linea {
-  min-width: 12rem;
+  min-width: min(12rem, 100%);
 }
 
 .tabla-scroll {
@@ -495,8 +496,13 @@
   justify-self: start;
 }
 
+.panel-admin > .campo--en-linea {
+  max-width: 100%;
+}
+
 .panel-admin > .campo--en-linea select {
-  min-width: 12rem;
+  min-width: min(12rem, 100%);
+  max-width: 100%;
 }
 
 /* Tabla de mesas en el teléfono: cada fila como un bloque (número y zona arriba, la dirección debajo). */

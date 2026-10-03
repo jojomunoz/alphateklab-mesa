@@ -59,5 +59,5 @@ Reglas comunes: `~/alphateklab/BRIEF.md`. Especificación: `~/alphateklab/ESPEC-
   esperar a `load` y a un selector.
 - Contextos distintos de Playwright no comparten localStorage ni BroadcastChannel: para «el teléfono y la
   computadora en la misma sala» usar dos páginas del mismo contexto; para el relevo real, dos `browser`.
-- ntfy trata como adjunto todo mensaje de más de 4.096 bytes: el resumen de mesa se recorta (hay prueba).
+- ntfy trata como adjunto todo mensaje de más de 4,096 bytes: el resumen de mesa se recorta (hay prueba).
 - Un `grid-area` con nombre dentro de un grid que no lo define crea una columna implícita (pasó en el kiosco).

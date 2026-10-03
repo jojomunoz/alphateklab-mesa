@@ -123,7 +123,6 @@ function ticket(t, ahora, { enColumna = false } = {}) {
       { class: 'renglones-cocina' },
       t.renglones.map((r) => {
         const plato = carta.platos.get(r.plato);
-        const mods = r.mods.map((m) => m.nombre).join(', ');
         return h(
           'li',
           {},
@@ -139,7 +138,15 @@ function ticket(t, ahora, { enColumna = false } = {}) {
             h('span', { class: 'renglon-cocina__marca', 'aria-hidden': 'true' }, r.hecho ? icono('check') : null),
             h('span', { class: 'renglon-cocina__texto' },
               h('span', { class: 'renglon-cocina__plato' }, h('strong', { class: 'cifra' }, `${r.cant} ×`), ' ', plato ? texto(plato.nombre, 'es') : r.nombre),
-              mods ? h('span', { class: 'renglon-cocina__mods' }, mods) : null,
+              r.mods.length
+                ? h('span', { class: 'renglon-cocina__mods' },
+                    r.mods.flatMap((m, i) => [
+                      i ? ', ' : null,
+                      // Lo que se quita («Sin cebolla») es lo que más se equivoca: subrayado y más grueso, no solo otro color.
+                      m.grupo === 'quitar' || /^sin\b/i.test(m.nombre) ? h('span', { class: 'renglon-cocina__quita' }, m.nombre) : m.nombre,
+                    ]),
+                  )
+                : null,
               r.nota ? h('span', { class: 'renglon-cocina__nota' }, `Nota: «${r.nota}»`) : null,
             ),
             h('span', { class: 'visualmente-oculto' }, r.hecho ? ' (hecho)' : ' (pendiente)'),

@@ -1,6 +1,6 @@
 // El estado de UNA mesa, compacto, para mandarlo al teléfono por el relevo.
 //
-// ntfy.sh trata como adjunto todo mensaje de más de 4.096 bytes; por eso el resumen va en arreglos cortos, los
+// ntfy.sh trata como adjunto todo mensaje de más de 4,096 bytes; por eso el resumen va en arreglos cortos, los
 // nombres de plato solo viajan si el teléfono no los tiene en su carta, y si aun así pasa del límite se quitan
 // primero las notas y luego los nombres. Hay una prueba que lo comprueba con una mesa de 30 renglones.
 

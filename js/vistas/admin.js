@@ -96,7 +96,8 @@ function pintarCarta() {
                 h('li', { class: `plato-admin${p.agotado ? ' plato-admin--agotado' : ''}` },
                   h('div', { class: 'plato-admin__texto' },
                     h('strong', {}, texto(p.nombre, 'es')),
-                    h('span', { class: 'ayuda' }, ` · ${texto(p.nombre, 'en')}`),
+                    // El nombre en inglés solo si es otro: «Carimañolas (3) · Carimañolas (3)» no dice nada.
+                    p.nombre?.en && p.nombre.en !== p.nombre.es ? h('span', { class: 'ayuda' }, ` · ${p.nombre.en}`) : null,
                     h('p', { class: 'plato-admin__meta' }, `${dinero(p.precio)} · ITBMS ${p.itbms} % · ${ESTACIONES[p.estacion] ?? p.estacion}${p.alergenos.length ? ` · contiene ${p.alergenos.map((a) => texto((c.alergenos ?? []).find((x) => x.id === a)?.nombre) || a).join(', ')}` : ''}${(p.grupos ?? []).length ? ` · opciones: ${p.grupos.map((g) => texto(c.grupos.find((x) => x.id === g)?.nombre) || g).join(', ')}` : ''}`),
                   ),
                   h('button', {
@@ -135,7 +136,7 @@ function plegable(clave, titulo, ...hijos) {
 }
 
 function editorCategorias(c) {
-  return plegable('categorias', 'Categorías y su orden',
+  return plegable('categorias', 'Editar categorías y su orden',
     h('ul', { class: 'lista-editor' },
       c.categorias.map((cat, i) => {
         const usadas = c.platos.filter((p) => p.cat === cat.id).length;
@@ -158,7 +159,7 @@ function editorCategorias(c) {
 }
 
 function editorGrupos(c) {
-  return plegable('grupos', 'Opciones de los platos (acompañamiento, término, extras…)',
+  return plegable('grupos', 'Editar opciones de los platos (acompañamiento, término, extras…)',
     h('p', { class: 'ayuda' }, '«Elige una» obliga a escoger una opción; «varias» deja marcar las que quiera. El precio de una opción se suma al del plato, también con ITBMS incluido.'),
     h('ul', { class: 'lista-editor' },
       c.grupos.map((g, gi) => {
@@ -524,13 +525,13 @@ function pintarAjustes() {
       h('legend', {}, 'Pedidos por QR'),
       h('div', { class: 'grupo__opciones' },
         [
-          ['todos', 'El mesero acepta cada pedido antes de que pase a cocina (recomendado)', 'Frena los pedidos hechos desde fuera del local con la foto de un QR.'],
+          ['todos', 'El mesero acepta cada pedido antes de que pase a cocina (recomendado)', 'Un pedido hecho desde fuera del local con la foto de un QR no llega a la cocina sin que el mesero lo vea.'],
           ['primero', 'El mesero acepta solo el primer pedido de cada mesa', 'Las rondas siguientes de esa cuenta van directo a cocina.'],
-          ['ninguno', 'Directo a cocina, sin aprobación', 'Solo si las placas tienen otra protección (PIN o NFC con firma).'],
+          ['ninguno', 'Directo a cocina, sin aprobación', 'Solo con placas NFC con firma (NTAG 424 DNA), que prueban que el teléfono está en la mesa. El PIN impreso no alcanza: sale en la misma foto que el QR.'],
         ].map(([v, t, d]) => h('label', { class: 'opcion opcion--doble' }, h('input', { type: 'radio', name: 'aprobacion', value: v, checked: a.aprobacion === v }), h('span', { class: 'opcion__texto' }, h('strong', {}, t), h('span', { class: 'ayuda' }, d)))),
       ),
     ),
-    h('label', { class: 'opcion opcion--doble' }, h('input', { type: 'checkbox', id: 'aj-pin', checked: a.pin }), h('span', { class: 'opcion__texto' }, h('strong', {}, 'Pedir el PIN de la mesa'), h('span', { class: 'ayuda' }, 'Cada placa lleva impreso un PIN de 3 números; el teléfono lo pide antes del primer pedido. Si lo enciendes, vuelve a imprimir las placas.'))),
+    h('label', { class: 'opcion opcion--doble' }, h('input', { type: 'checkbox', id: 'aj-pin', checked: a.pin }), h('span', { class: 'opcion__texto' }, h('strong', {}, 'Pedir el PIN de la mesa'), h('span', { class: 'ayuda' }, 'Cada placa lleva impreso un PIN de 3 números; el teléfono lo pide antes del primer pedido. Frena a quien solo tiene el enlace, no a quien tiene una foto de la placa, porque el PIN sale en la misma foto. Si lo enciendes, vuelve a imprimir las placas.'))),
     h('div', { class: 'campo' }, h('label', { for: 'aj-resena' }, 'Enlace para dejar una reseña en Google (opcional)'), h('input', { id: 'aj-resena', type: 'url', value: a.resena, placeholder: 'https://g.page/r/…', 'aria-describedby': 'aj-resena-ayuda' }), h('p', { class: 'ayuda', id: 'aj-resena-ayuda' }, 'Se lo mostramos al comensal después de pagar. Sin enlace, la pantalla explica que ahí iría el del local.')),
     h('div', { class: 'fila-botones' }, h('button', { type: 'submit', class: 'boton boton--primario' }, 'Guardar ajustes')),
   );
@@ -542,7 +543,7 @@ function pintarAjustes() {
       h('p', {}, 'En esta demo no hay pasarela: el pago es simulado y la caja lo confirma a mano. Con un cliente real hay dos caminos:'),
       h('ul', { class: 'lista' },
         h('li', {}, h('strong', {}, 'Sin servidor: '), 'la cuenta muestra el QR estático de Yappy Comercial del local y el monto exacto. El cajero ve cada pago en su app y pulsa «Pago recibido». Yappy le cobra al local 1 % + ITBMS; al comensal, nada.'),
-        h('li', {}, h('strong', {}, 'Con servidor: '), 'botón de pago de Yappy por API, o enlace de pago de Tilopay para tarjeta (3,75 % + B/. 0.50 por cobro) con webhook. La mesa pasa a «pagada» cuando llega la confirmación de la pasarela, nunca antes.'),
+        h('li', {}, h('strong', {}, 'Con servidor: '), 'botón de pago de Yappy por API, o enlace de pago de Tilopay para tarjeta (3.75 % + B/. 0.50 por cobro) con webhook. La mesa pasa a «pagada» cuando llega la confirmación de la pasarela, nunca antes.'),
       ),
     ),
     h('section', { class: 'admin__bloque', 'aria-labelledby': 'h-sala' },

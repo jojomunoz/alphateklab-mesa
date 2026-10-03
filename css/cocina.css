@@ -229,7 +229,8 @@
   color: var(--papel-tinta);
   text-align: left;
   cursor: pointer;
-  font-size: 1.375rem;
+  /* Legible a 2 m: crece con la pantalla de pared (22 px a 1280, unos 29 a 1920). */
+  font-size: clamp(1.375rem, 1.5vw, 1.875rem);
   line-height: 1.25;
 }
 
@@ -260,13 +261,20 @@
 }
 
 .renglon-cocina__mods {
-  font-size: 1.0625rem;
+  font-size: clamp(1.125rem, 1.15vw, 1.5rem);
   color: var(--papel-tinta-2);
   font-weight: 700;
 }
 
+.renglon-cocina__quita {
+  color: var(--papel-tinta);
+  text-decoration: underline;
+  text-decoration-thickness: 3px;
+  text-underline-offset: 0.18em;
+}
+
 .renglon-cocina__nota {
-  font-size: 1.0625rem;
+  font-size: clamp(1.125rem, 1.15vw, 1.5rem);
   color: var(--papel-tinta);
 }
 

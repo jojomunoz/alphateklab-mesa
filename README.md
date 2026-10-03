@@ -39,9 +39,9 @@ de la demo (`img/marca/`, copia de `alphateklab/assets/marca/`); lo demás es de
 python3 -m http.server 4870 -d ~/alphateklab/repos
 # abrir http://localhost:4870/alphateklab-mesa/
 node --test pruebas/                       # lógica pura
-node herramientas/recorrido.mjs            # recorrido con Playwright (servidor en marcha)
+node herramientas/recorrido.mjs            # recorrido con Playwright (servidor en marcha) y los casos de borde de la revisión
 node herramientas/recorrido.mjs --relevo   # además, dos navegadores por el relevo ntfy.sh real
-node herramientas/capturas.mjs [carpeta]   # capturas de cada vista a 390 y 1280, claro y oscuro, y el kiosco a 1080×1920
+node herramientas/capturas.mjs [carpeta]   # capturas de cada vista a 390 y 1280, claro y oscuro, a 320, con la letra al 200 % y el kiosco a 1080×1920; mide desbordes
 node herramientas/placas-pdf.mjs           # imprime las placas a PDF y comprueba cuatro por hoja carta
 python3 herramientas/mutaciones.py         # rompe cada regla a propósito y comprueba que alguna prueba falla
 ```
@@ -87,8 +87,10 @@ GitHub Pages sí funciona.
 - Estados del pedido, del aviso, de la mesa y del pago con transiciones válidas; las demás se rechazan.
   → `pruebas/estados.test.mjs`, `pruebas/caja.test.mjs`
 - **Contra pedidos falsos:** por defecto cada pedido por QR entra «por aceptar» en el salón y pasa a cocina cuando
-  el mesero lo acepta (como el modo manual de Qamarero). Ajustes: solo el primero de cada mesa, o ninguno. Opcional:
-  PIN de 3 cifras impreso en la placa. Y no más de 3 pedidos esperando por mesa. El caso que lo justifica: en
+  el mesero lo acepta (como el modo manual de Qamarero): el pedido falso llega al salón, pero no a la cocina sin que
+  el mesero lo vea. Ajustes: solo el primero de cada mesa, o ninguno. Opcional: PIN de 3 cifras impreso en la placa,
+  que frena a quien solo tiene el enlace pero no a quien tiene una foto de la placa (sale en la misma foto); contra
+  la foto, las etiquetas NFC con firma (NTAG 424 DNA). Y no más de 3 pedidos esperando por mesa. El caso que lo justifica: en
   Kunming (China), la foto de una mesa publicada en redes dejó a la vista su QR y otros lo usaron para hacer
   pedidos falsos ([China Daily, 4-dic-2023](https://www.chinadaily.com.cn/a/202312/04/WS656dd404a31090682a5f15f7.html)).
 - Cada mensaje se aplica una sola vez por su `id` aunque llegue por BroadcastChannel y por ntfy.
@@ -101,7 +103,7 @@ GitHub Pages sí funciona.
    dominio del restaurante. El relevo público y el `localStorage` son solo para la demo.
 2. **Pasarela con webhook.** Sin servidor: el QR estático de Yappy Comercial del local (1 % + ITBMS) y el cajero
    confirma lo que ve en su app. Con servidor: botón de pago de Yappy por API o enlace de pago de Tilopay
-   (3,75 % + B/. 0.50 por tarjeta, con `webhook_url`); la mesa pasa a «pagada» cuando llega el webhook de confirmación, nunca antes.
+   (3.75 % + B/. 0.50 por tarjeta, con `webhook_url`); la mesa pasa a «pagada» cuando llega el webhook de confirmación, nunca antes.
 3. **Factura electrónica** con el PAC del restaurante (obligatoria desde el 1-ene-2026 para quien factura más de
    B/. 36,000 al año o más de 100 documentos al mes): el borrador del salón es lo que se le enviaría.
 4. **Placas** atornilladas o en acrílico, QR al dominio propio, revisión en cada turno; etiquetas NFC NTAG 424 DNA
@@ -124,7 +126,7 @@ fuentes/    Bricolage Grotesque y Atkinson Hyperlegible Next (woff2, latin + lat
 img/        íconos (sprite SVG), favicon y el QR de Yappy de ejemplo
 sw.js       service worker: la carta queda guardada para verla con mala señal
 pruebas/    node --test
-herramientas/ recorrido con Playwright y el generador del QR de ejemplo
+herramientas/ recorrido y capturas con Playwright, placas a PDF y mutaciones de las pruebas (el QR de ejemplo de Yappy, img/yappy-ejemplo.svg, se hizo a mano)
 ```
 
 Librería externa: `qrcode-generator@1.4.4` (MIT) desde jsDelivr, con `integrity`, solo en las páginas que dibujan QR.

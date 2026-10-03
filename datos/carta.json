@@ -57,7 +57,7 @@
     },
     {
       "id": "quitar",
-      "nombre": { "es": "Sin", "en": "Leave out" },
+      "nombre": { "es": "Quitar ingredientes", "en": "Leave out" },
       "tipo": "varios",
       "obligatorio": false,
       "opciones": [

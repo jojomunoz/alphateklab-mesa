@@ -135,7 +135,8 @@ async function iniciar() {
   aplicarTextos();
   const params = leerParametros(location.search);
   const salaGuardada = leer('sala');
-  sala = params.sala ?? (esSala(salaGuardada) ? salaGuardada : null);
+  // Un código dañado no se cambia en silencio por el de esta computadora: se dice que no es válido.
+  sala = params.sala ?? (!params.errores.includes('sala') && esSala(salaGuardada) ? salaGuardada : null);
   try {
     cartaBase = await cargarCartaBase();
   } catch {
@@ -143,7 +144,7 @@ async function iniciar() {
     return;
   }
   $('#estado-carga').hidden = true;
-  if (!sala) return pintarEntrada({ sinSala: true });
+  if (!sala) return pintarEntrada({ sinSala: true, salaInvalida: params.errores.includes('sala') });
   if (params.mesa === null) {
     prepararBarra({ sala });
     return pintarEntrada({ error: params.errores.includes('mesa') });
@@ -160,7 +161,7 @@ function pintarErrorCarga() {
   );
 }
 
-function pintarEntrada({ sinSala = false, error = false, noExiste = null } = {}) {
+function pintarEntrada({ sinSala = false, salaInvalida = false, error = false, noExiste = null } = {}) {
   const v = $('#vista-entrada');
   v.hidden = false;
   $('#titulo-mesa').textContent = T('queMesa');
@@ -168,7 +169,7 @@ function pintarEntrada({ sinSala = false, error = false, noExiste = null } = {})
   if (sinSala) {
     pintar(
       v,
-      h('p', { class: 'nota nota--espera' }, icono('info'), h('span', {}, T('sinSala'))),
+      h('p', { class: 'nota nota--espera' }, icono('info'), h('span', {}, T(salaInvalida ? 'salaInvalida' : 'sinSala'))),
       h('p', { class: 'entrada__enlace' }, h('a', { href: 'index.html' }, 'alphateklab Mesa')),
     );
     return;
@@ -676,7 +677,7 @@ function pintarCarrito() {
 function abrirLlamar() {
   const dlg = $('#dlg-llamar');
   const error = h('p', { class: 'mensaje-error', role: 'alert' });
-  const detalle = h('input', { id: 'detalle-llamada', maxlength: '80', autocomplete: 'off' });
+  const detalle = h('input', { id: 'detalle-llamada', maxlength: '80', autocomplete: 'off', 'aria-describedby': 'detalle-ayuda' });
   pintar(
     dlg,
     h('div', { class: 'hoja__cabeza' }, h('h2', { id: 'dlg-llamar-titulo' }, T('tituloLlamar')), h('button', { type: 'button', class: 'boton-icono', 'aria-label': T('cerrar'), onclick: () => dlg.close() }, icono('x'))),
@@ -702,7 +703,7 @@ function abrirLlamar() {
         'div',
         { class: 'hoja__cuerpo' },
         h('fieldset', { class: 'grupo' }, h('legend', { class: 'visualmente-oculto' }, T('tituloLlamar')), h('div', { class: 'grupo__opciones' }, ['pedir', 'ayuda', 'otra'].map((m) => h('label', { class: 'opcion' }, h('input', { type: 'radio', name: 'motivo', value: m, onchange: () => (error.textContent = '') }), h('span', { class: 'opcion__texto' }, T(`motivo.${m}`)))))),
-        h('div', { class: 'campo' }, h('label', { for: 'detalle-llamada' }, T('detalleOpcional')), detalle, h('p', { class: 'ayuda' }, T('notaAyuda'))),
+        h('div', { class: 'campo' }, h('label', { for: 'detalle-llamada' }, T('detalleOpcional')), detalle, h('p', { id: 'detalle-ayuda', class: 'ayuda' }, T('detalleAyuda'))),
       ),
       h('div', { class: 'hoja__pie' }, error, h('button', { type: 'submit', class: 'boton boton--primario boton--grande boton--ancho' }, icono('campana'), T('llamarMesero'))),
     ),
@@ -944,9 +945,8 @@ function pintarCuenta() {
   if (pidiendo || avisoCuenta) {
     const est = pidiendo && !avisoCuenta ? 'enviando' : avisoCuenta.estado;
     partes.push(h('p', { class: `estado ${est === 'atendida' ? 'estado--ok' : 'estado--espera'} estado--bloque` }, icono(est === 'atendida' ? 'check' : 'recibo'), `${T('aviso.cuenta')}. ${T(`aviso.${est}`)}.`));
-  } else if (res.saldo > 0) {
-    partes.push(h('button', { type: 'button', class: 'boton boton--secundario', onclick: () => cliente.enviar('cuenta', { accion: 'pedir' }) }, icono('recibo'), T('pedirCuenta')));
   }
+  // «Pedir la cuenta» está una sola vez, arriba; aquí solo se dice en qué va el aviso.
 
   // Comprobantes de este teléfono
   const mios = ui.misPagos.filter((p) => p.cid === c.id);

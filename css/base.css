@@ -9,7 +9,6 @@
 html {
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
-  overflow-x: clip;
 }
 
 body {
@@ -20,7 +19,6 @@ body {
   font-family: var(--f-texto);
   font-size: 1.0625rem;
   line-height: 1.5;
-  overflow-x: clip;
 }
 
 ::selection {
@@ -38,6 +36,8 @@ h4 {
   margin: 0;
   text-wrap: balance;
   letter-spacing: -0.01em;
+  /* «Acompañamientos» con la letra al 200 % no cabe en 390 px: se parte antes que salirse de la pantalla. */
+  overflow-wrap: break-word;
 }
 
 p {
@@ -635,6 +635,8 @@ details.barra-demo > .contenedor {
 .renglon__nombre {
   flex: 0 1 auto;
   min-width: 0;
+  /* Con la letra muy grande, una palabra larga se parte antes que empujar el importe fuera de la pantalla. */
+  overflow-wrap: anywhere;
 }
 
 .renglon__puntos {
@@ -843,5 +845,45 @@ body.con-barra-carrito .avisos-breves {
   body {
     background: #fff;
     color: #000;
+  }
+}
+
+/* ——— Plegables del panel y del editor del plano ———
+   Con `display: flex` el summary pierde el triángulo del navegador: sin una marca, «Categorías y su orden» se
+   leía como un título sin nada debajo. Va un chevrón que gira al abrir (estado, 120 ms). */
+.editor-admin > summary,
+.edicion__zonas > summary {
+  list-style: none;
+  gap: 10px;
+}
+
+.editor-admin > summary::-webkit-details-marker,
+.edicion__zonas > summary::-webkit-details-marker {
+  display: none;
+}
+
+.editor-admin > summary::after,
+.edicion__zonas > summary::after {
+  content: '';
+  flex: none;
+  width: 0.6em;
+  height: 0.6em;
+  margin: -0.25em 0.2em 0 auto;
+  border-right: 2.5px solid currentColor;
+  border-bottom: 2.5px solid currentColor;
+  transform: rotate(45deg);
+  transition: transform var(--dur-respuesta) var(--ease-salida);
+}
+
+.editor-admin[open] > summary::after,
+.edicion__zonas[open] > summary::after {
+  margin-top: 0.25em;
+  transform: rotate(-135deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .editor-admin > summary::after,
+  .edicion__zonas > summary::after {
+    transition: none;
   }
 }

@@ -21,7 +21,7 @@ const ESTADOS = {
   ocupada: { texto: 'Ocupada', icono: 'persona' },
   pidio: { texto: 'Pidió', icono: 'bolsa' },
   llama: { texto: 'Llama', icono: 'campana' },
-  cuenta: { texto: 'Pidió la cuenta', icono: 'recibo' },
+  cuenta: { texto: 'Pidió la cuenta', corto: 'Cuenta', icono: 'recibo' },
   pagada: { texto: 'Pagada', icono: 'check' },
 };
 const ESTADO_PEDIDO = {
@@ -138,6 +138,7 @@ function pintarPlano() {
   const cruzadas = ui.editando ? new Set(p.mesas.filter((m) => cruces(p, m.id).length).map((m) => m.id)) : new Set();
   pintar(
     $('#mesas'),
+    h('p', { class: 'ayuda plano__pista' }, 'Desliza el plano de lado para ver todas las mesas.'),
     h(
       'div',
       { class: `plano${ui.editando ? ' plano--editando' : ''}` },
@@ -166,13 +167,14 @@ function pintarPlano() {
                     'data-foco': `mesa-${mp.id}`,
                     'aria-label': ui.editando ? `Mesa ${mp.numero}, ${mp.forma}, ${plural(mp.capacidad, 'persona', 'personas')}. Flechas para mover; Mayús para pasos largos.` : etiquetaMesa(mp),
                     'aria-pressed': ui.editando ? String(sel) : false,
+                    'aria-current': !ui.editando && sel ? 'true' : false,
                     onclick: ui.editando ? () => editarMesa(mp.id) : () => seleccionar(mp.numero),
                     onkeydown: ui.editando ? (ev2) => teclaMesa(ev2, mp.id) : null,
                     onpointerdown: ui.editando ? (ev2) => empezarArrastre(ev2, mp.id) : null,
                   },
                   h('span', { class: 'mesa-tile__num cifra' }, String(mp.numero)),
                   !ui.editando && e.icono ? icono(e.icono, 'icono mesa-tile__icono') : null,
-                  !ui.editando ? h('span', { class: 'mesa-tile__estado' }, listos && ev === 'ocupada' ? 'Listo' : e.texto) : h('span', { class: 'mesa-tile__estado' }, `${mp.capacidad} p.`),
+                  !ui.editando ? h('span', { class: 'mesa-tile__estado' }, listos && ev === 'ocupada' ? 'Listo' : mp.forma === 'redonda' ? e.corto ?? e.texto : e.texto) : h('span', { class: 'mesa-tile__estado' }, `${mp.capacidad} p.`),
                 );
               }),
           ),
@@ -207,7 +209,7 @@ function pintarLista() {
                   {},
                   h(
                     'button',
-                    { type: 'button', class: `fila-mesa est-${ev}${ui.seleccion === mp.numero ? ' fila-mesa--sel' : ''}`, 'data-foco': `fila-${mp.numero}`, onclick: () => seleccionar(mp.numero) },
+                    { type: 'button', class: `fila-mesa est-${ev}${ui.seleccion === mp.numero ? ' fila-mesa--sel' : ''}`, 'aria-current': ui.seleccion === mp.numero ? 'true' : false, 'data-foco': `fila-${mp.numero}`, onclick: () => seleccionar(mp.numero) },
                     h('span', { class: 'fila-mesa__num' }, `Mesa ${mp.numero}`),
                     h('span', { class: 'fila-mesa__cap' }, plural(mp.capacidad, 'persona', 'personas')),
                     h('span', { class: `insignia insignia--${ev}` }, ESTADOS[ev].icono ? icono(ESTADOS[ev].icono) : null, ESTADOS[ev].texto),
@@ -561,7 +563,7 @@ function abrirFactura(n) {
         h(
           'article',
           { class: 'ticket ticket--factura', 'aria-labelledby': 'factura-titulo' },
-          h('header', { class: 'ticket__cabeza ticket__cabeza--factura' }, h('h3', { class: 'ticket__titulo', id: 'factura-titulo' }, 'Borrador de factura'), h('p', { class: 'ticket__meta' }, `${est().ajustes.nombre} (restaurante de ejemplo) · Mesa ${n} · ${new Intl.DateTimeFormat('es-PA', { dateStyle: 'short', timeStyle: 'short' }).format(new Date())}`)),
+          h('header', { class: 'ticket__cabeza ticket__cabeza--factura' }, h('h3', { class: 'ticket__titulo', id: 'factura-titulo' }, 'Borrador de factura'), h('p', { class: 'ticket__meta' }, `${est().ajustes.nombre} (restaurante de ejemplo) · Mesa ${n} · ${new Intl.DateTimeFormat('es-PA', { day: 'numeric', month: 'long', year: 'numeric', hour: 'numeric', minute: '2-digit' }).format(new Date())}`)),
           h('p', { class: 'factura__cliente' }, `Cliente: ${datos.nombre.trim() || 'Consumidor final'}${datos.ruc.trim() ? ` · RUC o cédula: ${datos.ruc.trim()}` : ''}`),
           h('ul', { class: 'renglones' }, renglones.map((r) => h('li', {}, h('div', { class: 'renglon' }, h('span', { class: 'renglon__nombre' }, h('strong', { class: 'renglon__cant' }, `${r.cant} ×`), ' ', `${r.nombre} (ITBMS ${r.tasa} %)`), h('span', { class: 'renglon__puntos', 'aria-hidden': 'true' }), h('span', { class: 'renglon__monto' }, dinero(r.monto)))))),
           h(
@@ -700,7 +702,7 @@ function pintarEdicion() {
         h('button', { type: 'button', class: 'boton boton--secundario', 'data-foco': 'agregar-mesa', onclick: () => { const r = agregarMesa(ui.borrador, zonaNueva.value, () => `m${generarId(6)}`); if (r.ok) ui.mesaEditada = r.mesa.id; aplicarCambio(r); } }, icono('mas'), 'Agregar mesa'),
       ),
       h('details', { class: 'edicion__zonas' },
-        h('summary', {}, 'Zonas del plano'),
+        h('summary', {}, 'Editar zonas del plano'),
         h('ul', { class: 'panel-lista' },
           p.zonas.map((z) =>
             h('li', { class: 'zona-edicion' },

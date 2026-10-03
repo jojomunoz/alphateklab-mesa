@@ -8,6 +8,16 @@
   max-width: 54rem;
 }
 
+/* Que el foco del teclado nunca quede debajo de las barras fijas (WCAG 2.4.11): al tabular, el navegador desplaza
+   dejando este margen. Arriba, pestañas (52 px) y categorías (unos 45 px); abajo, la barra del carrito (unos 77 px). */
+html:has(> body.vista-mesa) {
+  scroll-padding-top: 108px;
+}
+
+html:has(> body.vista-mesa.con-barra-carrito) {
+  scroll-padding-bottom: calc(88px + env(safe-area-inset-bottom));
+}
+
 .vista-mesa.con-barra-carrito {
   padding-bottom: calc(88px + env(safe-area-inset-bottom));
 }
@@ -19,13 +29,16 @@
 
 .cabecera-mesa__fila {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 12px;
   justify-content: space-between;
 }
 
+/* Con la letra grande, el botón de idioma baja a otra línea en vez de taparle el nombre al local. */
 .local {
   display: flex;
+  flex: 1 1 12rem;
   align-items: center;
   gap: 8px;
   min-width: 0;
@@ -72,7 +85,7 @@
 
 .acciones-mesa {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 9rem), 1fr));
   gap: 10px;
   margin-top: 14px;
 }
@@ -361,6 +374,7 @@
 }
 
 .barra-carrito__boton {
+  flex-wrap: wrap;
   justify-content: space-between;
 }
 
@@ -569,12 +583,14 @@
 
 .pago {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 22px;
   margin-top: 22px;
 }
 
 .paso {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 10px;
 }
 
@@ -585,20 +601,27 @@
 }
 
 .grupo__opciones--fila {
-  grid-template-columns: repeat(auto-fit, minmax(9.5rem, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 9.5rem), 1fr));
 }
 
+/* Los porcentajes en columnas de al menos 6.5rem (tres a 390 px, dos a 320 px, una con la letra al 200 %);
+   «Otra cifra» y «Sin propina» en su propia fila. minmax(0, …) y min-width: 0 para que una cifra larga no
+   empuje la rejilla fuera de la pantalla (pasaba a 320 px: el «20 %» quedaba cortado). */
 .grupo__opciones--propina {
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 6.5rem), 1fr));
+}
+
+.grupo__opciones--propina .opcion {
+  min-width: 0;
 }
 
 .grupo__opciones--propina .opcion:nth-child(n + 4) {
-  grid-column: span 3;
+  grid-column: 1 / -1;
 }
 
 @media (min-width: 560px) {
   .grupo__opciones--propina {
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(5, minmax(0, 1fr));
   }
   .grupo__opciones--propina .opcion:nth-child(n + 4) {
     grid-column: auto;

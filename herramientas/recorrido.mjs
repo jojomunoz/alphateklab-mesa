@@ -334,6 +334,40 @@ async function casosDeBorde(browser) {
     const boton = await cocina.locator('#boton-deshacer').innerText();
     if (/Mesa 7/.test(boton)) throw new Error(`el botón sigue ofreciendo deshacer ese pedido: «${boton}»`);
   });
+  await paso('el foco del teclado nunca queda debajo de las barras fijas de la carta (WCAG 2.4.11)', async () => {
+    await tel.goto(`${BASE}mesa.html?sala=${sala}&m=7#carta`);
+    await tel.waitForSelector('[data-plato=cerveza]');
+    await tel.click('[data-plato=cerveza]');
+    await tel.click('#dlg-plato button[type=submit]');
+    await tel.waitForSelector('#barra-carrito:not([hidden])');
+    const tapado = () =>
+      tel.evaluate(() => {
+        const el = document.activeElement;
+        if (!el || el === document.body || el.closest('.pestanas, .categorias, #barra-carrito, .barra-demo')) return null;
+        const r = el.getBoundingClientRect();
+        // Lo que tapan las barras fijas: la parte del elemento que cae dentro de alguna de ellas, o fuera de la ventana.
+        const barras = ['.pestanas', '.categorias', '#barra-carrito'].map((s) => document.querySelector(s)?.getBoundingClientRect()).filter(Boolean);
+        let tapada = Math.max(0, -r.top) + Math.max(0, r.bottom - innerHeight);
+        for (const b of barras) tapada += Math.max(0, Math.min(r.bottom, b.bottom) - Math.max(r.top, b.top));
+        const visible = Math.max(0, r.height - tapada);
+        return visible < r.height - 1 ? `«${el.textContent.trim().slice(0, 30)}» se ve ${Math.round(visible)} de ${Math.round(r.height)} px` : null;
+      });
+    await tel.evaluate(() => { scrollTo(0, 0); document.querySelector('.categorias__enlace').focus(); });
+    const problemas = [];
+    for (let i = 0; i < 30; i++) {
+      await tel.keyboard.press('Tab');
+      const t = await tapado();
+      if (t) problemas.push(`Tab ${i + 1}: ${t}`);
+    }
+    await tel.evaluate(() => document.querySelector('.platos li:last-child .plato').focus());
+    await tel.keyboard.press('End');
+    for (let i = 0; i < 12; i++) {
+      await tel.keyboard.press('Shift+Tab');
+      const t = await tapado();
+      if (t) problemas.push(`Mayús+Tab ${i + 1}: ${t}`);
+    }
+    if (problemas.length) throw new Error(problemas.slice(0, 4).join('; '));
+  });
   await paso('PIN equivocado: el campo vuelve a salir (también tras recargar) y con el PIN bueno el pedido entra', async () => {
     const admin = await ctx.newPage();
     vigilar(admin, 'panel');

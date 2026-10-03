@@ -632,6 +632,56 @@
   .k-plato__precio {
     font-size: 1.5rem;
   }
+  /* El carrito toma el alto que sobra debajo de los platos (antes quedaban unos 720 px vacíos en medio) y se lee
+     a un brazo de distancia: renglones de 22 px y opciones de 18 px. */
+  .k-pedido {
+    grid-template-rows: auto auto minmax(0, max-content) minmax(36dvh, 1fr);
+  }
+  .k-carrito {
+    max-height: none;
+    padding: 20px 24px calc(20px + env(safe-area-inset-bottom));
+  }
+  .k-carrito__titulo {
+    font-size: 1.75rem;
+  }
+  .k-renglon {
+    font-size: 1.375rem;
+    padding-block: 10px;
+  }
+  .k-renglon__mods {
+    font-size: 1.125rem;
+  }
+  .k-carrito__pie {
+    font-size: 1.25rem;
+  }
+  /* Pagar: el contenido al centro del alto y más grande, en vez de arriba con 900 px vacíos debajo. */
+  .k-pagar__cuerpo {
+    max-width: 60rem;
+    align-content: center;
+    gap: 34px;
+    padding: 32px 28px;
+  }
+  .k-pagar .k-titulo {
+    font-size: 2.75rem;
+  }
+  .k-pagar__cuerpo .renglones {
+    font-size: 1.5rem;
+  }
+  .k-pagar__cuerpo .renglon__detalle,
+  .k-pagar__cuerpo .renglon--menor {
+    font-size: 1.1875rem;
+  }
+  .k-pagar__cuerpo .ticket__total {
+    font-size: 1.875rem;
+  }
+  .k-eleccion legend,
+  .k-sugerencia__texto {
+    font-size: 1.75rem;
+  }
+  .k-opcion {
+    min-height: 108px;
+    font-size: 1.5rem;
+  }
 }
 
 /* De noche el reposo no ilumina el local con un verde claro de pared a pared: fondo oscuro y el llamado en verde. */
