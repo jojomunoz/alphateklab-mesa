@@ -70,8 +70,8 @@ GitHub Pages sí funciona.
 
 ## Reglas de negocio (y dónde están probadas)
 
-- Dinero en centésimos enteros. Los precios de la carta **ya traen el ITBMS** (Ley 473 de 2025, en vigor desde el
-  19-jun-2026); la cuenta desglosa el impuesto contenido por tasa, `monto × tasa / (100 + tasa)`, redondeado al
+- Dinero en centésimos enteros. Los precios de la carta **ya traen el ITBMS** (Ley 473 de 2025, que rige desde el
+  1-jul-2027 por la Ley 531 de 2026); la cuenta desglosa el impuesto contenido por tasa, `monto × tasa / (100 + tasa)`, redondeado al
   centésimo «mitad hacia arriba» una vez por renglón: 7 % comida y bebidas sin alcohol, 10 % bebidas alcohólicas
   (DGI). Ningún cargo extra para el comensal. → `pruebas/dinero.test.mjs`
 - **Tipo de local** (Ajustes): «Restaurante (ITBMS 7 % y 10 % en alcohol)» o «Fonda o comida rápida (sin ITBMS en

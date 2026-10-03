@@ -77,7 +77,7 @@ function pintarCarta() {
     panel,
     h('div', { class: 'admin__intro' },
       h('h2', {}, 'Carta'),
-      h('p', { class: 'ayuda' }, 'Los precios son finales, con ITBMS incluido (Ley 473 de 2025): el comensal paga lo que ve. Los cambios se guardan en esta computadora y la carta de las mesas los ve al momento; un plato agotado deja de poder pedirse.'),
+      h('p', { class: 'ayuda' }, 'Los precios son finales, con ITBMS incluido: el comensal paga lo que ve (desde el 1 de julio de 2027 lo exige la Ley 473 de 2025). Los cambios se guardan en esta computadora y la carta de las mesas los ve al momento; un plato agotado deja de poder pedirse.'),
     ),
     h('div', { class: 'barra-herramientas' },
       h('button', { type: 'button', class: 'boton boton--primario', 'data-foco': 'nuevo-plato', onclick: () => editarPlato(null) }, icono('mas'), 'Agregar plato'),

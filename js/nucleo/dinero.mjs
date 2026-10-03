@@ -1,6 +1,6 @@
 // Dinero en centésimos enteros. Nunca flotantes.
 //
-// Los precios de la carta ya traen el ITBMS adentro (Ley 473 de 2025: desde el 19-jun-2026 el precio que se
+// Los precios de la carta ya traen el ITBMS adentro (Ley 473 de 2025; la Ley 531 de 2026 movió su vigencia al 1-jul-2027: desde entonces el precio que se
 // muestra es el final). Por eso aquí el impuesto no se suma: se calcula el que va CONTENIDO en cada renglón,
 // `monto × tasa / (100 + tasa)`, redondeado al centésimo «mitad hacia arriba», una vez por renglón.
 //
