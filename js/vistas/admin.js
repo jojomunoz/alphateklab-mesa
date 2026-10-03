@@ -81,8 +81,8 @@ function pintarCarta() {
     ),
     h('div', { class: 'barra-herramientas' },
       h('button', { type: 'button', class: 'boton boton--primario', 'data-foco': 'nuevo-plato', onclick: () => editarPlato(null) }, icono('mas'), 'Agregar plato'),
-      h('button', { type: 'button', class: 'boton boton--secundario', 'data-foco': 'exportar', onclick: exportar }, 'Exportar la carta (JSON)'),
-      h('button', { type: 'button', class: 'boton boton--secundario', 'data-foco': 'importar', onclick: () => archivo.click() }, 'Importar una carta (JSON)'),
+      h('button', { type: 'button', class: 'boton boton--secundario', 'data-foco': 'exportar', onclick: exportar }, 'Descargar una copia de la carta'),
+      h('button', { type: 'button', class: 'boton boton--secundario', 'data-foco': 'importar', onclick: () => archivo.click() }, 'Cargar una copia de la carta'),
       archivo,
     ),
     ui.cartaError.length ? h('div', { class: 'nota nota--alerta', role: 'alert' }, icono('alerta'), h('div', {}, h('p', {}, h('strong', {}, 'No se guardó. Esto hay que corregir:')), h('ul', { class: 'lista' }, ui.cartaError.slice(0, 12).map((e) => h('li', {}, e))))) : null,
@@ -277,7 +277,7 @@ function exportar() {
     URL.revokeObjectURL(a.href);
     a.remove();
   }, 1000);
-  anunciar('Carta exportada.');
+  anunciar('Copia de la carta descargada.');
 }
 
 async function importar(ev) {
@@ -288,7 +288,7 @@ async function importar(ev) {
   try {
     datos = JSON.parse(await f.text());
   } catch {
-    ui.cartaError = ['El archivo no es un JSON válido.'];
+    ui.cartaError = ['Ese archivo no es una copia de la carta: no se pudo leer.'];
     pintarCarta();
     return;
   }
@@ -298,8 +298,8 @@ async function importar(ev) {
     pintarCarta();
     return;
   }
-  if (!(await confirmar({ titulo: '¿Reemplazar la carta?', texto: `La carta del archivo tiene ${datos.platos.length} platos en ${datos.categorias.length} categorías. Reemplaza la actual en esta computadora.`, aceptar: 'Reemplazar' }))) return;
-  await guardarCarta(datos, 'Carta importada.');
+  if (!(await confirmar({ titulo: '¿Reemplazar la carta?', texto: `La copia tiene ${datos.platos.length} platos en ${datos.categorias.length} categorías. Reemplaza la actual en esta computadora.`, aceptar: 'Reemplazar' }))) return;
+  await guardarCarta(datos, 'Carta reemplazada con la copia.');
 }
 
 // ——— Mesas y placas ———
@@ -548,7 +548,7 @@ function pintarAjustes() {
     ),
     h('section', { class: 'admin__bloque', 'aria-labelledby': 'h-sala' },
       h('h3', { id: 'h-sala' }, 'Código de sala'),
-      h('p', {}, `Esta computadora usa la sala ${caja.sala}. Va en la dirección de cada mesa y en el tema del relevo (atk-mesa-${caja.sala}).`),
+      h('p', {}, `Esta computadora usa la sala ${caja.sala}. Va en la dirección de cada mesa: sin él, un teléfono no puede mandarle pedidos a esta caja.`),
       h('p', { class: 'ayuda' }, 'Cámbialo si alguien de fuera lo conoce. Las placas impresas con el código viejo dejan de funcionar y se borran los datos de esta computadora.'),
       h('button', { type: 'button', class: 'boton boton--peligro', onclick: cambiarSala }, 'Cambiar el código de sala'),
     ),

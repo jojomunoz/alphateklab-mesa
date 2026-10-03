@@ -109,10 +109,10 @@ export function alergenosDe(carta, platoId, mods = []) {
 /** Validación completa (para importar un JSON en el panel). Devuelve {ok, errores:[texto]}. */
 export function validarCarta(carta) {
   const errores = [];
-  if (!carta || typeof carta !== 'object') return { ok: false, errores: ['El archivo no es una carta (no es un objeto JSON).'] };
+  if (!carta || typeof carta !== 'object') return { ok: false, errores: ['Ese archivo no es una copia de la carta.'] };
   if (!Array.isArray(carta.categorias) || carta.categorias.length === 0) errores.push('Falta la lista de categorías.');
   if (!Array.isArray(carta.platos)) errores.push('Falta la lista de platos.');
-  if (!Array.isArray(carta.grupos)) errores.push('Falta la lista de grupos de modificadores (puede ir vacía: []).');
+  if (!Array.isArray(carta.grupos)) errores.push('Falta la lista de opciones de los platos (puede ir vacía).');
   if (errores.length) return { ok: false, errores };
   const ids = new Set();
   const cats = new Set();
