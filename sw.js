@@ -3,7 +3,7 @@
 // siguiente carga y nunca se mezclan archivos de dos versiones. No toca nada de otros dominios (el relevo
 // ntfy.sh y la librería del QR pasan directo).
 
-const VERSION = 'atk-mesa-v2';
+const VERSION = 'atk-mesa-v3';
 const PRECARGA = [
   'mesa.html',
   'manifest.webmanifest',
@@ -24,6 +24,7 @@ const PRECARGA = [
   'js/nucleo/dinero.mjs',
   'js/nucleo/division.mjs',
   'js/nucleo/estados.mjs',
+  'js/nucleo/intentos.mjs',
   'js/nucleo/mensajes.mjs',
   'js/nucleo/plano.mjs',
   'js/nucleo/propina.mjs',
