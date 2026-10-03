@@ -1,0 +1,157 @@
+/* alphateklab Mesa · tokens. Colores SOLO desde aquí. Los pares que se usan están medidos en
+   pruebas/contraste.test.mjs (lee este archivo; si cambias un color, la prueba lo vuelve a medir). */
+
+@font-face {
+  font-family: 'Bricolage Grotesque';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('../fuentes/bricolage-700-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Bricolage Grotesque';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('../fuentes/bricolage-700-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Atkinson Hyperlegible Next';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url('../fuentes/atkinson-next-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Atkinson Hyperlegible Next';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url('../fuentes/atkinson-next-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+:root {
+  color-scheme: light;
+  /* papel y tinta: gris verdoso claro, no crema; ni blanco ni negro puros */
+  --fondo: #f3f5f1;
+  --superficie: #fbfcfa;
+  --superficie-2: #e8ece6;
+  --tinta: #1b1f1c;
+  --tinta-2: #4b544e;
+  --filete: #cdd5cd;
+  --borde: #7d887f;
+  /* verde plátano: botón principal y encabezados de categoría */
+  --primario: #1f5130;
+  --sobre-primario: #fbfcfa;
+  --primario-texto: #1f5130;
+  --primario-suave: #dce9de;
+  /* pixbae: solo la marca de la fonda y el contador del carrito (cifra en negrita de 19 px o más) */
+  --pixbae: #d8452a;
+  --sobre-pixbae: #fbfcfa;
+  /* estados, con su fondo suave */
+  --ok: #1d7a3e;
+  --ok-suave: #e2f0e5;
+  --espera: #a15c07;
+  --espera-suave: #fbeedb;
+  --alerta: #b42318;
+  --alerta-suave: #fbe5e2;
+  --foco: #1f5130;
+  --velo: #1b1f1c;
+
+  --f-titulo: 'Bricolage Grotesque', 'Atkinson Hyperlegible Next', system-ui, sans-serif;
+  --f-texto: 'Atkinson Hyperlegible Next', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  --r-control: 6px;
+  --r-ticket: 0;
+
+  --dur-respuesta: 120ms;
+  --dur-estado: 220ms;
+  --dur-vista: 340ms;
+  --ease-salida: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-mover: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-irse: cubic-bezier(0.4, 0, 1, 1);
+  --mov-dist: 10px;
+
+  --alto-barra: 44px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-tema='claro']) {
+    color-scheme: dark;
+    --fondo: #101512;
+    --superficie: #182019;
+    --superficie-2: #212a23;
+    --tinta: #e7ece7;
+    --tinta-2: #a8b3ab;
+    --filete: #2c3730;
+    --borde: #6f7d73;
+    --primario: #8fd1a4;
+    --sobre-primario: #0f1d14;
+    --primario-texto: #8fd1a4;
+    --primario-suave: #1d3325;
+    --pixbae: #ef6b4f;
+    --sobre-pixbae: #101512;
+    --ok: #6ccf8e;
+    --ok-suave: #15301f;
+    --espera: #e9a849;
+    --espera-suave: #352610;
+    --alerta: #f08a7c;
+    --alerta-suave: #3a1a16;
+    --foco: #8fd1a4;
+    --velo: #000000;
+  }
+}
+
+:root[data-tema='oscuro'] {
+  color-scheme: dark;
+  --fondo: #101512;
+  --superficie: #182019;
+  --superficie-2: #212a23;
+  --tinta: #e7ece7;
+  --tinta-2: #a8b3ab;
+  --filete: #2c3730;
+  --borde: #6f7d73;
+  --primario: #8fd1a4;
+  --sobre-primario: #0f1d14;
+  --primario-texto: #8fd1a4;
+  --primario-suave: #1d3325;
+  --pixbae: #ef6b4f;
+  --sobre-pixbae: #101512;
+  --ok: #6ccf8e;
+  --ok-suave: #15301f;
+  --espera: #e9a849;
+  --espera-suave: #352610;
+  --alerta: #f08a7c;
+  --alerta-suave: #3a1a16;
+  --foco: #8fd1a4;
+  --velo: #000000;
+}
+
+/* Cocina: siempre oscura. Tickets de papel sobre el riel, legibles a 2 m. */
+.tema-cocina {
+  color-scheme: dark;
+  --riel: #0b0f0c;
+  --riel-2: #161c18;
+  --sobre-riel: #eef1ec;
+  --sobre-riel-2: #9aa59d;
+  --papel: #eef1ec;
+  --papel-tinta: #111512;
+  --papel-tinta-2: #4b544e;
+  --banda-verde: #1d7a3e;
+  --banda-ambar: #a15c07;
+  --banda-rojo: #b42318;
+  --sobre-banda: #fbfcfa;
+  --foco-cocina: #8fd1a4;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --mov-dist: 0px;
+    --dur-estado: 120ms;
+    --dur-vista: 120ms;
+  }
+}
