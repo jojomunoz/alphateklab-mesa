@@ -4,6 +4,36 @@ import { TASAS_ITBMS, tasaAplicable } from './dinero.mjs';
 
 export const IDIOMAS = ['es', 'en'];
 export const MAX_CANT = 20;
+
+// Fotos de los platos: «img/platos/<id>» más «-200.webp», «-480.webp» o «-960.webp». Solo rutas de esta carpeta,
+// para que una carta importada no pueda pedir imágenes a otro sitio.
+export const ANCHOS_FOTO = [200, 480, 960];
+const RUTA_FOTO = /^img\/platos\/[a-z0-9-]+$/;
+/**
+ * Las fotos y las sugerencias llegaron a la carta de ejemplo el 3-oct-2026. A una carta ya guardada en la caja se le
+ * agregan las de los platos que coinciden por id, sin tocar nada de lo que editó el dueño. Devuelve si cambió algo.
+ */
+export function completarFotos(carta, base) {
+  if (!carta || !Array.isArray(carta.platos)) return false;
+  let cambio = false;
+  const fotos = new Map((base?.platos ?? []).filter((p) => typeof p.foto === 'string').map((p) => [p.id, p.foto]));
+  for (const p of carta.platos) {
+    if (p.foto == null && fotos.has(p.id)) {
+      p.foto = fotos.get(p.id);
+      cambio = true;
+    }
+  }
+  if (!Array.isArray(carta.sugerencias) && Array.isArray(base?.sugerencias)) {
+    carta.sugerencias = [...base.sugerencias];
+    cambio = true;
+  }
+  return cambio;
+}
+
+/** Dirección de la foto de un plato en un ancho, o null si el plato no tiene foto. */
+export function fotoPlato(p, ancho) {
+  return typeof p?.foto === 'string' && RUTA_FOTO.test(p.foto) ? `${p.foto}-${ancho}.webp` : null;
+}
 export const MAX_NOTA = 140;
 
 /** Texto en el idioma pedido, con el español de respaldo. */
@@ -143,6 +173,7 @@ export function validarCarta(carta) {
     if (!TASAS_ITBMS.includes(p.itbms)) errores.push(`El plato ${etiqueta} tiene una tasa de ITBMS no válida (${p.itbms}).`);
     if (!estaciones.has(p.estacion)) errores.push(`El plato ${etiqueta} va a una estación desconocida («${p.estacion}»).`);
     for (const g of p.grupos ?? []) if (!grupos.has(g)) errores.push(`El plato ${etiqueta} usa un grupo que no existe («${g}»).`);
+    if (p.foto != null && !(typeof p.foto === 'string' && RUTA_FOTO.test(p.foto))) errores.push(`El plato ${etiqueta} trae una foto que no es de esta carta.`);
   }
   return { ok: errores.length === 0, errores };
 }

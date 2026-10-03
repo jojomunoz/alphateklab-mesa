@@ -1,7 +1,7 @@
 // mesa.html · el comensal: carta → plato → pedido → cocina; llamar al mesero; cuenta → dividir → propina → pago.
 
 import { $, $$, h, icono, pintar, hora } from '../ui/dom.js';
-import { anunciar, prepararBarra, pintarConexion } from '../ui/comun.js';
+import { anunciar, prepararBarra, pintarConexion, imgPlato } from '../ui/comun.js';
 import { cargarCartaBase } from '../ui/caja-local.js';
 import { crearClienteMesa } from '../ui/cliente-mesa.js';
 import { leer, escribir, borrar, leerSesion, escribirSesion, borrarSesion } from '../ui/almacen.js';
@@ -419,11 +419,14 @@ function pintarCarta() {
                   'aria-disabled': p.agotado ? 'true' : false,
                   onclick: () => (p.agotado ? anunciar(`${texto(p.nombre, ui.idioma)}: ${T('agotado')}`) : abrirPlato(p.id)),
                 },
-                h('span', { class: 'plato__fila' }, h('span', { class: 'plato__nombre' }, texto(p.nombre, ui.idioma)), h('span', { class: 'plato__precio precio' }, dinero(p.precio))),
-                desc ? h('span', { class: 'plato__desc' }, desc) : null,
-                alerg.length ? h('span', { class: 'plato__alergenos' }, T('contiene', { lista: alerg.join(', ') })) : null,
-                p.agotado ? h('span', { class: 'estado estado--alerta plato__agotado' }, icono('x'), T('agotado')) : null,
-                cuantos ? h('span', { class: 'plato__en-pedido' }, icono('bolsa'), T('enTuPedido', { n: cuantos })) : null,
+                h('span', { class: 'plato__texto' },
+                  h('span', { class: 'plato__fila' }, h('span', { class: 'plato__nombre' }, texto(p.nombre, ui.idioma)), h('span', { class: 'plato__precio precio' }, dinero(p.precio))),
+                  desc ? h('span', { class: 'plato__desc' }, desc) : null,
+                  alerg.length ? h('span', { class: 'plato__alergenos' }, T('contiene', { lista: alerg.join(', ') })) : null,
+                  p.agotado ? h('span', { class: 'estado estado--alerta plato__agotado' }, icono('x'), T('agotado')) : null,
+                  cuantos ? h('span', { class: 'plato__en-pedido' }, icono('bolsa'), T('enTuPedido', { n: cuantos })) : null,
+                ),
+                imgPlato(p, { clase: 'plato__foto', sizes: '80px', ancho: 200 }),
               ),
             );
           }),
@@ -431,7 +434,8 @@ function pintarCarta() {
     ),
   );
 
-  pintar(v, nav, h('div', { class: 'contenedor carta' }, h('p', { class: 'carta__impuesto' }, textoPrecios(ui.idioma, cliente.resumen?.ajustes?.tipoLocal)), avisoCartaDesfasada(), secciones));
+  const conFotos = carta.platos.some((p) => p.foto);
+  pintar(v, nav, h('div', { class: 'contenedor carta' }, h('p', { class: 'carta__impuesto' }, textoPrecios(ui.idioma, cliente.resumen?.ajustes?.tipoLocal), conFotos ? ` ${T('fotosIlustrativas')}` : ''), avisoCartaDesfasada(), secciones));
   vigilarCategorias();
 }
 
@@ -542,6 +546,7 @@ function abrirPlato(id) {
       },
     },
     h('div', { class: 'hoja__cuerpo' },
+      imgPlato(p, { clase: 'hoja__foto', sizes: '(min-width: 640px) 560px, 100vw', ancho: 960, carga: 'eager' }),
       texto(p.desc, ui.idioma) ? h('p', { class: 'plato__desc plato__desc--ficha' }, texto(p.desc, ui.idioma)) : null,
       alergTexto,
       fieldsets,

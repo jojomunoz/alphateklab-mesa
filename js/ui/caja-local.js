@@ -3,6 +3,7 @@
 // pisen. Lo usan el inicio, la cocina, el salón, el kiosco, el panel y la mesa cuando se abre en la misma
 // computadora.
 
+import { completarFotos } from '../nucleo/carta.mjs';
 import { aplicar, ESQUEMA } from '../nucleo/caja.mjs';
 import { crearSemilla, semillaVieja, cuentaComoUso } from '../nucleo/semilla.mjs';
 import { generarSala, generarId, esSala } from '../nucleo/url.mjs';
@@ -81,6 +82,8 @@ export function abrirCaja(cartaBase) {
     // Primera visita, esquema viejo o datos de ejemplo sin tocar desde hace rato: el ejemplo vuelve con horas
     // de ahora (si no, la cocina mostraría tickets de ayer).
     estado = nuevaSemilla();
+    escribir(CLAVE_ESTADO, estado);
+  } else if (completarFotos(estado.carta, cartaBase)) {
     escribir(CLAVE_ESTADO, estado);
   }
 

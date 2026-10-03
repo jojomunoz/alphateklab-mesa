@@ -123,10 +123,14 @@ js/ui/      almacenamiento, caja local, relevo ntfy, puente caja↔teléfonos, p
 js/vistas/  una por página
 datos/      carta.json (la carta de ejemplo)
 fuentes/    Bricolage Grotesque y Atkinson Hyperlegible Next (woff2, latin + latin-ext, de Google Fonts)
-img/        íconos (sprite SVG), favicon y el QR de Yappy de ejemplo
+img/        íconos (sprite SVG), favicon, el QR de Yappy de ejemplo y platos/ (fotos de los 26 platos en WebP de 200, 480 y 960 px)
 sw.js       service worker: la carta queda guardada para verla con mala señal
 pruebas/    node --test
 herramientas/ recorrido y capturas con Playwright, placas a PDF y mutaciones de las pruebas (el QR de ejemplo de Yappy, img/yappy-ejemplo.svg, se hizo a mano)
 ```
 
 Librería externa: `qrcode-generator@1.4.4` (MIT) desde jsDelivr, con `integrity`, solo en las páginas que dibujan QR.
+
+Fotos de los platos: generadas con inteligencia artificial (ChatGPT / OpenAI) el 3 de octubre de 2026 con una sola
+receta para las 26 (misma mesa de teca y la misma luz); son ilustrativas y la carta lo dice («Fotos ilustrativas»).
+Cada plato apunta a la suya con `foto` en `datos/carta.json`; una carta importada solo puede usar rutas de `img/platos/`.

@@ -2,7 +2,7 @@
 // a los 60 s sin uso, con aviso los últimos 10.
 
 import { $, $$, h, icono, pintar } from '../ui/dom.js';
-import { anunciar } from '../ui/comun.js';
+import { anunciar, imgPlato } from '../ui/comun.js';
 import { arrancarCaja } from '../ui/arranque.js';
 import { leer, escribir } from '../ui/almacen.js';
 import { t as tr, textoError, textoPrecios } from '../nucleo/textos.mjs';
@@ -139,9 +139,12 @@ function pantallaPedido() {
                   'aria-disabled': p.agotado ? 'true' : false,
                   onclick: () => (p.agotado ? anunciar(`${texto(p.nombre, k.idioma)}: ${T('agotado')}`) : abrirPlato(p.id)),
                 },
-                  h('span', { class: 'k-plato__nombre' }, texto(p.nombre, k.idioma)),
-                  texto(p.desc, k.idioma) ? h('span', { class: 'k-plato__desc' }, texto(p.desc, k.idioma)) : null,
-                  h('span', { class: 'k-plato__precio cifra' }, p.agotado ? T('agotado') : dinero(p.precio)),
+                  imgPlato(p, { clase: 'k-plato__foto', sizes: '(min-width: 900px) 360px, 50vw', ancho: 480 }),
+                  h('span', { class: 'k-plato__texto' },
+                    h('span', { class: 'k-plato__nombre' }, texto(p.nombre, k.idioma)),
+                    texto(p.desc, k.idioma) ? h('span', { class: 'k-plato__desc' }, texto(p.desc, k.idioma)) : null,
+                    h('span', { class: 'k-plato__precio cifra' }, p.agotado ? T('agotado') : dinero(p.precio)),
+                  ),
                 ),
               ),
             ),
@@ -166,12 +169,30 @@ function pantallaPedido() {
               ),
             ),
           )
-        : h('p', { class: 'k-carrito__vacio' }, T('kioscoVacio')),
+        : h('div', { class: 'k-carrito__vacio' }, h('p', {}, T('kioscoVacio')), sugeridos(c)),
       h('div', { class: 'k-carrito__pie' },
         h('p', { class: 'k-carrito__total' }, h('span', {}, T('total')), h('strong', { class: 'cifra' }, dinero(total()))),
         h('p', { class: 'ayuda' }, textoPrecios(k.idioma, caja?.estado?.ajustes?.tipoLocal)),
         h('button', { type: 'button', class: 'boton boton--primario boton-k boton-k--grande', 'data-foco': 'ir-pagar', disabled: !k.carrito.length, onclick: () => ir('pagar') }, T('irAPagar')),
       ),
+    ),
+  );
+}
+
+/** Con el pedido vacío, las sugerencias de la casa (las elige el local en la carta) llenan el hueco del carrito. */
+function sugeridos(c) {
+  const lista = (c.sugerencias ?? []).map((id) => c.platos.find((p) => p.id === id)).filter((p) => p && !p.agotado).slice(0, 3);
+  if (!lista.length) return null;
+  return h('section', { class: 'k-sugeridos', 'aria-labelledby': 'k-sugeridos-titulo' },
+    h('h3', { id: 'k-sugeridos-titulo', class: 'k-sugeridos__titulo' }, T('sugerenciasCasa')),
+    h('ul', { class: 'k-sugeridos__lista' },
+      lista.map((p) => h('li', {},
+        h('button', { type: 'button', class: 'k-sugerido', 'data-foco': `ks-${p.id}`, onclick: () => abrirPlato(p.id) },
+          imgPlato(p, { clase: 'k-sugerido__foto', sizes: '(min-width: 900px) 300px, 30vw', ancho: 480 }),
+          h('span', { class: 'k-sugerido__nombre' }, texto(p.nombre, k.idioma)),
+          h('span', { class: 'k-sugerido__precio cifra' }, dinero(p.precio)),
+        ),
+      )),
     ),
   );
 }

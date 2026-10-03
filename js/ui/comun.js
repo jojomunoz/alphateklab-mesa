@@ -2,6 +2,27 @@
 
 import { h, icono, $ } from './dom.js';
 import { urlMesa, baseDe } from '../nucleo/url.mjs';
+import { fotoPlato, ANCHOS_FOTO } from '../nucleo/carta.mjs';
+
+/**
+ * Foto de un plato con sus tres anchos (el navegador elige según `sizes` y la densidad de la pantalla), o null si el
+ * plato no tiene. Va con alt vacío: el nombre del plato ya está escrito al lado.
+ */
+export function imgPlato(p, { clase, sizes, ancho = 480, carga = 'lazy' } = {}) {
+  const src = fotoPlato(p, ancho);
+  if (!src) return null;
+  return h('img', {
+    class: clase,
+    src,
+    srcset: ANCHOS_FOTO.map((w) => `${fotoPlato(p, w)} ${w}w`).join(', '),
+    sizes,
+    width: String(ancho),
+    height: String(ancho),
+    alt: '',
+    loading: carga,
+    decoding: 'async',
+  });
+}
 
 /** Avisos breves con región viva para lectores de pantalla. */
 let zonaAvisos = null;

@@ -107,162 +107,163 @@
     { "id": "bebidas", "nombre": { "es": "Bebidas", "en": "Drinks" } },
     { "id": "con-alcohol", "nombre": { "es": "Con alcohol", "en": "Alcoholic drinks" } }
   ],
+  "sugerencias": ["arroz-con-pollo", "corvina-frita", "chicha-saril"],
   "platos": [
     {
       "id": "carimanolas", "cat": "entradas", "precio": 450, "itbms": 7, "estacion": "caliente",
       "nombre": { "es": "Carimañolas (3)", "en": "Carimañolas (3)" },
       "desc": { "es": "Masa de yuca rellena de carne molida, fritas al momento.", "en": "Cassava fritters stuffed with seasoned ground beef, fried to order." },
-      "alergenos": [], "grupos": [], "agotado": false
+      "alergenos": [], "grupos": [], "agotado": false, "foto": "img/platos/carimanolas"
     },
     {
       "id": "patacones-ceviche", "cat": "entradas", "precio": 850, "itbms": 7, "estacion": "frios",
       "nombre": { "es": "Patacones con ceviche de corvina", "en": "Tostones with corvina ceviche" },
       "desc": { "es": "Corvina curada en limón con cebolla, culantro y ají chombo, sobre patacones.", "en": "Lime-cured corvina with onion, culantro and Scotch bonnet pepper, on tostones." },
-      "alergenos": ["pescado"], "grupos": ["quitar"], "agotado": false
+      "alergenos": ["pescado"], "grupos": ["quitar"], "agotado": false, "foto": "img/platos/patacones-ceviche"
     },
     {
       "id": "hojaldras", "cat": "entradas", "precio": 350, "itbms": 7, "estacion": "caliente",
       "nombre": { "es": "Hojaldras (2)", "en": "Hojaldras (2)" },
       "desc": { "es": "Masa de trigo frita, recién hecha.", "en": "Panamanian fried dough, made to order." },
-      "alergenos": ["gluten"], "grupos": [], "agotado": false
+      "alergenos": ["gluten"], "grupos": [], "agotado": false, "foto": "img/platos/hojaldras"
     },
     {
       "id": "tamal-de-olla", "cat": "entradas", "precio": 600, "itbms": 7, "estacion": "caliente",
       "nombre": { "es": "Tamal de olla", "en": "Tamal de olla" },
       "desc": { "es": "Masa de maíz nuevo cocida con pollo guisado, servida en cazuela.", "en": "Fresh corn masa cooked with stewed chicken, served in a clay pot." },
-      "alergenos": [], "grupos": [], "agotado": true
+      "alergenos": [], "grupos": [], "agotado": true, "foto": "img/platos/tamal-de-olla"
     },
     {
       "id": "sancocho", "cat": "sopas", "precio": 750, "itbms": 7, "estacion": "caliente",
       "nombre": { "es": "Sancocho de gallina", "en": "Hen sancocho" },
       "desc": { "es": "Gallina de patio, ñame y culantro. Con arroz blanco aparte.", "en": "Free-range hen soup with yam and culantro. White rice on the side." },
-      "alergenos": [], "grupos": ["quitar"], "agotado": false
+      "alergenos": [], "grupos": ["quitar"], "agotado": false, "foto": "img/platos/sancocho"
     },
     {
       "id": "arroz-con-pollo", "cat": "fuertes", "precio": 950, "itbms": 7, "estacion": "caliente",
       "nombre": { "es": "Arroz con pollo", "en": "Arroz con pollo" },
       "desc": { "es": "Arroz guisado con pollo, pimentón y aceitunas.", "en": "Rice cooked with chicken, bell pepper and olives." },
-      "alergenos": [], "grupos": ["acomp-sin-arroz", "extra"], "agotado": false
+      "alergenos": [], "grupos": ["acomp-sin-arroz", "extra"], "agotado": false, "foto": "img/platos/arroz-con-pollo"
     },
     {
       "id": "ropa-vieja", "cat": "fuertes", "precio": 1200, "itbms": 7, "estacion": "caliente",
       "nombre": { "es": "Ropa vieja con arroz y tajadas", "en": "Ropa vieja with rice and ripe plantain" },
       "desc": { "es": "Carne de res desmechada en salsa criolla, con arroz blanco y tajadas.", "en": "Shredded beef in a tomato and pepper sauce, with white rice and fried ripe plantain." },
-      "alergenos": [], "grupos": ["quitar", "extra"], "agotado": false
+      "alergenos": [], "grupos": ["quitar", "extra"], "agotado": false, "foto": "img/platos/ropa-vieja"
     },
     {
       "id": "corvina-frita", "cat": "fuertes", "precio": 1650, "itbms": 7, "estacion": "caliente",
       "nombre": { "es": "Corvina frita entera", "en": "Whole fried corvina" },
       "desc": { "es": "Corvina entera de una libra, más o menos, enharinada y frita. Con limón.", "en": "Whole corvina, about one pound, floured and fried. Served with lime." },
-      "alergenos": ["pescado", "gluten"], "grupos": ["acomp", "extra"], "agotado": false
+      "alergenos": ["pescado", "gluten"], "grupos": ["acomp", "extra"], "agotado": false, "foto": "img/platos/corvina-frita"
     },
     {
       "id": "corvina-ajillo", "cat": "fuertes", "precio": 1400, "itbms": 7, "estacion": "caliente",
       "nombre": { "es": "Filete de corvina al ajillo", "en": "Corvina fillet in garlic butter" },
       "desc": { "es": "A la plancha, con mantequilla y ajo.", "en": "Grilled, with butter and garlic." },
-      "alergenos": ["pescado", "lacteos"], "grupos": ["acomp"], "agotado": false
+      "alergenos": ["pescado", "lacteos"], "grupos": ["acomp"], "agotado": false, "foto": "img/platos/corvina-ajillo"
     },
     {
       "id": "bistec-picado", "cat": "fuertes", "precio": 1100, "itbms": 7, "estacion": "caliente",
       "nombre": { "es": "Bistec picado", "en": "Bistec picado" },
       "desc": { "es": "Res picada guisada con cebolla, tomate y pimentón.", "en": "Diced beef stewed with onion, tomato and bell pepper." },
-      "alergenos": [], "grupos": ["acomp", "quitar", "extra"], "agotado": false
+      "alergenos": [], "grupos": ["acomp", "quitar", "extra"], "agotado": false, "foto": "img/platos/bistec-picado"
     },
     {
       "id": "churrasco", "cat": "fuertes", "precio": 1800, "itbms": 7, "estacion": "caliente",
       "nombre": { "es": "Churrasco (8 oz)", "en": "Churrasco steak (8 oz)" },
       "desc": { "es": "A la parrilla, con chimichurri de la casa.", "en": "Grilled, with house chimichurri." },
-      "alergenos": [], "grupos": ["termino", "acomp", "extra"], "agotado": false
+      "alergenos": [], "grupos": ["termino", "acomp", "extra"], "agotado": false, "foto": "img/platos/churrasco"
     },
     {
       "id": "arroz-coco", "cat": "acompanamientos", "precio": 300, "itbms": 7, "estacion": "caliente",
       "nombre": { "es": "Arroz con coco y guandú", "en": "Coconut rice with pigeon peas" },
       "desc": { "es": "", "en": "" },
-      "alergenos": [], "grupos": [], "agotado": false
+      "alergenos": [], "grupos": [], "agotado": false, "foto": "img/platos/arroz-coco"
     },
     {
       "id": "tajadas", "cat": "acompanamientos", "precio": 250, "itbms": 7, "estacion": "caliente",
       "nombre": { "es": "Tajadas", "en": "Fried ripe plantain" },
       "desc": { "es": "Plátano maduro frito.", "en": "Sweet, ripe plantain, fried." },
-      "alergenos": [], "grupos": [], "agotado": false
+      "alergenos": [], "grupos": [], "agotado": false, "foto": "img/platos/tajadas"
     },
     {
       "id": "patacones", "cat": "acompanamientos", "precio": 300, "itbms": 7, "estacion": "caliente",
       "nombre": { "es": "Patacones", "en": "Tostones" },
       "desc": { "es": "Plátano verde frito y aplastado.", "en": "Green plantain, fried and smashed." },
-      "alergenos": [], "grupos": [], "agotado": false
+      "alergenos": [], "grupos": [], "agotado": false, "foto": "img/platos/patacones"
     },
     {
       "id": "ensalada", "cat": "acompanamientos", "precio": 300, "itbms": 7, "estacion": "frios",
       "nombre": { "es": "Ensalada de la casa", "en": "House salad" },
       "desc": { "es": "Lechuga, tomate, pepino y zanahoria.", "en": "Lettuce, tomato, cucumber and carrot." },
-      "alergenos": [], "grupos": [], "agotado": false
+      "alergenos": [], "grupos": [], "agotado": false, "foto": "img/platos/ensalada"
     },
     {
       "id": "cocadas", "cat": "postres", "precio": 300, "itbms": 7, "estacion": "frios",
       "nombre": { "es": "Cocadas (3)", "en": "Cocadas (3)" },
       "desc": { "es": "Coco rallado cocido con panela.", "en": "Grated coconut cooked with raw cane sugar." },
-      "alergenos": [], "grupos": [], "agotado": false
+      "alergenos": [], "grupos": [], "agotado": false, "foto": "img/platos/cocadas"
     },
     {
       "id": "arroz-con-leche", "cat": "postres", "precio": 350, "itbms": 7, "estacion": "frios",
       "nombre": { "es": "Arroz con leche", "en": "Rice pudding" },
       "desc": { "es": "Con canela y pasas.", "en": "With cinnamon and raisins." },
-      "alergenos": ["lacteos"], "grupos": [], "agotado": false
+      "alergenos": ["lacteos"], "grupos": [], "agotado": false, "foto": "img/platos/arroz-con-leche"
     },
     {
       "id": "raspao", "cat": "postres", "precio": 250, "itbms": 7, "estacion": "frios",
       "nombre": { "es": "Raspao", "en": "Raspao (shaved ice)" },
       "desc": { "es": "Hielo raspado con sirope y leche condensada.", "en": "Shaved ice with syrup and condensed milk." },
-      "alergenos": ["lacteos"], "grupos": ["sirope"], "agotado": false
+      "alergenos": ["lacteos"], "grupos": ["sirope"], "agotado": false, "foto": "img/platos/raspao"
     },
     {
       "id": "chicheme", "cat": "bebidas", "precio": 300, "itbms": 7, "estacion": "bar",
       "nombre": { "es": "Chicheme", "en": "Chicheme" },
       "desc": { "es": "Maíz cocido con leche, canela y vainilla. Frío.", "en": "Cold drink of cooked corn, milk, cinnamon and vanilla." },
-      "alergenos": ["lacteos"], "grupos": [], "agotado": false
+      "alergenos": ["lacteos"], "grupos": [], "agotado": false, "foto": "img/platos/chicheme"
     },
     {
       "id": "chicha-tamarindo", "cat": "bebidas", "precio": 250, "itbms": 7, "estacion": "bar",
       "nombre": { "es": "Chicha de tamarindo", "en": "Tamarind juice" },
       "desc": { "es": "Hecha en casa.", "en": "Made in house." },
-      "alergenos": [], "grupos": [], "agotado": false
+      "alergenos": [], "grupos": [], "agotado": false, "foto": "img/platos/chicha-tamarindo"
     },
     {
       "id": "chicha-saril", "cat": "bebidas", "precio": 250, "itbms": 7, "estacion": "bar",
       "nombre": { "es": "Chicha de saril", "en": "Sorrel (saril) drink" },
       "desc": { "es": "Flor de saril con jengibre.", "en": "Roselle flower with ginger." },
-      "alergenos": [], "grupos": [], "agotado": false
+      "alergenos": [], "grupos": [], "agotado": false, "foto": "img/platos/chicha-saril"
     },
     {
       "id": "cafe-boquete", "cat": "bebidas", "precio": 225, "itbms": 7, "estacion": "bar",
       "nombre": { "es": "Café de Boquete", "en": "Boquete coffee" },
       "desc": { "es": "Café filtrado de las tierras altas de Chiriquí.", "en": "Filter coffee from the Chiriquí highlands." },
-      "alergenos": [], "grupos": ["cafe"], "agotado": false
+      "alergenos": [], "grupos": ["cafe"], "agotado": false, "foto": "img/platos/cafe-boquete"
     },
     {
       "id": "agua", "cat": "bebidas", "precio": 150, "itbms": 7, "estacion": "bar",
       "nombre": { "es": "Agua (500 ml)", "en": "Bottled water (500 ml)" },
       "desc": { "es": "", "en": "" },
-      "alergenos": [], "grupos": [], "agotado": false
+      "alergenos": [], "grupos": [], "agotado": false, "foto": "img/platos/agua"
     },
     {
       "id": "cerveza", "cat": "con-alcohol", "precio": 300, "itbms": 10, "estacion": "bar",
       "nombre": { "es": "Cerveza nacional", "en": "Panamanian beer" },
       "desc": { "es": "Lager en botella, bien fría.", "en": "Bottled lager, ice cold." },
-      "alergenos": ["gluten"], "grupos": [], "agotado": false
+      "alergenos": ["gluten"], "grupos": [], "agotado": false, "foto": "img/platos/cerveza"
     },
     {
       "id": "seco-con-leche", "cat": "con-alcohol", "precio": 450, "itbms": 10, "estacion": "bar",
       "nombre": { "es": "Seco con leche", "en": "Seco with milk" },
       "desc": { "es": "Seco panameño, leche y hielo.", "en": "Panamanian cane spirit with milk over ice." },
-      "alergenos": ["lacteos"], "grupos": [], "agotado": false
+      "alergenos": ["lacteos"], "grupos": [], "agotado": false, "foto": "img/platos/seco-con-leche"
     },
     {
       "id": "ron-coco", "cat": "con-alcohol", "precio": 650, "itbms": 10, "estacion": "bar",
       "nombre": { "es": "Ron con agua de coco", "en": "Rum with coconut water" },
       "desc": { "es": "Ron añejo con agua de coco natural.", "en": "Aged rum with fresh coconut water." },
-      "alergenos": [], "grupos": [], "agotado": false
+      "alergenos": [], "grupos": [], "agotado": false, "foto": "img/platos/ron-coco"
     }
   ]
 }

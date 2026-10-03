@@ -287,6 +287,42 @@ html:has(> body.vista-mesa.con-barra-carrito) {
   }
 }
 
+/* Con foto: el texto a la izquierda y la miniatura cuadrada a la derecha, como en las apps de pedidos. */
+.plato:has(.plato__foto) {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  column-gap: 14px;
+}
+
+.plato__texto {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.plato__foto {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: var(--r-control);
+  background: var(--superficie-2);
+}
+
+.plato[aria-disabled='true'] .plato__foto {
+  filter: grayscale(1);
+  opacity: 0.55;
+}
+
+.hoja__foto {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: var(--r-control);
+  background: var(--superficie-2);
+}
+
 .plato__fila {
   display: flex;
   align-items: first baseline;

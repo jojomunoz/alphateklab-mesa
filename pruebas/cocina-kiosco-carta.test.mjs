@@ -152,3 +152,27 @@ test('la línea de los precios dice la verdad en una fonda', () => {
   assert.match(textoPrecios('es', 'fonda'), /no llevan ITBMS/);
   assert.match(textoPrecios('en', 'fonda'), /no ITBMS/);
 });
+
+test('fotos: solo rutas de esta carta, y una caja guardada recibe las del ejemplo sin perder lo editado', async () => {
+  const { fotoPlato, completarFotos } = await import('../js/nucleo/carta.mjs');
+  assert.equal(fotoPlato(CARTA.platos[0], 200), `img/platos/${CARTA.platos[0].id}-200.webp`);
+  assert.equal(fotoPlato({ foto: 'https://otro.sitio/x' }, 200), null);
+  assert.equal(fotoPlato({ foto: 'img/platos/../../x' }, 200), null);
+  assert.equal(fotoPlato({}, 200), null);
+  const ajena = structuredClone(CARTA);
+  ajena.platos[0].foto = 'https://otro.sitio/espia.gif';
+  assert.ok(validarCarta(ajena).errores.some((e) => /foto/.test(e)));
+  assert.ok(validarCarta(CARTA).ok, validarCarta(CARTA).errores.join('\n'));
+  // Una caja guardada antes de las fotos: el dueño cambió un precio y agregó un plato propio.
+  const vieja = structuredClone(CARTA);
+  for (const p of vieja.platos) delete p.foto;
+  delete vieja.sugerencias;
+  vieja.platos[0].precio = 999;
+  vieja.platos.push({ ...vieja.platos[1], id: 'plato-propio' });
+  assert.equal(completarFotos(vieja, CARTA), true);
+  assert.equal(vieja.platos[0].precio, 999);
+  assert.equal(vieja.platos[0].foto, CARTA.platos[0].foto);
+  assert.equal(vieja.platos.at(-1).foto, undefined);
+  assert.deepEqual(vieja.sugerencias, CARTA.sugerencias);
+  assert.equal(completarFotos(vieja, CARTA), false);
+});
