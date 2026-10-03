@@ -1,0 +1,737 @@
+/* mesa.html · el teléfono del comensal. Móvil primero; en pantalla ancha, la carta en dos columnas. */
+
+.vista-mesa {
+  --alto-pestanas: 52px;
+}
+
+.vista-mesa .contenedor {
+  max-width: 54rem;
+}
+
+.vista-mesa.con-barra-carrito {
+  padding-bottom: calc(88px + env(safe-area-inset-bottom));
+}
+
+/* ——— Cabecera: el número de mesa grande, para comprobar que es la tuya ——— */
+.cabecera-mesa {
+  padding-block: 14px 16px;
+}
+
+.cabecera-mesa__fila {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  justify-content: space-between;
+}
+
+.local {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.local__marca {
+  width: 30px;
+  height: 30px;
+  flex: none;
+  color: var(--pixbae);
+  fill: var(--pixbae);
+}
+
+.local__nombre {
+  font-family: var(--f-titulo);
+  font-size: 1.125rem;
+}
+
+.local__ejemplo {
+  display: block;
+  color: var(--tinta-2);
+  font-size: 0.875rem;
+}
+
+.boton-idioma {
+  flex: none;
+  font-size: 0.9375rem;
+  padding-inline: 0.8em;
+}
+
+.mesa-numero {
+  margin-top: 10px;
+  font-size: clamp(2.75rem, 13vw, 4rem);
+  line-height: 1;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+.mesa-nota {
+  margin-top: 6px;
+  color: var(--tinta-2);
+  font-size: 0.9375rem;
+}
+
+.acciones-mesa {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.acciones-mesa .boton {
+  padding-inline: 0.6em;
+  font-size: 1rem;
+}
+
+.cabecera-mesa .conexion {
+  margin-top: 10px;
+}
+
+.estado-carga {
+  padding-block: 32px;
+  display: grid;
+  gap: 14px;
+  justify-items: start;
+}
+
+/* ——— Pestañas ——— */
+.pestanas {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: var(--fondo);
+  border-bottom: 1px solid var(--filete);
+}
+
+.pestanas__lista {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.pestanas [role='tab'] {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: var(--alto-pestanas);
+  padding: 0 6px;
+  border: 0;
+  background: transparent;
+  color: var(--tinta-2);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.pestanas [role='tab'][aria-selected='true'] {
+  color: var(--tinta);
+}
+
+.pestanas [role='tab'][aria-selected='true']::after {
+  content: '';
+  position: absolute;
+  left: 10%;
+  right: 10%;
+  bottom: -1px;
+  height: 4px;
+  background: var(--primario-texto);
+}
+
+.pestanas [role='tab']:focus-visible {
+  outline-offset: -3px;
+}
+
+.pestanas__marca {
+  min-width: 22px;
+  height: 22px;
+  padding-inline: 5px;
+  border-radius: 3px;
+  background: var(--primario);
+  color: var(--sobre-primario);
+  font-size: 0.8125rem;
+  line-height: 22px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.pestanas__marca[hidden] {
+  display: none;
+}
+
+.vista {
+  padding-block: 8px 32px;
+}
+
+/* ——— Carta ——— */
+.categorias {
+  position: sticky;
+  top: var(--alto-pestanas);
+  z-index: 15;
+  background: var(--fondo);
+  border-bottom: 1px solid var(--filete);
+}
+
+.categorias__lista {
+  display: flex;
+  gap: 2px;
+  list-style: none;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent);
+  mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent);
+  scroll-behavior: smooth;
+}
+
+.categorias__lista::-webkit-scrollbar {
+  display: none;
+}
+
+.categorias__lista li {
+  flex: none;
+}
+
+.categorias__lista li:last-child {
+  padding-right: 24px;
+}
+
+.categorias__enlace {
+  min-height: 44px;
+  padding: 0 10px;
+  border: 0;
+  background: transparent;
+  color: var(--tinta-2);
+  font-weight: 700;
+  font-size: 0.9375rem;
+  white-space: nowrap;
+  cursor: pointer;
+  text-decoration: underline transparent;
+  text-decoration-thickness: 3px;
+  text-underline-offset: 0.45em;
+}
+
+.categorias__enlace[aria-current='true'] {
+  color: var(--primario-texto);
+  text-decoration-color: currentColor;
+}
+
+.categorias__enlace:focus-visible {
+  outline-offset: -3px;
+}
+
+.carta__impuesto {
+  margin-top: 14px;
+  color: var(--tinta-2);
+  font-size: 0.9375rem;
+}
+
+.categoria {
+  scroll-margin-top: calc(var(--alto-pestanas) + 52px);
+  padding-top: 22px;
+}
+
+.categoria h2 {
+  color: var(--primario-texto);
+  font-size: 1.5rem;
+  padding-bottom: 6px;
+  border-bottom: 3px solid var(--primario-texto);
+}
+
+.categoria h2:focus {
+  outline: none;
+}
+
+.categoria h2:focus-visible {
+  outline: 3px solid var(--foco);
+}
+
+.platos {
+  list-style: none;
+}
+
+.platos > li + li {
+  border-top: 1px dashed var(--filete);
+}
+
+.plato {
+  display: grid;
+  gap: 4px;
+  width: 100%;
+  padding: 14px 4px;
+  border: 0;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background-color var(--dur-respuesta) linear;
+}
+
+.plato:active:not([aria-disabled='true']) {
+  background: var(--superficie-2);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .plato:hover:not([aria-disabled='true']) {
+    background: var(--superficie-2);
+  }
+}
+
+.plato__fila {
+  display: flex;
+  align-items: first baseline;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.plato__nombre {
+  font-family: var(--f-titulo);
+  font-size: 1.125rem;
+  line-height: 1.25;
+  min-width: 0;
+}
+
+.plato__precio {
+  flex: none;
+  font-weight: 700;
+}
+
+.plato__desc {
+  color: var(--tinta-2);
+  font-size: 0.9375rem;
+}
+
+.plato__desc--ficha {
+  color: var(--tinta);
+  font-size: 1rem;
+}
+
+.plato__alergenos {
+  color: var(--tinta-2);
+  font-size: 0.875rem;
+}
+
+.plato__agotado {
+  justify-self: start;
+}
+
+.plato__en-pedido {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--primario-texto);
+  font-weight: 700;
+  font-size: 0.9375rem;
+}
+
+.plato[aria-disabled='true'] {
+  cursor: not-allowed;
+}
+
+.plato[aria-disabled='true'] .plato__nombre,
+.plato[aria-disabled='true'] .plato__precio {
+  color: var(--tinta-2);
+}
+
+.plato[aria-disabled='true'] .plato__precio {
+  text-decoration: line-through;
+}
+
+@media (min-width: 900px) {
+  .platos {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 40px;
+  }
+  .platos > li + li {
+    border-top: 0;
+  }
+  .platos > li {
+    border-bottom: 1px dashed var(--filete);
+  }
+}
+
+/* ——— Barra del pedido ——— */
+.barra-carrito {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 30;
+  padding: 10px 0 calc(10px + env(safe-area-inset-bottom));
+  background: var(--fondo);
+  border-top: 1px solid var(--filete);
+}
+
+.barra-carrito__boton {
+  justify-content: space-between;
+}
+
+.barra-carrito__texto {
+  flex: 1;
+  text-align: left;
+}
+
+.contador {
+  min-width: 32px;
+  height: 32px;
+  padding-inline: 8px;
+  border-radius: 999px;
+  background: var(--pixbae);
+  color: var(--sobre-pixbae);
+  font-size: 1.1875rem;
+  font-weight: 700;
+  line-height: 32px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ——— Hojas (ficha del plato, pedido, llamada) ——— */
+.hoja__form {
+  display: contents;
+}
+
+.grupo {
+  display: grid;
+  gap: 8px;
+}
+
+.grupo legend {
+  margin-bottom: 8px;
+  font-size: 1.0625rem;
+}
+
+.grupo__regla {
+  margin-left: 4px;
+  color: var(--tinta-2);
+  font-weight: 400;
+  font-size: 0.9375rem;
+}
+
+.grupo__opciones {
+  display: grid;
+  gap: 8px;
+}
+
+.cantidad {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.cantidad__control {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.cantidad__valor {
+  min-width: 2.5ch;
+  text-align: center;
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.boton--con-total {
+  justify-content: space-between;
+}
+
+.renglon-carrito + .renglon-carrito {
+  padding-top: 10px;
+  border-top: 1px dashed var(--filete);
+}
+
+.renglon-carrito__controles {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.renglon-carrito__cant {
+  min-width: 2ch;
+  text-align: center;
+  font-weight: 700;
+}
+
+.renglon-carrito__controles .boton--texto {
+  margin-left: auto;
+}
+
+.vacio {
+  padding: 18px 0;
+  color: var(--tinta-2);
+}
+
+.aviso-relevo {
+  font-size: 0.875rem;
+}
+
+/* ——— Mi mesa ——— */
+.bloque {
+  display: grid;
+  gap: 10px;
+  margin-block: 14px 22px;
+}
+
+.bloque__titulo {
+  font-size: 1.25rem;
+}
+
+.avisos {
+  list-style: none;
+  display: grid;
+  gap: 8px;
+}
+
+.aviso {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 10px;
+  padding: 10px 12px;
+  border-radius: var(--r-control);
+  background: var(--superficie);
+  border: 1px solid var(--filete);
+}
+
+.aviso > .icono {
+  width: 1.4em;
+  height: 1.4em;
+}
+
+.aviso__texto {
+  flex: 1 1 10rem;
+  font-weight: 700;
+}
+
+.aviso__hora {
+  font-weight: 400;
+  color: var(--tinta-2);
+  font-variant-numeric: tabular-nums;
+}
+
+.aviso .boton--texto {
+  min-height: 44px;
+}
+
+.lista-tickets {
+  list-style: none;
+  display: grid;
+  gap: 18px;
+  margin-top: 16px;
+}
+
+.ticket--pedido .estado {
+  margin-bottom: 10px;
+}
+
+.avance {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 4px;
+  list-style: none;
+  margin-bottom: 12px;
+}
+
+.avance__paso {
+  height: 6px;
+  background: var(--superficie-2);
+}
+
+.avance__paso--hecho {
+  background: var(--ok);
+}
+
+.avance__paso[aria-current='step'] {
+  height: 10px;
+  margin-top: -2px;
+}
+
+/* ——— Cuenta y pago ——— */
+.ticket--cuenta {
+  margin-top: 12px;
+}
+
+.ticket__precuenta {
+  margin-top: 6px;
+  color: var(--tinta-2);
+  font-size: 0.875rem;
+}
+
+.renglon--falta {
+  font-weight: 700;
+}
+
+.estado--bloque {
+  display: flex;
+  width: fit-content;
+  max-width: 100%;
+  margin-block: 14px;
+}
+
+.pago {
+  display: grid;
+  gap: 22px;
+  margin-top: 22px;
+}
+
+.paso {
+  display: grid;
+  gap: 10px;
+}
+
+.paso__titulo {
+  margin-bottom: 8px;
+  font-family: var(--f-titulo);
+  font-size: 1.25rem;
+}
+
+.grupo__opciones--fila {
+  grid-template-columns: repeat(auto-fit, minmax(9.5rem, 1fr));
+}
+
+.grupo__opciones--propina {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.grupo__opciones--propina .opcion:nth-child(n + 4) {
+  grid-column: span 3;
+}
+
+@media (min-width: 560px) {
+  .grupo__opciones--propina {
+    grid-template-columns: repeat(5, 1fr);
+  }
+  .grupo__opciones--propina .opcion:nth-child(n + 4) {
+    grid-column: auto;
+  }
+}
+
+.opcion--propina {
+  flex-wrap: wrap;
+  row-gap: 0;
+}
+
+.opcion--propina .opcion__texto {
+  font-weight: 700;
+}
+
+.opcion--propina .opcion__extra {
+  flex-basis: 100%;
+  padding-left: 34px;
+  font-size: 0.9375rem;
+}
+
+.opcion__sub {
+  display: block;
+}
+
+.propina__detalle {
+  font-weight: 700;
+}
+
+.metodo__detalle {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.yappy-qr {
+  width: 168px;
+  height: 168px;
+  border: 1px solid var(--filete);
+}
+
+.asignacion {
+  list-style: none;
+  display: grid;
+  gap: 12px;
+}
+
+.asignacion__renglon {
+  display: grid;
+  gap: 6px;
+  padding-bottom: 10px;
+  border-bottom: 1px dashed var(--filete);
+}
+
+.asignacion__personas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.persona {
+  min-width: 44px;
+  min-height: 44px;
+  border: 2px solid var(--borde);
+  border-radius: var(--r-control);
+  background: var(--superficie);
+  color: var(--tinta);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+}
+
+.persona[aria-pressed='true'] {
+  background: var(--primario);
+  border-color: var(--primario);
+  color: var(--sobre-primario);
+}
+
+.ticket--resumen {
+  display: grid;
+  gap: 6px;
+}
+
+.cierre {
+  display: grid;
+  gap: 14px;
+  margin-top: 18px;
+}
+
+.resena {
+  display: grid;
+  gap: 8px;
+  justify-items: start;
+  margin-top: 6px;
+}
+
+.entrada {
+  display: grid;
+  gap: 16px;
+  max-width: 26rem;
+  padding-block: 16px;
+}
+
+.entrada h2 {
+  font-family: var(--f-texto);
+  font-weight: 400;
+  font-size: 1.0625rem;
+  line-height: 1.5;
+}
+
+.entrada input {
+  font-size: 2rem;
+  font-weight: 700;
+  max-width: 8ch;
+  font-variant-numeric: tabular-nums;
+}
+
+.entrada__enlace {
+  margin-top: 12px;
+}
+
+/* ——— Pie ——— */
+.pie-mesa {
+  display: grid;
+  gap: 8px;
+  justify-items: start;
+  padding-block: 24px 32px;
+  border-top: 1px solid var(--filete);
+  color: var(--tinta-2);
+  font-size: 0.875rem;
+}
+
+.pie-mesa .boton--texto {
+  padding-inline: 0;
+}

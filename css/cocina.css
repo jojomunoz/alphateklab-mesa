@@ -1,0 +1,341 @@
+/* cocina.html · siempre oscura. Tickets de papel colgados del riel; legible a 2 m. */
+
+.vista-cocina {
+  background: var(--riel);
+  color: var(--sobre-riel);
+  font-size: 1.125rem;
+}
+
+.vista-cocina :focus-visible {
+  outline-color: var(--foco-cocina);
+}
+
+.contenedor--ancho {
+  max-width: 120rem;
+}
+
+.cabecera-cocina {
+  padding-block: 14px 10px;
+  border-bottom: 1px solid var(--riel-2);
+}
+
+.cabecera-cocina__fila {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px 20px;
+}
+
+.cabecera-cocina h1 {
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+}
+
+.cabecera-cocina__local {
+  font-family: var(--f-texto);
+  font-weight: 400;
+  font-size: 1rem;
+  color: var(--sobre-riel-2);
+  letter-spacing: 0;
+}
+
+.reloj {
+  margin-left: auto;
+  font-family: var(--f-titulo);
+  font-size: clamp(1.5rem, 3vw, 2.25rem);
+}
+
+.vista-cocina .conexion {
+  flex-basis: 100%;
+}
+
+.cabecera-cocina__controles {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 16px;
+  margin-top: 10px;
+}
+
+.filtro {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.filtro__boton {
+  min-height: 44px;
+  padding: 0 14px;
+  border: 2px solid var(--borde);
+  border-radius: var(--r-control);
+  background: transparent;
+  color: var(--sobre-riel);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.filtro__boton[aria-pressed='true'] {
+  background: var(--sobre-riel);
+  color: var(--riel);
+  border-color: var(--sobre-riel);
+}
+
+.cabecera-cocina__botones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.vista-cocina .boton--secundario {
+  background: var(--riel-2);
+  color: var(--sobre-riel);
+  border-color: var(--borde);
+}
+
+.vista-cocina .boton--secundario[aria-pressed='true'] {
+  border-color: var(--banda-verde);
+}
+
+.vista-cocina .boton:disabled {
+  background: transparent;
+  color: var(--sobre-riel-2);
+  border-color: var(--riel-2);
+}
+
+/* ——— Tablero ——— */
+.tablero {
+  padding-block: 18px;
+}
+
+.columnas {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 22px;
+  align-items: start;
+}
+
+.columna__titulo {
+  font-size: 1.375rem;
+  padding-bottom: 8px;
+  margin-bottom: 12px;
+  border-bottom: 3px solid var(--sobre-riel-2);
+}
+
+.columna__cuenta {
+  color: var(--sobre-riel-2);
+}
+
+.riel {
+  list-style: none;
+  display: grid;
+  gap: 18px;
+}
+
+.riel--flujo {
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 21rem), 1fr));
+  align-items: start;
+}
+
+.vacio-cocina {
+  padding: 28px 0;
+  color: var(--sobre-riel-2);
+  font-size: 1.25rem;
+}
+
+.vacio-cocina--columna {
+  font-size: 1.0625rem;
+  padding: 8px 0;
+}
+
+/* El ticket de cocina: papel, banda de tiempo arriba */
+.ticket--cocina {
+  --diente: 9px;
+  background: var(--papel);
+  color: var(--papel-tinta);
+  padding: var(--diente) 0 calc(var(--diente) + 8px);
+}
+
+.ticket--nuevo {
+  animation: ticket-entra var(--dur-estado) var(--ease-salida);
+}
+
+@keyframes ticket-entra {
+  from {
+    transform: translateY(calc(var(--mov-dist) * -2));
+    opacity: 0;
+  }
+}
+
+.ticket-cocina__banda {
+  display: grid;
+  gap: 2px;
+  padding: 12px 16px 10px;
+  color: var(--sobre-banda);
+  background: var(--banda-verde);
+}
+
+.nivel-ambar .ticket-cocina__banda {
+  background: var(--banda-ambar);
+}
+
+.nivel-rojo .ticket-cocina__banda {
+  background: var(--banda-rojo);
+}
+
+.ticket-cocina__origen {
+  font-size: 1.625rem;
+}
+
+.ticket-cocina__ronda,
+.ticket-cocina__llevar {
+  font-family: var(--f-texto);
+  font-weight: 700;
+  font-size: 1.125rem;
+}
+
+.ticket-cocina__tiempo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.ticket-cocina__estacion {
+  padding: 8px 16px 0;
+  color: var(--papel-tinta-2);
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.renglones-cocina {
+  list-style: none;
+  padding: 6px 8px 0;
+}
+
+.renglones-cocina li + li {
+  border-top: 2px dashed color-mix(in srgb, var(--papel-tinta) 25%, transparent);
+}
+
+.renglon-cocina {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  width: 100%;
+  min-height: 56px;
+  padding: 10px 8px;
+  border: 0;
+  background: transparent;
+  color: var(--papel-tinta);
+  text-align: left;
+  cursor: pointer;
+  font-size: 1.375rem;
+  line-height: 1.25;
+}
+
+.renglon-cocina:focus-visible {
+  outline: 3px solid var(--banda-verde);
+  outline-offset: -3px;
+}
+
+.renglon-cocina__marca {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  flex: none;
+  margin-top: 1px;
+  border: 3px solid var(--papel-tinta);
+  border-radius: 3px;
+}
+
+.renglon-cocina__marca .icono {
+  width: 24px;
+  height: 24px;
+}
+
+.renglon-cocina__texto {
+  display: grid;
+  gap: 2px;
+}
+
+.renglon-cocina__mods {
+  font-size: 1.0625rem;
+  color: var(--papel-tinta-2);
+  font-weight: 700;
+}
+
+.renglon-cocina__nota {
+  font-size: 1.0625rem;
+  color: var(--papel-tinta);
+}
+
+.renglon-cocina[aria-pressed='true'] .renglon-cocina__plato,
+.renglon-cocina[aria-pressed='true'] .renglon-cocina__mods {
+  text-decoration: line-through;
+  text-decoration-thickness: 2px;
+  color: var(--papel-tinta-2);
+}
+
+.renglon-cocina[aria-pressed='true'] .renglon-cocina__marca {
+  background: var(--banda-verde);
+  border-color: var(--banda-verde);
+  color: var(--sobre-banda);
+}
+
+.ticket-cocina__pie {
+  padding: 10px 12px 0;
+}
+
+.boton-listo {
+  background: var(--banda-verde);
+  color: var(--sobre-banda);
+  font-size: 1.25rem;
+}
+
+/* ——— Listos para servir ——— */
+.listos {
+  margin-top: 6px;
+  padding: 14px 16px;
+  border: 2px solid var(--banda-verde);
+  border-radius: var(--r-control);
+}
+
+.listos h2 {
+  font-size: 1.25rem;
+  margin-bottom: 8px;
+}
+
+.listos ul {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 24px;
+}
+
+.listo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.listo > .icono {
+  color: var(--ok);
+}
+
+.listo__desde {
+  color: var(--sobre-riel-2);
+}
+
+.ayuda-cocina {
+  margin-block: 18px 32px;
+  color: var(--sobre-riel-2);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  @keyframes ticket-entra {
+    from {
+      opacity: 0;
+    }
+  }
+}

@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="es" data-tema="oscuro">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cocina · Fonda Pixbae (restaurante de ejemplo)</title>
+  <meta name="description" content="Pantalla de cocina de alphateklab Mesa: comandas por estación con hora de entrada y minutos de espera.">
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#0b0f0c">
+  <link rel="icon" href="img/favicon.svg" type="image/svg+xml">
+  <link rel="preload" href="fuentes/bricolage-700-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="fuentes/atkinson-next-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/cocina.css">
+  <script type="module" src="js/vistas/cocina.js"></script>
+</head>
+<body class="vista-cocina tema-cocina">
+  <header class="barra-demo">
+    <div class="contenedor contenedor--ancho">
+      <div class="barra-demo__fila">
+        <p class="barra-demo__marca"><strong>alphateklab Mesa</strong> · demo con un restaurante de ejemplo</p>
+        <nav aria-label="Vistas de la demo">
+          <ul>
+            <li><a href="index.html">Inicio</a></li>
+            <li><a href="mesa.html">Mesa 7</a></li>
+            <li><a href="cocina.html">Cocina</a></li>
+            <li><a href="salon.html">Salón</a></li>
+            <li><a href="kiosco.html">Kiosco</a></li>
+            <li><a href="admin.html">Panel</a></li>
+          </ul>
+        </nav>
+        <button type="button" class="boton boton--texto" data-restablecer hidden>Restablecer datos de ejemplo</button>
+      </div>
+      <p class="barra-demo__aviso"><svg class="icono" aria-hidden="true"><use href="img/iconos.svg#info"></use></svg>Modo demostración entre dispositivos: los datos pasan por un servidor público de pruebas (ntfy.sh). No escribas datos reales.</p>
+    </div>
+  </header>
+
+  <header class="cabecera-cocina">
+    <div class="contenedor contenedor--ancho cabecera-cocina__fila">
+      <h1>Cocina <span class="cabecera-cocina__local">Fonda Pixbae · ejemplo</span></h1>
+      <p class="reloj cifra" id="reloj" aria-label="Hora actual"></p>
+      <p class="conexion" id="conexion" data-estado="conectando">Relevo entre dispositivos: conectando…</p>
+    </div>
+    <div class="contenedor contenedor--ancho cabecera-cocina__controles">
+      <div class="filtro" role="group" aria-label="Estación que muestra esta pantalla" id="filtro"></div>
+      <div class="cabecera-cocina__botones">
+        <button type="button" class="boton boton--secundario" id="boton-sonido" aria-pressed="false">
+          <svg class="icono" aria-hidden="true"><use href="img/iconos.svg#sonido-no"></use></svg>
+          <span>Activar sonido</span>
+        </button>
+        <button type="button" class="boton boton--secundario" id="boton-deshacer" disabled>
+          <svg class="icono" aria-hidden="true"><use href="img/iconos.svg#deshacer"></use></svg>
+          <span>Deshacer último toque</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main id="principal" class="contenedor contenedor--ancho">
+    <noscript><p class="nota">La pantalla de cocina necesita JavaScript.</p></noscript>
+    <h2 class="visualmente-oculto">Comandas abiertas</h2>
+    <div id="tablero" class="tablero" aria-live="off"></div>
+    <section class="listos" id="listos" aria-labelledby="titulo-listos" hidden>
+      <h2 id="titulo-listos">Listos para servir</h2>
+      <ul id="lista-listos"></ul>
+    </section>
+    <p class="ayuda ayuda-cocina">Toca un renglón cuando esté hecho. Con el ticket completo aparece «Listo para servir», que avisa al salón. Verde: menos de 10 min; ámbar: de 10 a 20; rojo: más de 20.</p>
+    <div id="anuncio-cocina" class="visualmente-oculto" role="status" aria-live="polite"></div>
+  </main>
+</body>
+</html>

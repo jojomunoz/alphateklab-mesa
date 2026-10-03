@@ -245,6 +245,8 @@ const MANEJADORES = {
     if (!t.ok) return fallo('transicion', t.error);
     marcar(b.pedido, 'rechazado', ahora);
     b.pedido.motivo = typeof a.datos?.motivo === 'string' ? a.datos.motivo.slice(0, 80) : '';
+    // El teléfono que lo mandó se entera aunque la cuenta se cierre (si la mesa queda libre).
+    if (b.mesa !== null) e.errores = [{ ref: b.pedido.id, mesa: b.mesa, motivo: 'rechazado', detalle: b.pedido.motivo, t: ahora }, ...e.errores].slice(0, 30);
     const m = e.mesas[b.mesa];
     if (m) {
       // Si la mesa solo tenía ese pedido y nada más, vuelve a quedar libre.

@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Tu mesa · Fonda Pixbae (restaurante de ejemplo)</title>
+  <meta name="description" content="Carta para pedir desde la mesa, llamar al mesero, pedir la cuenta y pagar con la propina que elijas. Demo de alphateklab Mesa con un restaurante de ejemplo.">
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#1f5130" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#101512" media="(prefers-color-scheme: dark)">
+  <link rel="icon" href="img/favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="preload" href="fuentes/bricolage-700-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="fuentes/atkinson-next-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/mesa.css">
+  <script type="module" src="js/vistas/mesa.js"></script>
+</head>
+<body class="vista-mesa">
+  <details class="barra-demo no-imprimir">
+    <summary>
+      <svg class="icono" aria-hidden="true"><use href="img/iconos.svg#info"></use></svg>
+      <span data-t="avisoRelevo">Modo demostración entre dispositivos: los datos pasan por un servidor público de pruebas (ntfy.sh). No escribas datos reales.</span>
+      <span class="barra-demo__mas">Demo</span>
+    </summary>
+    <div class="contenedor">
+      <div class="barra-demo__fila">
+        <p class="barra-demo__marca"><strong>alphateklab Mesa</strong> · demo con un restaurante de ejemplo</p>
+        <nav aria-label="Vistas de la demo">
+          <ul>
+            <li><a href="index.html">Inicio</a></li>
+            <li><a href="mesa.html">Mesa 7</a></li>
+            <li><a href="cocina.html">Cocina</a></li>
+            <li><a href="salon.html">Salón</a></li>
+            <li><a href="kiosco.html">Kiosco</a></li>
+            <li><a href="admin.html">Panel</a></li>
+          </ul>
+        </nav>
+        <button type="button" class="boton boton--texto" data-restablecer hidden>Restablecer datos de ejemplo</button>
+      </div>
+    </div>
+  </details>
+
+  <header class="cabecera-mesa">
+    <div class="contenedor cabecera-mesa__fila">
+      <div class="local">
+        <svg class="local__marca" viewBox="0 0 32 32" aria-hidden="true"><use href="img/iconos.svg#pixbae"></use></svg>
+        <p><span class="local__nombre" id="local-nombre">Fonda Pixbae</span> <span class="local__ejemplo" data-t="ejemplo">restaurante de ejemplo</span></p>
+      </div>
+      <button type="button" class="boton boton--secundario boton-idioma" id="boton-idioma" hidden>
+        <svg class="icono" aria-hidden="true"><use href="img/iconos.svg#idioma"></use></svg>
+        <span>English</span>
+      </button>
+    </div>
+    <div class="contenedor">
+      <h1 class="mesa-numero" id="titulo-mesa">Tu mesa</h1>
+      <p class="mesa-nota" id="nota-mesa" data-t="noEsTuMesa">¿No es tu mesa? Avísale al mesero.</p>
+      <div class="acciones-mesa" id="acciones-mesa" hidden>
+        <button type="button" class="boton boton--secundario" id="boton-llamar">
+          <svg class="icono" aria-hidden="true"><use href="img/iconos.svg#campana"></use></svg>
+          <span data-t="llamarMesero">Llamar al mesero</span>
+        </button>
+        <button type="button" class="boton boton--secundario" id="boton-cuenta">
+          <svg class="icono" aria-hidden="true"><use href="img/iconos.svg#recibo"></use></svg>
+          <span data-t="pedirCuenta">Pedir la cuenta</span>
+        </button>
+      </div>
+      <p class="conexion" id="conexion" data-estado="conectando" hidden></p>
+    </div>
+  </header>
+
+  <noscript>
+    <p class="nota sin-js">Para pedir desde la mesa hace falta JavaScript. Pídele la carta impresa al mesero.</p>
+  </noscript>
+
+  <div class="pestanas no-imprimir" id="pestanas" hidden>
+    <div class="contenedor">
+      <div role="tablist" aria-label="Secciones de la mesa" class="pestanas__lista">
+        <button type="button" role="tab" id="tab-carta" aria-controls="vista-carta" aria-selected="true" data-vista="carta"><span data-t="tabCarta">Carta</span></button>
+        <button type="button" role="tab" id="tab-mesa" aria-controls="vista-mesa" aria-selected="false" tabindex="-1" data-vista="mesa"><span data-t="tabMesa">Mi mesa</span> <span class="pestanas__marca" id="marca-mesa"></span></button>
+        <button type="button" role="tab" id="tab-cuenta" aria-controls="vista-cuenta" aria-selected="false" tabindex="-1" data-vista="cuenta"><span data-t="tabCuenta">Cuenta</span></button>
+      </div>
+    </div>
+  </div>
+
+  <main id="principal">
+    <div id="estado-carga" class="contenedor estado-carga" role="status">
+      <p data-t="cargandoCarta">Cargando la carta…</p>
+    </div>
+    <section id="vista-entrada" class="contenedor vista" hidden aria-labelledby="titulo-entrada"></section>
+    <section id="vista-carta" class="vista" role="tabpanel" aria-labelledby="tab-carta" hidden></section>
+    <section id="vista-mesa" class="vista contenedor" role="tabpanel" aria-labelledby="tab-mesa" hidden></section>
+    <section id="vista-cuenta" class="vista contenedor" role="tabpanel" aria-labelledby="tab-cuenta" hidden></section>
+  </main>
+
+  <footer class="pie-mesa contenedor no-imprimir">
+    <button type="button" class="boton boton--texto" id="boton-privacidad" data-t="privacidad">Privacidad</button>
+    <p class="pie-mesa__aviso" data-t="avisoRelevo">Modo demostración entre dispositivos: los datos pasan por un servidor público de pruebas (ntfy.sh). No escribas datos reales.</p>
+    <p class="pie-mesa__firma">Carta digital de <a href="index.html">alphateklab Mesa</a>.</p>
+  </footer>
+
+  <div class="barra-carrito no-imprimir" id="barra-carrito" hidden>
+    <div class="contenedor">
+      <button type="button" class="boton boton--primario boton--ancho boton--grande barra-carrito__boton" id="boton-carrito">
+        <span class="contador" id="contador-carrito">0</span>
+        <span class="barra-carrito__texto" id="texto-carrito">Ver pedido</span>
+        <span class="barra-carrito__total precio" id="total-carrito"></span>
+      </button>
+    </div>
+  </div>
+
+  <dialog class="hoja" id="dlg-plato" aria-labelledby="dlg-plato-titulo"></dialog>
+  <dialog class="hoja" id="dlg-carrito" aria-labelledby="dlg-carrito-titulo"></dialog>
+  <dialog class="hoja" id="dlg-llamar" aria-labelledby="dlg-llamar-titulo"></dialog>
+  <dialog class="hoja" id="dlg-privacidad" aria-labelledby="dlg-privacidad-titulo"></dialog>
+</body>
+</html>

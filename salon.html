@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Salón · Fonda Pixbae (restaurante de ejemplo)</title>
+  <meta name="description" content="Mapa del salón de alphateklab Mesa: estado de cada mesa, pedidos por aceptar, llamadas al mesero, cobro, borrador de factura y editor del plano.">
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#1f5130" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#101512" media="(prefers-color-scheme: dark)">
+  <link rel="icon" href="img/favicon.svg" type="image/svg+xml">
+  <link rel="preload" href="fuentes/bricolage-700-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="fuentes/atkinson-next-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/salon.css">
+  <script type="module" src="js/vistas/salon.js"></script>
+</head>
+<body class="vista-salon">
+  <header class="barra-demo">
+    <div class="contenedor contenedor--salon">
+      <div class="barra-demo__fila">
+        <p class="barra-demo__marca"><strong>alphateklab Mesa</strong> · demo con un restaurante de ejemplo</p>
+        <nav aria-label="Vistas de la demo">
+          <ul>
+            <li><a href="index.html">Inicio</a></li>
+            <li><a href="mesa.html">Mesa 7</a></li>
+            <li><a href="cocina.html">Cocina</a></li>
+            <li><a href="salon.html">Salón</a></li>
+            <li><a href="kiosco.html">Kiosco</a></li>
+            <li><a href="admin.html">Panel</a></li>
+          </ul>
+        </nav>
+        <button type="button" class="boton boton--texto" data-restablecer hidden>Restablecer datos de ejemplo</button>
+      </div>
+      <p class="barra-demo__aviso"><svg class="icono" aria-hidden="true"><use href="img/iconos.svg#info"></use></svg>Modo demostración entre dispositivos: los datos pasan por un servidor público de pruebas (ntfy.sh). No escribas datos reales.</p>
+    </div>
+  </header>
+
+  <header class="cabecera-salon">
+    <div class="contenedor contenedor--salon cabecera-salon__fila">
+      <h1>Salón <span class="cabecera-salon__local">Fonda Pixbae · ejemplo</span></h1>
+      <p class="conexion" id="conexion" data-estado="conectando">Relevo entre dispositivos: conectando…</p>
+    </div>
+  </header>
+
+  <main id="principal" class="contenedor contenedor--salon salon">
+    <noscript><p class="nota">El salón necesita JavaScript.</p></noscript>
+    <div class="salon__principal">
+      <section class="pendientes" id="pendientes" aria-labelledby="titulo-pendientes">
+        <h2 id="titulo-pendientes">Por atender</h2>
+        <div id="lista-pendientes"></div>
+      </section>
+
+      <section class="mapa" aria-labelledby="titulo-mapa">
+        <div class="mapa__cabeza">
+          <h2 id="titulo-mapa">Mesas</h2>
+          <div class="segmentado" role="group" aria-label="Cómo ver las mesas" id="selector-vista">
+            <button type="button" aria-pressed="true" data-modo="plano">Plano</button>
+            <button type="button" aria-pressed="false" data-modo="lista">Lista</button>
+          </div>
+          <button type="button" class="boton boton--secundario" id="boton-editar">
+            <svg class="icono" aria-hidden="true"><use href="img/iconos.svg#lapiz"></use></svg>
+            <span>Editar plano</span>
+          </button>
+        </div>
+        <ul class="leyenda" aria-label="Qué significa cada estado">
+          <li><span class="muestra muestra--libre"></span>Libre</li>
+          <li><span class="muestra muestra--ocupada"></span>Ocupada</li>
+          <li><span class="muestra muestra--pidio"></span>Pidió (por aceptar)</li>
+          <li><span class="muestra muestra--llama"></span>Llama al mesero</li>
+          <li><span class="muestra muestra--cuenta"></span>Pidió la cuenta</li>
+          <li><span class="muestra muestra--pagada"></span>Pagada</li>
+        </ul>
+        <div id="edicion" hidden></div>
+        <div id="mesas"></div>
+      </section>
+
+      <section class="mostrador" id="mostrador" aria-labelledby="titulo-mostrador">
+        <h2 id="titulo-mostrador">Mostrador (pedidos del kiosco)</h2>
+        <div id="lista-mostrador"></div>
+      </section>
+
+      <p class="cierre-dia" id="cierre-dia"></p>
+    </div>
+
+    <aside class="panel-mesa" id="panel-mesa" aria-label="Detalle de la mesa"></aside>
+  </main>
+
+  <dialog class="hoja hoja--mesa" id="dlg-mesa" aria-labelledby="titulo-panel"></dialog>
+  <dialog class="hoja" id="dlg-factura" aria-labelledby="titulo-factura"></dialog>
+  <div id="anuncio-salon" class="visualmente-oculto" role="status" aria-live="polite"></div>
+</body>
+</html>

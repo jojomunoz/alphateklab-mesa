@@ -43,7 +43,7 @@ export function resumenMesa(estado, n, cartaBase, ahora = Date.now()) {
     av: (c?.avisos ?? []).map((a) => [a.id, a.tipo, a.estado, a.t, a.refs ?? []]),
     pag: (c?.pagos ?? []).map((p) => [p.id, p.parte, p.monto, p.propina, p.metodo, p.estado]),
     div: c?.division ? { t: c.division.tipo, n: c.division.n, p: c.division.partes, tot: c.division.total, as: c.division.asignacion ?? null } : null,
-    err: estado.errores.filter((x) => x.mesa === n).slice(0, 4).map((x) => [x.ref, x.motivo]),
+    err: estado.errores.filter((x) => x.mesa === n).slice(0, 4).map((x) => [x.ref, x.motivo, typeof x.detalle === 'string' ? x.detalle.slice(0, 80) : null]),
   };
   return recortar(s);
 }
@@ -105,7 +105,7 @@ export function expandirResumen(s) {
     ajustes: { aprobacion: s.aj.ap, pin: Boolean(s.aj.pin), propinas: s.aj.pr, resena: s.aj.re },
     parche: s.pc,
     cuenta,
-    errores: (s.err ?? []).map(([ref, motivo]) => ({ ref, motivo })),
+    errores: (s.err ?? []).map(([ref, motivo, detalle]) => ({ ref, motivo, detalle: detalle ?? null })),
     recortado: s.recortado ?? 0,
   };
 }
