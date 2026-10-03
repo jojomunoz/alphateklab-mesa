@@ -24,7 +24,7 @@ html:has(> body.vista-mesa.con-barra-carrito) {
 
 /* ——— Cabecera: el número de mesa grande, para comprobar que es la tuya ——— */
 .cabecera-mesa {
-  padding-block: 14px 16px;
+  padding-block: 10px 12px;
 }
 
 .cabecera-mesa__fila {
@@ -69,34 +69,67 @@ html:has(> body.vista-mesa.con-barra-carrito) {
   padding-inline: 0.8em;
 }
 
+.boton-idioma__corto {
+  display: none;
+}
+
+/* En un teléfono el botón dice «EN» o «ES» (su nombre completo va en aria-label), así el local cabe en una línea. */
+@media (max-width: 440px) {
+  .boton-idioma__largo {
+    display: none;
+  }
+  .boton-idioma__corto {
+    display: inline;
+  }
+}
+
+/* El número de mesa y, al lado, el aviso por si no es la tuya: una sola franja, para que la carta empiece arriba. */
+.mesa-identidad {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: 14px;
+  row-gap: 2px;
+  margin-top: 8px;
+}
+
 .mesa-numero {
-  margin-top: 10px;
-  font-size: clamp(2.75rem, 13vw, 4rem);
-  line-height: 1;
+  font-size: clamp(2.25rem, 10vw, 3.5rem);
+  line-height: 1.05;
   letter-spacing: -0.02em;
   font-variant-numeric: tabular-nums;
 }
 
 .mesa-nota {
-  margin-top: 6px;
   color: var(--tinta-2);
-  font-size: 0.9375rem;
+  font-size: 0.875rem;
 }
 
+.mesa-identidad .conexion {
+  flex-basis: 100%;
+}
+
+/* «Llamar al mesero» y «Pedir la cuenta» viven en la barra de abajo. */
 .acciones-mesa {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 9rem), 1fr));
+  grid-template-columns: 1fr 1fr;
   gap: 10px;
-  margin-top: 14px;
+  flex: 1 1 auto;
+  min-width: 0;
 }
 
+/* Como la barra de una app: el ícono arriba y el nombre abajo, para que «Llamar al mesero» quepa en una línea. */
 .acciones-mesa .boton {
-  padding-inline: 0.6em;
-  font-size: 1rem;
+  flex-direction: column;
+  gap: 2px;
+  min-height: 56px;
+  padding: 4px 6px;
+  font-size: 0.875rem;
+  line-height: 1.15;
 }
 
 .cabecera-mesa .conexion {
-  margin-top: 10px;
+  margin-top: 6px;
 }
 
 .estado-carga {
@@ -409,14 +442,65 @@ html:has(> body.vista-mesa.con-barra-carrito) {
   border-top: 1px solid var(--filete);
 }
 
+.barra-carrito__fila {
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+}
+
 .barra-carrito__boton {
+  flex: 1 1 auto;
+  min-width: 0;
   flex-wrap: wrap;
   justify-content: space-between;
+}
+
+/* Con algo en el pedido, llamar y pedir la cuenta quedan como íconos (con su nombre para lectores de pantalla). */
+.barra-carrito--con-pedido .acciones-mesa {
+  flex: none;
+  grid-template-columns: auto auto;
+}
+
+.barra-carrito--con-pedido .acciones-mesa {
+  gap: 8px;
+}
+
+.barra-carrito--con-pedido .acciones-mesa .boton {
+  width: 48px;
+  padding: 0;
+  justify-content: center;
+}
+
+.barra-carrito--con-pedido .barra-carrito__boton {
+  padding-inline: 12px;
+  font-size: 1.0625rem;
+}
+
+/* Teléfonos de 360 px: íconos de 44 px y letra un poco menor, para que «Ver pedido» y el total quepan en una línea. */
+@media (max-width: 380px) {
+  .barra-carrito--con-pedido .acciones-mesa .boton {
+    width: 44px;
+  }
+  .barra-carrito--con-pedido .barra-carrito__boton {
+    gap: 8px;
+    padding-inline: 10px;
+    font-size: 1rem;
+  }
+}
+
+.barra-carrito--con-pedido .acciones-mesa__texto {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 
 .barra-carrito__texto {
   flex: 1;
   text-align: left;
+  white-space: nowrap;
 }
 
 .contador {
@@ -812,4 +896,18 @@ html:has(> body.vista-mesa.con-barra-carrito) {
   flex-wrap: wrap;
   align-items: center;
   gap: 8px;
+}
+
+/* Al pagar, la vista baja al comprobante: que su título quede debajo de las pestañas fijas, no tapado por ellas. */
+.ticket--comprobante {
+  scroll-margin-top: calc(var(--tope-categorias, var(--alto-pestanas)) + 16px);
+}
+
+.ticket--comprobante .ticket__titulo:focus {
+  outline: none;
+}
+
+.ticket--comprobante .ticket__titulo:focus-visible {
+  outline: 3px solid var(--foco);
+  outline-offset: 2px;
 }

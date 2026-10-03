@@ -170,6 +170,14 @@ async function mismoNavegador(browser) {
     await tel.click('[data-foco=pagar]');
     await esperarTexto(tel, '.ticket--comprobante', 'Pendiente de confirmar');
     await esperarTexto(tel, '.ticket--comprobante', 'Pago simulado');
+    // El título del comprobante queda a la vista, debajo de las pestañas fijas, y con el foco (antes quedaba tapado).
+    const [tituloArriba, pestanasAbajo, conFoco] = await tel.evaluate(() => [
+      document.querySelector('.ticket--comprobante .ticket__titulo').getBoundingClientRect().top,
+      document.querySelector('#pestanas').getBoundingClientRect().bottom,
+      document.activeElement?.classList.contains('ticket__titulo'),
+    ]);
+    if (tituloArriba < pestanasAbajo) throw new Error(`el título del comprobante (y=${Math.round(tituloArriba)}) queda debajo de las pestañas (hasta y=${Math.round(pestanasAbajo)})`);
+    if (!conFoco) throw new Error('el foco no pasó al título del comprobante');
   });
   const tel2 = await ctx.newPage();
   const tel3 = await ctx.newPage();
@@ -340,8 +348,20 @@ async function casosDeBorde(browser) {
     await tel.click('[data-plato=cerveza]');
     await tel.click('#dlg-plato button[type=submit]');
     await tel.waitForSelector('#barra-carrito:not([hidden])');
+    // Se mide con la página quieta: tras «End» el navegador se desplaza con suavidad un rato, y medir a mitad de
+    // camino daba fallas al azar (1 de cada 4 corridas) que un teclado humano nunca ve.
     const tapado = () =>
-      tel.evaluate(() => {
+      tel.evaluate(async () => {
+        await new Promise((listo) => {
+          let antes = scrollY, quietos = 0;
+          const mirar = () => {
+            if (scrollY === antes) quietos += 1;
+            else { quietos = 0; antes = scrollY; }
+            if (quietos >= 4) listo();
+            else requestAnimationFrame(mirar);
+          };
+          requestAnimationFrame(mirar);
+        });
         const el = document.activeElement;
         if (!el || el === document.body || el.closest('.pestanas, .categorias, #barra-carrito, .barra-demo')) return null;
         const r = el.getBoundingClientRect();
@@ -361,6 +381,7 @@ async function casosDeBorde(browser) {
     }
     await tel.evaluate(() => document.querySelector('.platos li:last-child .plato').focus());
     await tel.keyboard.press('End');
+    await tapado(); // espera a que termine el desplazamiento suave de «End» antes de volver con Mayús+Tab
     for (let i = 0; i < 12; i++) {
       await tel.keyboard.press('Shift+Tab');
       const t = await tapado();

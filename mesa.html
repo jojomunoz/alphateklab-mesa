@@ -51,22 +51,12 @@
       </div>
       <button type="button" class="boton boton--secundario boton-idioma" id="boton-idioma" hidden>
         <svg class="icono" aria-hidden="true"><use href="img/iconos.svg#idioma"></use></svg>
-        <span>English</span>
+        <span class="boton-idioma__largo">English</span><span class="boton-idioma__corto" aria-hidden="true">EN</span>
       </button>
     </div>
-    <div class="contenedor">
+    <div class="contenedor mesa-identidad">
       <h1 class="mesa-numero" id="titulo-mesa">Tu mesa</h1>
       <p class="mesa-nota" id="nota-mesa" data-t="noEsTuMesa">¿No es tu mesa? Avísale al mesero.</p>
-      <div class="acciones-mesa" id="acciones-mesa" hidden>
-        <button type="button" class="boton boton--secundario" id="boton-llamar">
-          <svg class="icono" aria-hidden="true"><use href="img/iconos.svg#campana"></use></svg>
-          <span data-t="llamarMesero">Llamar al mesero</span>
-        </button>
-        <button type="button" class="boton boton--secundario" id="boton-cuenta">
-          <svg class="icono" aria-hidden="true"><use href="img/iconos.svg#recibo"></use></svg>
-          <span data-t="pedirCuenta">Pedir la cuenta</span>
-        </button>
-      </div>
       <p class="conexion" id="conexion" data-estado="conectando" hidden></p>
     </div>
   </header>
@@ -102,8 +92,19 @@
   </footer>
 
   <div class="barra-carrito no-imprimir" id="barra-carrito" hidden>
-    <div class="contenedor">
-      <button type="button" class="boton boton--primario boton--ancho boton--grande barra-carrito__boton" id="boton-carrito">
+    <div class="contenedor barra-carrito__fila">
+      <!-- Llamar y pedir la cuenta van abajo, a mano mientras se recorre la carta; con pedido quedan como íconos. -->
+      <div class="acciones-mesa" id="acciones-mesa" hidden>
+        <button type="button" class="boton boton--secundario" id="boton-llamar">
+          <svg class="icono" aria-hidden="true"><use href="img/iconos.svg#campana"></use></svg>
+          <span class="acciones-mesa__texto" data-t="llamarMesero">Llamar al mesero</span>
+        </button>
+        <button type="button" class="boton boton--secundario" id="boton-cuenta">
+          <svg class="icono" aria-hidden="true"><use href="img/iconos.svg#recibo"></use></svg>
+          <span class="acciones-mesa__texto" data-t="pedirCuenta">Pedir la cuenta</span>
+        </button>
+      </div>
+      <button type="button" class="boton boton--primario boton--ancho boton--grande barra-carrito__boton" id="boton-carrito" hidden>
         <span class="contador" id="contador-carrito">0</span>
         <span class="barra-carrito__texto" id="texto-carrito">Ver pedido</span>
         <span class="barra-carrito__total precio" id="total-carrito"></span>

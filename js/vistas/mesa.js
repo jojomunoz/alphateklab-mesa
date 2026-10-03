@@ -224,6 +224,7 @@ function arrancarMesa(n) {
   document.title = `${T('mesaTitulo', { n })} · Pixbae (${T('ejemplo')})`;
   $('#acciones-mesa').hidden = false;
   $('#pestanas').hidden = false;
+  pintarBarraCarrito();
   medirPestanas();
   $('#boton-idioma').hidden = false;
   $('#conexion').hidden = cliente.local;
@@ -245,7 +246,8 @@ function aplicarTextos() {
   for (const el of $$('[data-t]')) el.textContent = T(el.dataset.t);
   const b = $('#boton-idioma');
   if (b) {
-    b.querySelector('span').textContent = T('idiomaBoton');
+    b.querySelector('.boton-idioma__largo').textContent = T('idiomaBoton');
+    b.querySelector('.boton-idioma__corto').textContent = ui.idioma === 'es' ? 'EN' : 'ES';
     b.setAttribute('aria-label', T('idiomaAria'));
     b.lang = ui.idioma === 'es' ? 'en' : 'es';
   }
@@ -307,6 +309,7 @@ function pintarTodo() {
   if (r && r.existe === false) {
     $('#pestanas').hidden = true;
     $('#acciones-mesa').hidden = true;
+    pintarBarraCarrito();
     for (const v of VISTAS) $(`#vista-${v}`).hidden = true;
     pintarEntrada({ noExiste: mesa });
     return;
@@ -345,8 +348,12 @@ function pintarMarcaMesa() {
 function pintarBarraCarrito() {
   const n = piezasCarrito();
   const barra = $('#barra-carrito');
-  barra.hidden = n === 0;
-  document.body.classList.toggle('con-barra-carrito', n > 0);
+  // La barra lleva siempre «Llamar al mesero» y «Pedir la cuenta» (si la mesa existe); el botón del pedido, solo con
+  // algo en el carrito, y entonces los otros dos quedan como íconos.
+  barra.hidden = n === 0 && $('#acciones-mesa').hidden;
+  barra.classList.toggle('barra-carrito--con-pedido', n > 0);
+  $('#boton-carrito').hidden = n === 0;
+  document.body.classList.toggle('con-barra-carrito', !barra.hidden);
   $('#contador-carrito').textContent = String(n);
   $('#texto-carrito').textContent = T('verPedido');
   $('#total-carrito').textContent = n ? dinero(totalCarrito()) : '';
@@ -982,7 +989,7 @@ function comprobante(p, res) {
     h(
       'article',
       { class: 'ticket ticket--comprobante', 'aria-labelledby': `pg-${p.id}` },
-      h('header', { class: 'ticket__cabeza' }, h('h3', { class: 'ticket__titulo', id: `pg-${p.id}` }, T('comprobante')), h('p', { class: 'ticket__meta' }, T(`metodo.${p.metodo}`))),
+      h('header', { class: 'ticket__cabeza' }, h('h3', { class: 'ticket__titulo', id: `pg-${p.id}`, tabindex: '-1', 'data-foco': `comprobante-${p.id}` }, T('comprobante')), h('p', { class: 'ticket__meta' }, T(`metodo.${p.metodo}`))),
       p.parte !== null && p.parte !== undefined && div ? h('p', { class: 'ayuda' }, T('parteDe', { n: p.parte + 1, total: div.n })) : null,
       renglonTicket(T('consumo'), dinero(p.monto)),
       renglonTicket(T('propina'), dinero(p.propina ?? 0)),
@@ -1241,7 +1248,14 @@ function contenidoResumenPago(base) {
         cliente.enviar('pago', { parte, monto: base, propina: res.propina, metodo: pago.metodo });
         ui.pago = nuevoPago();
         pintarCuenta();
-        $('#vista-cuenta .ticket--comprobante')?.scrollIntoView({ block: 'center' });
+        // Al comprobante por arriba (su scroll-margin deja libres las pestañas fijas) y con el foco en su título: con
+        // «center», un comprobante largo quedaba con el título debajo de las pestañas.
+        const ticket = $('#vista-cuenta .ticket--comprobante');
+        if (ticket) {
+          ticket.scrollIntoView({ block: 'start' });
+          // data-foco en el título: al llegar la respuesta de la caja la vista se repinta y el foco sigue ahí
+          ticket.querySelector('.ticket__titulo')?.focus({ preventScroll: true });
+        }
       },
     }, pago.metodo === 'mesero' ? T('avisarPagoMesero') : T('simularPago')),
   ];
