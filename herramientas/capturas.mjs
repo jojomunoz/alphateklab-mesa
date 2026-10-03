@@ -11,6 +11,7 @@ const DIR = process.argv[2] ?? 'capturas';
 mkdirSync(DIR, { recursive: true });
 
 const errores = [];
+let limitados = 0;
 const informe = [];
 
 async function medir(page) {
@@ -57,7 +58,10 @@ async function preparar(browser, { ancho, alto, esquema }) {
   const ctx = await browser.newContext({ locale: 'es-PA', viewport: { width: ancho, height: alto }, colorScheme: esquema });
   const page = await ctx.newPage();
   page.on('console', (m) => {
-    if (m.type() === 'error' || m.type() === 'warning') errores.push(`[${ancho}×${alto} ${esquema}] ${m.text()}`);
+    if (m.type() !== 'error' && m.type() !== 'warning') return;
+    // 429 de ntfy.sh (límite por IP del relevo público): se cuenta aparte, no es un error de la página.
+    if (/status of 429/.test(m.text()) && /ntfy\.sh/.test(m.location()?.url ?? '')) limitados++;
+    else errores.push(`[${ancho}×${alto} ${esquema}] ${m.text()}`);
   });
   page.on('pageerror', (e) => errores.push(`[${ancho}×${alto} ${esquema}] ${e.message}`));
   // Un servicio con la mesa 7 pidiendo y la cuenta dividida, para que cada vista tenga estados reales.
@@ -203,4 +207,5 @@ for (const r of informe) {
 const capturas = informe.filter((r) => 'scrollX' in r).length;
 console.log(`\n${capturas} capturas en ${DIR}/. Scroll horizontal en ${informe.filter((r) => r.scrollX).length} de ${capturas}.`);
 console.log(errores.length ? `Consola: ${errores.length} errores o avisos\n${errores.join('\n')}` : 'Consola: sin errores ni avisos.');
+if (limitados) console.log(`ntfy.sh contestó 429 (límite por IP) ${limitados} veces; la página reintentó.`);
 process.exit(problemas || errores.length ? 1 : 0);

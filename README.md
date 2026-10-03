@@ -62,7 +62,9 @@ GitHub Pages sí funciona.
   en el tema `atk-mesa-<sala>`. Cualquiera que conozca el código de sala puede leer y escribir ahí, por eso toda
   pantalla avisa «No escribas datos reales», y la caja solo acepta del relevo lo que hace un comensal (pedir, llamar,
   pedir o dividir la cuenta, avisar un pago); confirmar pagos, liberar mesas o cambiar la carta solo se hace en la
-  computadora. Si ntfy no responde, todo sigue funcionando en el mismo navegador.
+  computadora. Si ntfy no responde, todo sigue funcionando en el mismo navegador. ntfy.sh además limita por IP: tras muchas
+  pruebas seguidas contesta 429 un rato; la caja reintenta el resumen a los 5, 15 y 30 s y el teléfono guarda sus
+  envíos en una bandeja de salida hasta que entran.
 - **Los datos** viven en el `localStorage` de la computadora (con versión de esquema). Sin almacenamiento
   (ventana privada) la demo funciona pero cada pestaña va por su cuenta.
 
