@@ -404,7 +404,7 @@ function bloquePedido(p, n, ahora) {
     'article',
     { class: 'pedido-salon' },
     h('header', { class: 'pedido-salon__cabeza' }, h('strong', {}, `Ronda ${p.ronda}`), h('span', { class: 'ayuda' }, ` · ${origen} · ${hora(p.t)}`), h('span', { class: `estado ${claseEstado}` }, ESTADO_PEDIDO[p.estado])),
-    h('ul', { class: 'renglones renglones--salon' }, p.renglones.map((r) => h('li', {}, h('div', { class: 'renglon' }, h('span', { class: 'renglon__cant' }, `${r.cant} ×`), h('span', { class: 'renglon__nombre' }, r.nombre), h('span', { class: 'renglon__puntos', 'aria-hidden': 'true' }), h('span', { class: 'renglon__monto' }, dinero(r.monto))), r.mods.length || r.nota ? h('p', { class: 'renglon__detalle' }, [r.mods.map((x) => x.nombre).join(', '), r.nota ? `«${r.nota}»` : ''].filter(Boolean).join(' · ')) : null))),
+    h('ul', { class: 'renglones renglones--salon' }, p.renglones.map((r) => h('li', {}, h('div', { class: 'renglon' }, h('span', { class: 'renglon__nombre' }, h('strong', { class: 'renglon__cant' }, `${r.cant} ×`), ' ', r.nombre), h('span', { class: 'renglon__puntos', 'aria-hidden': 'true' }), h('span', { class: 'renglon__monto' }, dinero(r.monto))), r.mods.length || r.nota ? h('p', { class: 'renglon__detalle' }, [r.mods.map((x) => x.nombre).join(', '), r.nota ? `«${r.nota}»` : ''].filter(Boolean).join(' · ')) : null))),
     p.estado === 'rechazado' && p.motivo ? h('p', { class: 'ayuda' }, `Motivo: ${p.motivo}`) : null,
     acciones,
   );
@@ -561,7 +561,7 @@ function abrirFactura(n) {
           { class: 'ticket ticket--factura', 'aria-labelledby': 'factura-titulo' },
           h('header', { class: 'ticket__cabeza ticket__cabeza--factura' }, h('h3', { class: 'ticket__titulo', id: 'factura-titulo' }, 'Borrador de factura'), h('p', { class: 'ticket__meta' }, `${est().ajustes.nombre} (restaurante de ejemplo) · Mesa ${n} · ${new Intl.DateTimeFormat('es-PA', { dateStyle: 'short', timeStyle: 'short' }).format(new Date())}`)),
           h('p', { class: 'factura__cliente' }, `Cliente: ${datos.nombre.trim() || 'Consumidor final'}${datos.ruc.trim() ? ` · RUC o cédula: ${datos.ruc.trim()}` : ''}`),
-          h('ul', { class: 'renglones' }, renglones.map((r) => h('li', {}, h('div', { class: 'renglon' }, h('span', { class: 'renglon__cant' }, `${r.cant} ×`), h('span', { class: 'renglon__nombre' }, `${r.nombre} (ITBMS ${r.tasa} %)`), h('span', { class: 'renglon__puntos', 'aria-hidden': 'true' }), h('span', { class: 'renglon__monto' }, dinero(r.monto)))))),
+          h('ul', { class: 'renglones' }, renglones.map((r) => h('li', {}, h('div', { class: 'renglon' }, h('span', { class: 'renglon__nombre' }, h('strong', { class: 'renglon__cant' }, `${r.cant} ×`), ' ', `${r.nombre} (ITBMS ${r.tasa} %)`), h('span', { class: 'renglon__puntos', 'aria-hidden': 'true' }), h('span', { class: 'renglon__monto' }, dinero(r.monto)))))),
           h(
             'div',
             { class: 'ticket__pie' },

@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>alphateklab Mesa · QR y NFC por mesa para restaurantes</title>
+  <meta name="description" content="Una placa con QR y NFC en cada mesa: el comensal ve la carta con precios finales, pide, llama al mesero y paga con la propina que elige. Con pantalla de cocina, mapa del salón y kiosco. Demo con un restaurante de ejemplo.">
+  <meta name="theme-color" content="#1f5130" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#101512" media="(prefers-color-scheme: dark)">
+  <meta property="og:title" content="alphateklab Mesa · QR y NFC por mesa">
+  <meta property="og:description" content="Pedir, llamar al mesero y pagar desde la mesa, con cocina y salón en tiempo real. Demo con un restaurante de ejemplo.">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="es_PA">
+  <link rel="icon" href="img/favicon.svg" type="image/svg+xml">
+  <link rel="preload" href="fuentes/bricolage-700-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="fuentes/atkinson-next-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/inicio.css">
+  <script type="module" src="js/vistas/inicio.js"></script>
+</head>
+<body class="vista-inicio">
+  <header class="barra-demo">
+    <div class="contenedor">
+      <div class="barra-demo__fila">
+        <p class="barra-demo__marca"><strong>alphateklab Mesa</strong> · demo con un restaurante de ejemplo</p>
+        <nav aria-label="Vistas de la demo">
+          <ul>
+            <li><a href="index.html">Inicio</a></li>
+            <li><a href="mesa.html">Mesa 7</a></li>
+            <li><a href="cocina.html">Cocina</a></li>
+            <li><a href="salon.html">Salón</a></li>
+            <li><a href="kiosco.html">Kiosco</a></li>
+            <li><a href="admin.html">Panel</a></li>
+          </ul>
+        </nav>
+        <button type="button" class="boton boton--texto" data-restablecer hidden>Restablecer datos de ejemplo</button>
+      </div>
+      <p class="barra-demo__aviso"><svg class="icono" aria-hidden="true"><use href="img/iconos.svg#info"></use></svg>Modo demostración entre dispositivos: los datos pasan por un servidor público de pruebas (ntfy.sh). No escribas datos reales.</p>
+    </div>
+  </header>
+
+  <main id="principal">
+    <section class="contenedor portada" aria-labelledby="titulo">
+      <div class="portada__texto">
+        <p class="portada__producto"><a href="../alphateklab/">alphateklab</a> Mesa</p>
+        <h1 id="titulo">Una placa con QR y NFC en cada mesa para pedir, llamar al mesero y pagar desde el teléfono</h1>
+        <p class="portada__bajada">Para restaurantes en Panamá. El comensal escanea la placa (o acerca el teléfono), ve la carta con el precio final, pide, llama al mesero y paga con la propina que él elige. La cocina y la caja lo ven en el momento.</p>
+        <p class="portada__honesto">El QR complementa la carta de papel y al mesero; no los reemplaza. En EE. UU. el 90 % de los comensales prefiere la carta impresa (<a href="https://ir.usfoods.com/news-events/press-releases/news-details/2024/US-Foods-2024-Diner-Dispatch-Survey-Uncovers-Surprising-Shifts-in-Diner-Preferences/default.aspx" rel="noopener">US Foods, abril de 2024, 1.005 encuestados</a>); de Panamá no hay una encuesta así. Donde el QR sí rinde es en pedir otra ronda, llamar y pagar sin esperar.</p>
+      </div>
+
+      <div class="prueba" aria-labelledby="titulo-prueba">
+        <h2 id="titulo-prueba" class="prueba__titulo">Pruébalo con tu teléfono</h2>
+        <div class="placa" id="placa">
+          <span class="placa__tornillo placa__tornillo--1" aria-hidden="true"></span>
+          <span class="placa__tornillo placa__tornillo--2" aria-hidden="true"></span>
+          <span class="placa__tornillo placa__tornillo--3" aria-hidden="true"></span>
+          <span class="placa__tornillo placa__tornillo--4" aria-hidden="true"></span>
+          <p class="placa__local"><svg class="placa__marca" viewBox="0 0 32 32" aria-hidden="true"><use href="img/iconos.svg#pixbae"></use></svg>Fonda Pixbae <span>restaurante de ejemplo</span></p>
+          <p class="placa__mesa">Mesa <strong>7</strong></p>
+          <div class="placa__qr" id="placa-qr" role="img" aria-label="Código QR de la mesa 7">
+            <p class="placa__cargando">Generando el QR…</p>
+          </div>
+          <p class="placa__instruccion">Escanea o acerca tu teléfono</p>
+          <p class="placa__dominio" id="placa-dominio">jojomunoz.github.io/alphateklab-mesa</p>
+        </div>
+        <ol class="prueba__pasos">
+          <li>Escanea el QR con la cámara del teléfono. Se abre la carta de la mesa 7, sin app y sin registrarte.</li>
+          <li>Pide algo, llama al mesero o pide la cuenta.</li>
+          <li>Míralo llegar a esta computadora: abre el salón y la cocina en otra pestaña.</li>
+        </ol>
+        <div class="prueba__botones">
+          <a class="boton boton--primario" href="salon.html" target="_blank" rel="noopener" id="abrir-salon">Abrir el salón</a>
+          <a class="boton boton--secundario" href="cocina.html" target="_blank" rel="noopener">Abrir la cocina</a>
+          <a class="boton boton--texto" href="mesa.html" id="abrir-mesa-aqui">Sin teléfono: abrir la mesa 7 aquí</a>
+        </div>
+        <div class="prueba__estado" id="estado-mesa7" aria-live="polite"></div>
+        <p class="conexion" id="conexion" data-estado="conectando">Relevo entre dispositivos: conectando…</p>
+        <p class="ayuda" id="aviso-localhost" hidden>Esta página está abierta en tu propia computadora (localhost): un teléfono no puede abrir esa dirección. Publicada en GitHub Pages, el mismo QR sí funciona.</p>
+      </div>
+    </section>
+
+    <section class="contenedor seccion" aria-labelledby="titulo-pasos">
+      <h2 id="titulo-pasos">Cómo funciona, en cuatro pasos</h2>
+      <ol class="pasos">
+        <li>
+          <h3>La mesa se identifica sola</h3>
+          <p>Cada placa lleva la dirección de su mesa en el QR y en una etiqueta NFC. El comensal ve en grande «Mesa 7 · Fonda Pixbae» y comprueba que es la suya; nunca elige la mesa de una lista.</p>
+        </li>
+        <li>
+          <h3>Pide por rondas; el mesero lo aprueba</h3>
+          <p>Varios teléfonos pueden pedir a la misma cuenta. Cada pedido entra «por aceptar» en el salón y pasa a la cocina cuando el mesero lo acepta: así una foto del QR publicada en redes no manda pedidos falsos.</p>
+        </li>
+        <li>
+          <h3>Llama al mesero y sabe que lo vieron</h3>
+          <p>«Llamar al mesero» y «Pedir la cuenta» muestran «Enviado» cuando llega al salón y «Visto por el mesero» cuando alguien lo atiende. La cocina marca cada plato y el comensal ve «Listo».</p>
+        </li>
+        <li>
+          <h3>Divide, elige la propina y paga</h3>
+          <p>La cuenta dice cuánto ITBMS lleva por tasa (7 % y 10 % en bebidas alcohólicas). Se divide en partes iguales o por platos, la propina la elige el comensal (10, 15, 20 %, otra cifra o ninguna; nada marcado de antemano) y paga con Yappy, tarjeta o al mesero. Queda «pendiente» hasta que la caja confirma.</p>
+        </li>
+      </ol>
+    </section>
+
+    <section class="contenedor seccion" aria-labelledby="titulo-vistas">
+      <h2 id="titulo-vistas">Lo que ve cada quien</h2>
+      <ul class="vistas">
+        <li><a href="mesa.html" id="vista-mesa">El comensal</a><span>Carta en español e inglés, pedido con opciones y nota, avance de cada ronda, llamar al mesero, cuenta, división, propina y pago.</span></li>
+        <li><a href="cocina.html">La cocina</a><span>Comandas como tickets por estación (caliente, fríos, bar), con hora de entrada, minutos y color con texto. Se toca cada plato al terminarlo.</span></li>
+        <li><a href="salon.html">El salón y la caja</a><span>Mapa de mesas con su estado, pedidos por aceptar, llamadas, cobro en efectivo, tarjeta, Yappy o mixto, borrador de factura y liberar mesa. El plano se edita arrastrando.</span></li>
+        <li><a href="kiosco.html">El kiosco de autopedido</a><span>Pantalla táctil vertical u horizontal para pedir en el local, con número de orden. Vuelve sola al inicio si nadie la toca.</span></li>
+        <li><a href="admin.html">El panel del dueño</a><span>Carta (precios, agotados, alérgenos, opciones), placas QR para imprimir, grabado de etiquetas NFC y ajustes.</span></li>
+      </ul>
+    </section>
+
+    <section class="contenedor seccion precios" aria-labelledby="titulo-precios">
+      <h2 id="titulo-precios">Lo que cuesta</h2>
+      <div class="ticket-sombra precios__ticket">
+        <div class="ticket">
+          <ul class="renglones precios__lista">
+            <li>
+              <div class="renglon"><span class="renglon__nombre"><strong>Menú QR a la medida</strong></span><span class="renglon__puntos" aria-hidden="true"></span><span class="renglon__monto">$10 al mes</span></div>
+              <p class="renglon__detalle">Solo la carta: tus platos, precios con ITBMS, alérgenos y agotados, que cambias tú desde el panel.</p>
+            </li>
+            <li>
+              <div class="renglon"><span class="renglon__nombre"><strong>Carta + llamar al mesero + pedir la cuenta</strong></span><span class="renglon__puntos" aria-hidden="true"></span><span class="renglon__monto">a cotizar</span></div>
+            </li>
+            <li>
+              <div class="renglon"><span class="renglon__nombre"><strong>Pedido y pago en mesa</strong>, con cocina y salón</span><span class="renglon__puntos" aria-hidden="true"></span><span class="renglon__monto">a cotizar</span></div>
+            </li>
+            <li>
+              <div class="renglon"><span class="renglon__nombre"><strong>Placas QR y NFC</strong> atornilladas o laminadas, instaladas en el local</span><span class="renglon__puntos" aria-hidden="true"></span><span class="renglon__monto">a cotizar</span></div>
+            </li>
+            <li>
+              <div class="renglon"><span class="renglon__nombre"><strong>Pantalla táctil de autopedido</strong></span><span class="renglon__puntos" aria-hidden="true"></span><span class="renglon__monto">a cotizar</span></div>
+            </li>
+          </ul>
+          <div class="ticket__pie">
+            <p class="renglon--menor">Al comensal no se le cobra ninguna tarifa: el precio de la carta es el final (Ley 473 de 2025).</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="contenedor seccion honestidad" aria-labelledby="titulo-demo">
+      <div>
+        <h2 id="titulo-demo">Lo que esta demo simula</h2>
+        <ul class="lista">
+          <li><strong>El pago.</strong> No hay pasarela: el botón dice «Simular pago (demo)» y la cuenta queda «pendiente de confirmar» hasta que la caja pulsa «Pago recibido». Nunca se piden datos de tarjeta.</li>
+          <li><strong>La factura.</strong> El salón arma el borrador con el ITBMS por tasa. La factura electrónica válida la emite el PAC autorizado por la DGI del restaurante; lo que se pide desde la mesa es una precuenta.</li>
+          <li><strong>El relevo entre dispositivos.</strong> El teléfono y esta computadora hablan por ntfy.sh, un servidor público de pruebas: cualquiera que conozca el código de sala puede leer esos mensajes. Por eso: no escribas datos reales. Si ntfy no responde, todo sigue funcionando en el mismo navegador.</li>
+          <li><strong>El restaurante.</strong> La Fonda Pixbae no existe. Su carta y sus precios son de ejemplo.</li>
+        </ul>
+      </div>
+      <div>
+        <h2 id="titulo-produccion">Para un restaurante de verdad</h2>
+        <ul class="lista">
+          <li>Un servidor propio con la cola de pedidos y avisos en tiempo real (no un relevo público), en el dominio del restaurante.</li>
+          <li>Pago con confirmación real: el QR de Yappy Comercial del local (1 % + ITBMS, sin servidor; el cajero ve cada pago en su app) o una pasarela panameña con webhook, que marca la mesa pagada cuando llega la confirmación, no antes.</li>
+          <li>La factura electrónica por el PAC del restaurante, obligatoria desde el 1 de enero de 2026 para quien factura más de B/. 36,000 al año o más de 100 documentos al mes.</li>
+          <li>Etiquetas NFC NTAG 424 DNA, que generan una dirección distinta en cada toque y prueban que el teléfono está en la mesa; necesitan ese servidor.</li>
+          <li>Esta demo vive en GitHub Pages, que sirve para mostrarla; sus términos no permiten montar ahí el sistema de un negocio.</li>
+        </ul>
+      </div>
+    </section>
+  </main>
+
+  <footer class="contenedor pie-inicio">
+    <p><a href="../alphateklab/">alphateklab</a> hace software a la medida para negocios —páginas web, apps, automatizaciones, sistemas como este— y además lo instala en el local: placas, pantallas, sensores. Panamá.</p>
+    <p class="ayuda">Fonda Pixbae es un restaurante ficticio para la demo. Página revisada el 3 de octubre de 2026.</p>
+  </footer>
+</body>
+</html>

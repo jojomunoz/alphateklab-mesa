@@ -611,8 +611,8 @@ details.barra-demo > .contenedor {
 }
 
 .renglon__cant {
-  flex: none;
   font-weight: 700;
+  white-space: nowrap;
 }
 
 .renglon__nombre {
@@ -793,6 +793,15 @@ dialog::backdrop {
 
 body.con-barra-carrito .avisos-breves {
   bottom: calc(84px + env(safe-area-inset-bottom));
+}
+
+/* ——— Códigos QR (generados en js/ui/comun.js) ——— */
+.qr__fondo {
+  fill: var(--qr-fondo);
+}
+
+.qr__modulos {
+  fill: var(--qr-tinta);
 }
 
 /* ——— Sin JavaScript ——— */

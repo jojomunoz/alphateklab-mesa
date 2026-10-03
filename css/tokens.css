@@ -77,6 +77,10 @@
   --mov-dist: 10px;
 
   --alto-barra: 44px;
+
+  /* El QR va siempre oscuro sobre claro, también en modo oscuro: muchos lectores no leen el QR invertido. */
+  --qr-fondo: #fbfcfa;
+  --qr-tinta: #1b1f1c;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -103,6 +107,8 @@
     --alerta-suave: #3a1a16;
     --foco: #8fd1a4;
     --velo: #000000;
+    --qr-fondo: #fbfcfa;
+    --qr-tinta: #1b1f1c;
   }
 }
 
@@ -129,6 +135,8 @@
   --alerta-suave: #3a1a16;
   --foco: #8fd1a4;
   --velo: #000000;
+  --qr-fondo: #fbfcfa;
+  --qr-tinta: #1b1f1c;
 }
 
 /* Cocina: siempre oscura. Tickets de papel sobre el riel, legibles a 2 m. */

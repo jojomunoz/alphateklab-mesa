@@ -1,0 +1,572 @@
+/* kiosco.html · pantalla táctil (1080×1920 vertical o 1920×1080 horizontal). Toques de 64 px o más; sin hover. */
+
+.vista-kiosco {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  min-height: 0;
+  overflow: hidden;
+  font-size: 1.125rem;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.contenedor--kiosco {
+  max-width: none;
+}
+
+.barra-demo--kiosco {
+  flex: none;
+  font-size: 0.8125rem;
+}
+
+.barra-demo--kiosco .barra-demo__fila {
+  padding-block: 0;
+}
+
+.barra-demo--kiosco .barra-demo__aviso {
+  padding-bottom: 4px;
+}
+
+.barra-demo--kiosco .conexion {
+  margin-left: 8px;
+}
+
+.kiosco {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.kiosco > section {
+  flex: 1;
+  min-height: 0;
+}
+
+/* ——— Reposo ——— */
+.reposo {
+  display: grid;
+  grid-template-rows: 1fr auto;
+}
+
+.reposo__toque {
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 14px;
+  width: 100%;
+  border: 0;
+  background: var(--primario);
+  color: var(--sobre-primario);
+  cursor: pointer;
+  padding: 24px;
+}
+
+.reposo__circulo {
+  display: grid;
+  place-items: center;
+  width: clamp(88px, 18vmin, 180px);
+  height: clamp(88px, 18vmin, 180px);
+  border-radius: 50%;
+  background: var(--superficie);
+}
+
+.reposo__marca {
+  width: 64%;
+  height: 64%;
+  fill: var(--pixbae);
+  color: var(--pixbae);
+}
+
+.reposo__local {
+  font-family: var(--f-titulo);
+  font-size: clamp(1.75rem, 6vmin, 3.5rem);
+}
+
+.reposo__ejemplo {
+  font-size: clamp(1rem, 2.4vmin, 1.375rem);
+}
+
+.reposo__titulo {
+  margin-top: 4vmin;
+  padding: 0.5em 1.2em;
+  border: 3px solid currentColor;
+  border-radius: var(--r-control);
+  font-family: var(--f-titulo);
+  font-size: clamp(2rem, 8vmin, 5rem);
+}
+
+.reposo__idiomas {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  padding: 14px;
+  background: var(--fondo);
+}
+
+.reposo__idiomas .boton,
+.boton-k {
+  min-height: 64px;
+  min-width: 64px;
+  font-size: 1.125rem;
+  padding-inline: 1.1em;
+}
+
+.reposo__idiomas .boton[aria-pressed='true'] {
+  border-color: var(--primario-texto);
+  background: var(--primario-suave);
+}
+
+.boton-k--grande {
+  min-height: 72px;
+  font-size: 1.3125rem;
+}
+
+.boton-icono--k {
+  min-width: 64px;
+  min-height: 64px;
+}
+
+/* ——— Pedido ——— */
+.pantalla {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.k-pedido {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto auto minmax(0, 1fr) auto;
+  grid-template-areas: 'cabeza' 'categorias' 'platos' 'carrito';
+}
+
+@media (min-aspect-ratio: 4 / 3) and (min-width: 1000px) {
+  .k-pedido {
+    grid-template-columns: 15rem minmax(0, 1fr) 26rem;
+    grid-template-rows: auto minmax(0, 1fr);
+    grid-template-areas: 'cabeza cabeza cabeza' 'categorias platos carrito';
+  }
+}
+
+.kiosco__cabeza {
+  grid-area: cabeza;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 16px;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--filete);
+}
+
+.kiosco__local {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--f-titulo);
+  font-size: 1.375rem;
+}
+
+.kiosco__local span {
+  font-family: var(--f-texto);
+  font-weight: 400;
+  font-size: 1rem;
+  color: var(--tinta-2);
+}
+
+.kiosco__marca {
+  width: 34px;
+  height: 34px;
+  fill: var(--pixbae);
+  color: var(--pixbae);
+}
+
+.kiosco__cabeza-botones {
+  display: flex;
+  gap: 10px;
+}
+
+.k-categorias {
+  grid-area: categorias;
+  display: flex;
+  gap: 8px;
+  padding: 10px 16px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  border-bottom: 1px solid var(--filete);
+}
+
+@media (min-aspect-ratio: 4 / 3) and (min-width: 1000px) {
+  .k-categorias {
+    flex-direction: column;
+    overflow-y: auto;
+    border-bottom: 0;
+    border-right: 1px solid var(--filete);
+  }
+}
+
+.k-categoria {
+  flex: none;
+  min-height: 64px;
+  padding: 0 20px;
+  border: 2px solid var(--borde);
+  border-radius: var(--r-control);
+  background: var(--superficie);
+  color: var(--tinta);
+  font-family: var(--f-titulo);
+  font-size: 1.25rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.k-categoria[aria-pressed='true'] {
+  background: var(--primario);
+  border-color: var(--primario);
+  color: var(--sobre-primario);
+}
+
+.k-platos {
+  grid-area: platos;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 14px 16px;
+}
+
+.k-platos__lista {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr));
+  gap: 12px;
+}
+
+.k-plato {
+  display: grid;
+  align-content: space-between;
+  gap: 8px;
+  width: 100%;
+  height: 100%;
+  min-height: 112px;
+  padding: 16px;
+  border: 2px solid var(--filete);
+  border-radius: var(--r-control);
+  background: var(--superficie);
+  color: var(--tinta);
+  text-align: left;
+  cursor: pointer;
+  transition: transform var(--dur-respuesta) var(--ease-salida);
+}
+
+.k-plato:active:not([aria-disabled='true']) {
+  transform: scale(0.98);
+  background: var(--superficie-2);
+}
+
+.k-plato__nombre {
+  font-family: var(--f-titulo);
+  font-size: 1.3125rem;
+  line-height: 1.2;
+}
+
+.k-plato__desc {
+  color: var(--tinta-2);
+  font-size: 1rem;
+}
+
+.k-plato__precio {
+  font-weight: 700;
+  font-size: 1.25rem;
+}
+
+.k-plato[aria-disabled='true'] {
+  color: var(--tinta-2);
+  background: var(--superficie-2);
+  cursor: not-allowed;
+}
+
+/* Carrito siempre visible */
+.k-carrito {
+  grid-area: carrito;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  min-height: 0;
+  max-height: 38dvh;
+  padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+  border-top: 2px solid var(--filete);
+  background: var(--superficie);
+}
+
+@media (min-aspect-ratio: 4 / 3) and (min-width: 1000px) {
+  .k-carrito {
+    max-height: none;
+    border-top: 0;
+    border-left: 2px solid var(--filete);
+  }
+}
+
+.k-carrito__titulo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.375rem;
+  margin-bottom: 6px;
+}
+
+.k-carrito__lista {
+  list-style: none;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  display: grid;
+  align-content: start;
+  gap: 6px;
+}
+
+.k-renglon {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 8px 12px;
+  padding-block: 6px;
+  border-bottom: 1px dashed var(--filete);
+}
+
+.k-renglon__texto {
+  display: grid;
+}
+
+.k-renglon__mods {
+  color: var(--tinta-2);
+  font-size: 0.9375rem;
+}
+
+.k-renglon__control {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.k-renglon__cant {
+  min-width: 2ch;
+  text-align: center;
+  font-weight: 700;
+}
+
+.k-renglon__monto {
+  font-weight: 700;
+  min-width: 5.5ch;
+  text-align: right;
+}
+
+.k-carrito__vacio {
+  color: var(--tinta-2);
+  padding-block: 8px;
+}
+
+.k-carrito__pie {
+  display: grid;
+  gap: 6px;
+  padding-top: 8px;
+}
+
+.k-carrito__total {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-family: var(--f-titulo);
+  font-size: 1.5rem;
+}
+
+/* ——— Pagar ——— */
+.k-pagar {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr) auto;
+}
+
+.k-pagar .kiosco__cabeza {
+  grid-area: auto;
+}
+
+.k-pagar__cuerpo {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 18px 16px;
+  display: grid;
+  gap: 22px;
+  align-content: start;
+  width: 100%;
+  max-width: 48rem;
+  margin-inline: auto;
+}
+
+.k-titulo {
+  font-size: 2rem;
+}
+
+.k-titulo:focus,
+.k-orden__titulo:focus {
+  outline: none;
+}
+
+.k-sugerencia {
+  display: grid;
+  gap: 10px;
+  padding: 16px;
+  border: 2px dashed var(--primario-texto);
+  border-radius: var(--r-control);
+}
+
+.k-sugerencia__texto {
+  font-family: var(--f-titulo);
+  font-size: 1.375rem;
+}
+
+.k-eleccion {
+  display: grid;
+  gap: 10px;
+}
+
+.k-eleccion legend {
+  margin-bottom: 10px;
+  font-family: var(--f-titulo);
+  font-size: 1.375rem;
+}
+
+.k-eleccion__botones {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.k-opcion {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 88px;
+  padding: 12px;
+  border: 3px solid var(--borde);
+  border-radius: var(--r-control);
+  background: var(--superficie);
+  color: var(--tinta);
+  font-weight: 700;
+  font-size: 1.25rem;
+  cursor: pointer;
+}
+
+.k-opcion .icono {
+  width: 1.6em;
+  height: 1.6em;
+}
+
+.k-opcion[aria-pressed='true'] {
+  border-color: var(--primario-texto);
+  background: var(--primario-suave);
+  box-shadow: inset 0 0 0 3px var(--primario-texto);
+}
+
+.k-pagar__pie {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+  border-top: 2px solid var(--filete);
+  background: var(--superficie);
+}
+
+.k-pagar__pie .boton--primario {
+  flex: 1 1 16rem;
+}
+
+.k-pagar__falta {
+  flex-basis: 100%;
+  text-align: right;
+}
+
+/* ——— Número de orden ——— */
+.k-orden {
+  flex: 1;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 18px;
+  padding: 24px;
+  text-align: center;
+}
+
+.k-orden__titulo {
+  font-size: clamp(1.75rem, 5vmin, 3rem);
+}
+
+.k-orden__numero {
+  font-family: var(--f-titulo);
+  font-size: clamp(6rem, 30vmin, 18rem);
+  line-height: 0.9;
+  letter-spacing: -0.04em;
+  color: var(--primario-texto);
+}
+
+.k-orden__detalle {
+  font-size: 1.375rem;
+  max-width: 34rem;
+}
+
+/* ——— Diálogos del kiosco ——— */
+.hoja--kiosco .hoja__cabeza h2 {
+  font-size: 1.75rem;
+}
+
+.opcion--k {
+  min-height: 64px;
+  font-size: 1.1875rem;
+}
+
+.opcion--k input {
+  width: 28px;
+  height: 28px;
+}
+
+.k-opciones {
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+}
+
+.k-cantidad {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+}
+
+.k-cantidad__valor {
+  min-width: 3ch;
+  text-align: center;
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.dialogo-kiosco {
+  text-align: center;
+  font-size: 1.25rem;
+}
+
+.dialogo-kiosco h2 {
+  font-size: 2rem;
+}
+
+.dialogo-kiosco .dialogo-confirmar__botones {
+  justify-content: center;
+}
+
+@media (min-width: 720px) {
+  .hoja--kiosco {
+    max-width: 44rem;
+  }
+}

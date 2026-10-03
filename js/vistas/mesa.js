@@ -558,7 +558,7 @@ function pintarCarrito() {
               h(
                 'li',
                 { class: 'renglon-carrito' },
-                h('div', { class: 'renglon' }, h('span', { class: 'renglon__cant' }, `${x.cant} ×`), h('span', { class: 'renglon__nombre' }, nombrePlato(x.plato)), h('span', { class: 'renglon__puntos', 'aria-hidden': 'true' }), h('span', { class: 'renglon__monto' }, dinero(precioUnitario(x.plato, x.mods) * x.cant))),
+                h('div', { class: 'renglon' }, h('span', { class: 'renglon__nombre' }, h('strong', { class: 'renglon__cant' }, `${x.cant} ×`), ' ', nombrePlato(x.plato)), h('span', { class: 'renglon__puntos', 'aria-hidden': 'true' }), h('span', { class: 'renglon__monto' }, dinero(precioUnitario(x.plato, x.mods) * x.cant))),
                 lineaMods(x.mods, x.nota) ? h('p', { class: 'renglon__detalle' }, lineaMods(x.mods, x.nota)) : null,
                 h(
                   'div',
@@ -724,7 +724,7 @@ function ticketPedido({ id, ronda, estado, disp, t, renglones, motivo, enviando 
           h(
             'li',
             {},
-            h('div', { class: 'renglon' }, h('span', { class: 'renglon__cant' }, `${r.cant} ×`), h('span', { class: 'renglon__nombre' }, nombrePlato(r.plato, r.nombre)), h('span', { class: 'renglon__puntos', 'aria-hidden': 'true' }), h('span', { class: 'renglon__monto' }, r.monto != null ? dinero(r.monto) : '')),
+            h('div', { class: 'renglon' }, h('span', { class: 'renglon__nombre' }, h('strong', { class: 'renglon__cant' }, `${r.cant} ×`), ' ', nombrePlato(r.plato, r.nombre)), h('span', { class: 'renglon__puntos', 'aria-hidden': 'true' }), h('span', { class: 'renglon__monto' }, r.monto != null ? dinero(r.monto) : '')),
             lineaMods(r.mods ?? [], r.nota) ? h('p', { class: 'renglon__detalle' }, lineaMods(r.mods ?? [], r.nota)) : null,
           ),
         ),
@@ -833,7 +833,7 @@ function ticketCuenta(res) {
         'ul',
         { class: 'renglones' },
         [...grupos.values()].map((r) =>
-          h('li', {}, h('div', { class: 'renglon' }, h('span', { class: 'renglon__cant' }, `${r.cant} ×`), h('span', { class: 'renglon__nombre' }, nombrePlato(r.plato, r.nombre)), h('span', { class: 'renglon__puntos', 'aria-hidden': 'true' }), h('span', { class: 'renglon__monto' }, dinero(r.monto))), lineaMods(r.mods ?? [], '') ? h('p', { class: 'renglon__detalle' }, lineaMods(r.mods ?? [], '')) : null),
+          h('li', {}, h('div', { class: 'renglon' }, h('span', { class: 'renglon__nombre' }, h('strong', { class: 'renglon__cant' }, `${r.cant} ×`), ' ', nombrePlato(r.plato, r.nombre)), h('span', { class: 'renglon__puntos', 'aria-hidden': 'true' }), h('span', { class: 'renglon__monto' }, dinero(r.monto))), lineaMods(r.mods ?? [], '') ? h('p', { class: 'renglon__detalle' }, lineaMods(r.mods ?? [], '')) : null),
         ),
       ),
       h(
@@ -1053,7 +1053,7 @@ function formularioDivision(c, res) {
     h('ul', { class: 'asignacion' },
       renglones.map((r) =>
         h('li', { class: 'asignacion__renglon' },
-          h('div', { class: 'renglon' }, h('span', { class: 'renglon__cant' }, `${r.cant} ×`), h('span', { class: 'renglon__nombre' }, nombrePlato(r.plato, r.nombre)), h('span', { class: 'renglon__puntos', 'aria-hidden': 'true' }), h('span', { class: 'renglon__monto' }, dinero(r.monto))),
+          h('div', { class: 'renglon' }, h('span', { class: 'renglon__nombre' }, h('strong', { class: 'renglon__cant' }, `${r.cant} ×`), ' ', nombrePlato(r.plato, r.nombre)), h('span', { class: 'renglon__puntos', 'aria-hidden': 'true' }), h('span', { class: 'renglon__monto' }, dinero(r.monto))),
           h('div', { class: 'asignacion__personas', role: 'group', 'aria-label': nombrePlato(r.plato, r.nombre) },
             Array.from({ length: n }, (_, i) => {
               const marcado = (asign[r.clave] ?? []).includes(i);

@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Kiosco · Fonda Pixbae (restaurante de ejemplo)</title>
+  <meta name="description" content="Pantalla táctil de autopedido de alphateklab Mesa: pedir en el local, para comer aquí o para llevar, con número de orden.">
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#1f5130" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#101512" media="(prefers-color-scheme: dark)">
+  <link rel="icon" href="img/favicon.svg" type="image/svg+xml">
+  <link rel="preload" href="fuentes/bricolage-700-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="fuentes/atkinson-next-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/kiosco.css">
+  <script type="module" src="js/vistas/kiosco.js"></script>
+</head>
+<body class="vista-kiosco">
+  <header class="barra-demo barra-demo--kiosco">
+    <div class="contenedor contenedor--kiosco">
+      <div class="barra-demo__fila">
+        <p class="barra-demo__marca"><strong>alphateklab Mesa</strong> · demo con un restaurante de ejemplo</p>
+        <nav aria-label="Vistas de la demo">
+          <ul>
+            <li><a href="index.html">Inicio</a></li>
+            <li><a href="mesa.html">Mesa 7</a></li>
+            <li><a href="cocina.html">Cocina</a></li>
+            <li><a href="salon.html">Salón</a></li>
+            <li><a href="kiosco.html">Kiosco</a></li>
+            <li><a href="admin.html">Panel</a></li>
+          </ul>
+        </nav>
+        <button type="button" class="boton boton--texto" data-restablecer hidden>Restablecer datos de ejemplo</button>
+      </div>
+      <p class="barra-demo__aviso"><svg class="icono" aria-hidden="true"><use href="img/iconos.svg#info"></use></svg>Modo demostración entre dispositivos: los datos pasan por un servidor público de pruebas (ntfy.sh). No escribas datos reales. <span class="conexion" id="conexion" data-estado="local"></span></p>
+    </div>
+  </header>
+
+  <main id="principal" class="kiosco">
+    <noscript><p class="nota">El kiosco necesita JavaScript.</p></noscript>
+    <section class="reposo" id="reposo" aria-labelledby="titulo-reposo">
+      <button type="button" class="reposo__toque" id="boton-empezar">
+        <span class="reposo__circulo" aria-hidden="true"><svg class="reposo__marca" viewBox="0 0 32 32"><use href="img/iconos.svg#pixbae"></use></svg></span>
+        <span class="reposo__local">Fonda Pixbae</span>
+        <span class="reposo__ejemplo" data-t="ejemplo">restaurante de ejemplo</span>
+        <span class="reposo__titulo" id="titulo-reposo" data-t="tocaParaPedir">Toca para pedir</span>
+      </button>
+      <div class="reposo__idiomas" role="group" aria-label="Idioma · Language">
+        <button type="button" class="boton boton--secundario" data-idioma="es" lang="es">Español</button>
+        <button type="button" class="boton boton--secundario" data-idioma="en" lang="en">English</button>
+      </div>
+    </section>
+    <section class="pantalla" id="pantalla" hidden></section>
+  </main>
+
+  <dialog class="hoja hoja--kiosco" id="dlg-plato" aria-labelledby="dlg-plato-titulo"></dialog>
+  <dialog class="dialogo-confirmar dialogo-kiosco" id="dlg-inactivo" aria-labelledby="titulo-inactivo">
+    <h2 id="titulo-inactivo" data-t="sigues">¿Sigues ahí?</h2>
+    <p id="texto-inactivo" aria-live="polite"></p>
+    <div class="dialogo-confirmar__botones">
+      <button type="button" class="boton boton--primario boton--grande" id="boton-sigo" data-t="sigoAqui">Sigo aquí</button>
+    </div>
+  </dialog>
+</body>
+</html>

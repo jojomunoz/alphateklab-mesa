@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Panel del dueño · Fonda Pixbae (restaurante de ejemplo)</title>
+  <meta name="description" content="Panel de alphateklab Mesa: carta, mesas y placas QR para imprimir, grabado de etiquetas NFC y ajustes.">
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#1f5130" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#101512" media="(prefers-color-scheme: dark)">
+  <link rel="icon" href="img/favicon.svg" type="image/svg+xml">
+  <link rel="preload" href="fuentes/bricolage-700-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="fuentes/atkinson-next-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/admin.css">
+  <script type="module" src="js/vistas/admin.js"></script>
+</head>
+<body class="vista-admin">
+  <header class="barra-demo">
+    <div class="contenedor">
+      <div class="barra-demo__fila">
+        <p class="barra-demo__marca"><strong>alphateklab Mesa</strong> · demo con un restaurante de ejemplo</p>
+        <nav aria-label="Vistas de la demo">
+          <ul>
+            <li><a href="index.html">Inicio</a></li>
+            <li><a href="mesa.html">Mesa 7</a></li>
+            <li><a href="cocina.html">Cocina</a></li>
+            <li><a href="salon.html">Salón</a></li>
+            <li><a href="kiosco.html">Kiosco</a></li>
+            <li><a href="admin.html">Panel</a></li>
+          </ul>
+        </nav>
+        <button type="button" class="boton boton--texto" data-restablecer hidden>Restablecer datos de ejemplo</button>
+      </div>
+      <p class="barra-demo__aviso"><svg class="icono" aria-hidden="true"><use href="img/iconos.svg#info"></use></svg>Modo demostración entre dispositivos: los datos pasan por un servidor público de pruebas (ntfy.sh). No escribas datos reales.</p>
+    </div>
+  </header>
+
+  <header class="contenedor cabecera-admin">
+    <h1>Panel del dueño <span class="cabecera-admin__local" id="nombre-local">Fonda Pixbae · ejemplo</span></h1>
+    <p class="conexion" id="conexion" data-estado="conectando">Relevo entre dispositivos: conectando…</p>
+  </header>
+
+  <div class="contenedor">
+    <div role="tablist" aria-label="Secciones del panel" class="pestanas-admin" id="pestanas">
+      <button type="button" role="tab" id="tab-carta" aria-controls="panel-carta" aria-selected="true" data-tab="carta">Carta</button>
+      <button type="button" role="tab" id="tab-mesas" aria-controls="panel-mesas" aria-selected="false" tabindex="-1" data-tab="mesas">Mesas y QR</button>
+      <button type="button" role="tab" id="tab-nfc" aria-controls="panel-nfc" aria-selected="false" tabindex="-1" data-tab="nfc">NFC</button>
+      <button type="button" role="tab" id="tab-ajustes" aria-controls="panel-ajustes" aria-selected="false" tabindex="-1" data-tab="ajustes">Ajustes</button>
+    </div>
+  </div>
+
+  <main id="principal" class="contenedor admin">
+    <noscript><p class="nota">El panel necesita JavaScript.</p></noscript>
+    <section id="panel-carta" role="tabpanel" aria-labelledby="tab-carta" class="panel-admin"></section>
+    <section id="panel-mesas" role="tabpanel" aria-labelledby="tab-mesas" class="panel-admin" hidden></section>
+    <section id="panel-nfc" role="tabpanel" aria-labelledby="tab-nfc" class="panel-admin" hidden></section>
+    <section id="panel-ajustes" role="tabpanel" aria-labelledby="tab-ajustes" class="panel-admin" hidden></section>
+  </main>
+
+  <dialog class="hoja" id="dlg-plato" aria-labelledby="dlg-plato-titulo"></dialog>
+</body>
+</html>

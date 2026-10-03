@@ -1,0 +1,490 @@
+/* admin.html · panel del dueño. Utilitario: los tokens de la casa, sin decoración que estorbe. */
+
+.vista-admin .contenedor {
+  max-width: 64rem;
+}
+
+.cabecera-admin {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px 20px;
+  padding-block: 18px 8px;
+}
+
+.cabecera-admin h1 {
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+}
+
+.cabecera-admin__local {
+  font-family: var(--f-texto);
+  font-weight: 400;
+  font-size: 1rem;
+  color: var(--tinta-2);
+  letter-spacing: 0;
+}
+
+.pestanas-admin {
+  display: flex;
+  gap: 2px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  border-bottom: 1px solid var(--filete);
+}
+
+.pestanas-admin [role='tab'] {
+  position: relative;
+  flex: none;
+  min-height: 48px;
+  padding: 0 16px;
+  border: 0;
+  background: transparent;
+  color: var(--tinta-2);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.pestanas-admin [role='tab'][aria-selected='true'] {
+  color: var(--tinta);
+}
+
+.pestanas-admin [role='tab'][aria-selected='true']::after {
+  content: '';
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  bottom: -1px;
+  height: 4px;
+  background: var(--primario-texto);
+}
+
+.pestanas-admin [role='tab']:focus-visible {
+  outline-offset: -3px;
+}
+
+.admin {
+  padding-block: 20px 48px;
+}
+
+.panel-admin {
+  display: grid;
+  gap: 20px;
+}
+
+.admin__intro {
+  display: grid;
+  gap: 6px;
+}
+
+.admin__intro h2 {
+  font-size: 1.625rem;
+}
+
+.admin__subtitulo {
+  font-size: 1.25rem;
+}
+
+.barra-herramientas {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 10px;
+}
+
+/* ——— Carta ——— */
+.categoria-admin {
+  display: grid;
+  gap: 8px;
+}
+
+.categoria-admin h3 {
+  font-size: 1.25rem;
+  color: var(--primario-texto);
+  padding-bottom: 4px;
+  border-bottom: 2px solid var(--primario-texto);
+}
+
+.categoria-admin h3 .ayuda {
+  font-family: var(--f-texto);
+  font-weight: 400;
+}
+
+.platos-admin {
+  list-style: none;
+  display: grid;
+}
+
+.plato-admin {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 14px;
+  padding-block: 10px;
+  border-bottom: 1px dashed var(--filete);
+}
+
+.plato-admin__texto {
+  flex: 1 1 18rem;
+  min-width: 0;
+}
+
+.plato-admin__meta {
+  color: var(--tinta-2);
+  font-size: 0.9375rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.plato-admin--agotado .plato-admin__texto > strong {
+  color: var(--tinta-2);
+  text-decoration: line-through;
+}
+
+/* Interruptor disponible/agotado: forma y texto, no solo color */
+.interruptor {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 10px 0 6px;
+  border: 2px solid var(--ok);
+  border-radius: var(--r-control);
+  background: var(--ok-suave);
+  color: var(--ok);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.interruptor__pista {
+  position: relative;
+  width: 36px;
+  height: 20px;
+  border-radius: 10px;
+  background: var(--ok);
+}
+
+.interruptor__pista::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 19px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--superficie);
+  transition: left var(--dur-respuesta) var(--ease-salida);
+}
+
+.interruptor--apagado {
+  border-color: var(--alerta);
+  background: var(--alerta-suave);
+  color: var(--alerta);
+}
+
+.interruptor--apagado .interruptor__pista {
+  background: var(--borde);
+}
+
+.interruptor--apagado .interruptor__pista::after {
+  left: 3px;
+}
+
+.editor-admin {
+  padding: 12px 14px;
+  border: 1px solid var(--filete);
+  border-radius: var(--r-control);
+  background: var(--superficie);
+}
+
+.editor-admin > summary {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.editor-admin[open] > summary {
+  margin-bottom: 10px;
+}
+
+.lista-editor,
+.opciones-admin {
+  list-style: none;
+  display: grid;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.fila-editor {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  gap: 8px 12px;
+  align-items: end;
+}
+
+.fila-editor--opcion {
+  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+}
+
+.campo--corto input {
+  max-width: 9rem;
+}
+
+.grupo-admin {
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+  border-radius: var(--r-control);
+  background: var(--fondo);
+}
+
+.icono--arriba {
+  transform: rotate(90deg);
+}
+
+.icono--abajo {
+  transform: rotate(-90deg);
+}
+
+.dos-columnas {
+  display: grid;
+  gap: 12px;
+}
+
+@media (min-width: 640px) {
+  .dos-columnas {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.casillas {
+  display: grid;
+  gap: 8px;
+}
+
+.casillas legend {
+  margin-bottom: 8px;
+}
+
+.casillas__lista {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
+  gap: 6px;
+}
+
+.opcion--compacta {
+  min-height: 44px;
+  padding: 6px 10px;
+}
+
+.opcion--doble .opcion__texto {
+  display: grid;
+  gap: 2px;
+}
+
+/* ——— Mesas y placas ——— */
+.campo--en-linea {
+  min-width: 12rem;
+}
+
+.tabla-scroll {
+  overflow-x: auto;
+}
+
+.tabla {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9375rem;
+}
+
+.tabla th,
+.tabla td {
+  padding: 6px 8px;
+  text-align: left;
+  border-bottom: 1px solid var(--filete);
+  vertical-align: middle;
+}
+
+.tabla thead th {
+  color: var(--tinta-2);
+}
+
+.tabla__url {
+  word-break: break-all;
+}
+
+.hoja-placas {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr));
+  gap: 16px;
+}
+
+.placa-impresa {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  padding: 18px;
+  border: 2px dashed var(--borde);
+  border-radius: 8px;
+  background: var(--superficie);
+  text-align: center;
+  break-inside: avoid;
+}
+
+.placa-impresa__local {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--f-titulo);
+}
+
+.placa-impresa__local span {
+  font-family: var(--f-texto);
+  font-weight: 400;
+  font-size: 0.75rem;
+  color: var(--tinta-2);
+}
+
+.placa-impresa__marca {
+  width: 22px;
+  height: 22px;
+  fill: var(--pixbae);
+  color: var(--pixbae);
+}
+
+.placa-impresa__mesa {
+  display: grid;
+  font-family: var(--f-titulo);
+  font-size: 1.125rem;
+  line-height: 1;
+}
+
+.placa-impresa__mesa strong {
+  font-size: 4.5rem;
+  line-height: 0.95;
+}
+
+.placa-impresa__qr {
+  width: min(100%, 12rem);
+  aspect-ratio: 1;
+}
+
+.placa-impresa__qr .qr {
+  width: 100%;
+  height: 100%;
+}
+
+.placa-impresa__instruccion {
+  display: grid;
+  font-weight: 700;
+}
+
+.placa-impresa__instruccion span {
+  font-weight: 400;
+  font-size: 0.875rem;
+  color: var(--tinta-2);
+}
+
+.placa-impresa__dominio,
+.placa-impresa__pin {
+  font-size: 0.8125rem;
+  color: var(--tinta-2);
+}
+
+.placa-impresa__pin {
+  font-weight: 700;
+  color: var(--tinta);
+}
+
+/* Impresión: solo las placas, cuatro por hoja carta (2 × 2), una por cuarto. */
+@media print {
+  @page {
+    size: letter;
+    margin: 0.4in;
+  }
+  body.imprimiendo-placas * {
+    visibility: hidden;
+  }
+  body.imprimiendo-placas .hoja-placas,
+  body.imprimiendo-placas .hoja-placas * {
+    visibility: visible;
+  }
+  body.imprimiendo-placas .hoja-placas {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-auto-rows: calc((11in - 0.8in) / 2);
+    gap: 0;
+  }
+  body.imprimiendo-placas .placa-impresa {
+    border: 1px dashed #777;
+    border-radius: 0;
+    background: #fff;
+    color: #000;
+    align-content: center;
+    padding: 0.3in;
+  }
+  body.imprimiendo-placas .placa-impresa__mesa strong {
+    font-size: 96pt;
+  }
+  body.imprimiendo-placas .placa-impresa__qr {
+    width: 2.6in;
+  }
+}
+
+/* ——— NFC y ajustes ——— */
+.nfc__url {
+  word-break: break-all;
+  font-variant-numeric: tabular-nums;
+}
+
+.nfc__grabar {
+  display: grid;
+  gap: 12px;
+}
+
+.ajustes {
+  display: grid;
+  gap: 20px;
+  max-width: 44rem;
+}
+
+.ajustes__grupo {
+  display: grid;
+  gap: 8px;
+}
+
+.ajustes__grupo legend {
+  margin-bottom: 8px;
+  font-size: 1.0625rem;
+}
+
+.propinas-ajuste {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 7rem));
+  gap: 10px;
+}
+
+.admin__bloque {
+  display: grid;
+  gap: 8px;
+  padding-top: 18px;
+  border-top: 1px solid var(--filete);
+  max-width: 44rem;
+}
+
+.admin__bloque h3 {
+  font-size: 1.25rem;
+}
+
+.admin__bloque > .boton,
+.panel-admin > .campo--en-linea {
+  justify-self: start;
+}
+
+.panel-admin > .campo--en-linea select {
+  min-width: 12rem;
+}

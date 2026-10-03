@@ -14,6 +14,7 @@ export function anunciar(texto, { tipo = 'normal', duracion = 4200 } = {}) {
   }
   const el = h('p', { class: `aviso-breve${tipo === 'alerta' ? ' aviso-breve--alerta' : ''}` }, texto);
   zonaAvisos.append(el);
+  while (zonaAvisos.children.length > 2) zonaAvisos.firstElementChild.remove();
   regionViva.textContent = '';
   requestAnimationFrame(() => {
     regionViva.textContent = texto;

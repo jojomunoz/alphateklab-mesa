@@ -32,6 +32,7 @@ test('resumen de mesa: ida y vuelta por JSON da la misma cuenta que la caja', ()
   assert.deepEqual(enTelefono.itbms, enCaja.itbms);
   assert.deepEqual(enTelefono.division, enCaja.division);
   assert.equal(enTelefono.pendiente, 1034);
+  assert.equal(viaje.cuenta.pagos[0].disp, 'tel', 'el teléfono reconoce su propio pago');
   assert.equal(viaje.cuenta.pedidos[0].renglones[0].nota, 'sin sal');
   assert.deepEqual(viaje.cuenta.pedidos[0].renglones[0].mods, [{ grupo: 'termino', opcion: 'medio' }, { grupo: 'acomp', opcion: 'tajadas' }]);
   assert.equal(viaje.cuenta.pedidos[0].renglones[0].nombre, ''); // el teléfono ya lo tiene en su carta

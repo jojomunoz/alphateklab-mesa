@@ -41,7 +41,7 @@ export function resumenMesa(estado, n, cartaBase, ahora = Date.now()) {
       p.motivo ?? '',
     ]),
     av: (c?.avisos ?? []).map((a) => [a.id, a.tipo, a.estado, a.t, a.refs ?? []]),
-    pag: (c?.pagos ?? []).map((p) => [p.id, p.parte, p.monto, p.propina, p.metodo, p.estado]),
+    pag: (c?.pagos ?? []).map((p) => [p.id, p.parte, p.monto, p.propina, p.metodo, p.estado, p.disp ?? null]),
     div: c?.division ? { t: c.division.tipo, n: c.division.n, p: c.division.partes, tot: c.division.total, as: c.division.asignacion ?? null } : null,
     err: estado.errores.filter((x) => x.mesa === n).slice(0, 4).map((x) => [x.ref, x.motivo, typeof x.detalle === 'string' ? x.detalle.slice(0, 80) : null]),
   };
@@ -90,7 +90,7 @@ export function expandirResumen(s) {
           })),
         })),
         avisos: s.av.map(([id, tipo, estado, t, refs]) => ({ id, tipo, estado, t, refs })),
-        pagos: s.pag.map(([id, parte, monto, propina, metodo, estado]) => ({ id, parte, monto, propina, metodo, estado })),
+        pagos: s.pag.map(([id, parte, monto, propina, metodo, estado, disp]) => ({ id, parte, monto, propina, metodo, estado, disp: disp ?? null })),
         division: s.div ? { tipo: s.div.t, n: s.div.n, partes: s.div.p, total: s.div.tot, asignacion: s.div.as } : null,
       }
     : null;
