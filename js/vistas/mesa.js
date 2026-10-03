@@ -224,6 +224,7 @@ function arrancarMesa(n) {
   document.title = `${T('mesaTitulo', { n })} · Pixbae (${T('ejemplo')})`;
   $('#acciones-mesa').hidden = false;
   $('#pestanas').hidden = false;
+  medirPestanas();
   $('#boton-idioma').hidden = false;
   $('#conexion').hidden = cliente.local;
   $('#boton-llamar').addEventListener('click', abrirLlamar);
@@ -1252,3 +1253,27 @@ if ('serviceWorker' in navigator && location.protocol !== 'file:') {
 }
 
 iniciar();
+
+// Las barras fijas de la carta no tienen alto fijo: con el texto grande del teléfono (200 %) «Mi mesa» ocupa dos
+// líneas y las pestañas pasan de 52 a ~103 px. Se miden y de ahí salen dónde se pegan las categorías y cuánto margen
+// deja el navegador al llevar el foco del teclado (WCAG 2.4.11). Con valores fijos, las categorías tapaban la mitad de
+// abajo de las pestañas.
+function medirPestanas() {
+  const pestanas = $('#pestanas');
+  const carrito = document.querySelector('#barra-carrito');
+  const raiz = document.querySelector('.vista-mesa') || document.documentElement; // donde css/mesa.css define --alto-pestanas
+  const alto = (el) => (el ? Math.ceil(el.getBoundingClientRect().height) : 0);
+  const fijar = () => {
+    // --tope-categorias y no --alto-pestanas: este último es también el alto mínimo de cada pestaña, y medir y
+    // escribir el mismo valor las hacía crecer en cada vuelta del ResizeObserver
+    raiz.style.setProperty('--tope-categorias', `${alto(pestanas)}px`);
+    // la barra de categorías la pinta la carta y se rehace al repintar: se busca cada vez
+    document.documentElement.style.setProperty('--barras-arriba', `${alto(pestanas) + alto(document.querySelector('.categorias')) + 10}px`);
+    document.documentElement.style.setProperty('--barras-abajo', `${alto(carrito) + 10}px`);
+  };
+  fijar();
+  if ('ResizeObserver' in window) {
+    const ro = new ResizeObserver(fijar);
+    for (const el of [pestanas, carrito, document.querySelector('#vista-carta')]) if (el) ro.observe(el);
+  }
+}

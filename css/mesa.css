@@ -11,11 +11,11 @@
 /* Que el foco del teclado nunca quede debajo de las barras fijas (WCAG 2.4.11): al tabular, el navegador desplaza
    dejando este margen. Arriba, pestañas (52 px) y categorías (unos 45 px); abajo, la barra del carrito (unos 77 px). */
 html:has(> body.vista-mesa) {
-  scroll-padding-top: 108px;
+  scroll-padding-top: var(--barras-arriba, 108px); /* medido en js/vistas/mesa.js: crece con el texto grande */
 }
 
 html:has(> body.vista-mesa.con-barra-carrito) {
-  scroll-padding-bottom: calc(88px + env(safe-area-inset-bottom));
+  scroll-padding-bottom: var(--barras-abajo, calc(88px + env(safe-area-inset-bottom)));
 }
 
 .vista-mesa.con-barra-carrito {
@@ -177,7 +177,7 @@ html:has(> body.vista-mesa.con-barra-carrito) {
 /* ——— Carta ——— */
 .categorias {
   position: sticky;
-  top: var(--alto-pestanas);
+  top: var(--tope-categorias, var(--alto-pestanas)); /* el alto real de las pestañas, medido en js/vistas/mesa.js */
   z-index: 15;
   background: var(--fondo);
   border-bottom: 1px solid var(--filete);
@@ -237,7 +237,7 @@ html:has(> body.vista-mesa.con-barra-carrito) {
 }
 
 .categoria {
-  scroll-margin-top: calc(var(--alto-pestanas) + 52px);
+  scroll-margin-top: calc(var(--tope-categorias, var(--alto-pestanas)) + 52px);
   padding-top: 22px;
 }
 

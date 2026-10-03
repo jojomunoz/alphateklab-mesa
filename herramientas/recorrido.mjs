@@ -368,6 +368,15 @@ async function casosDeBorde(browser) {
     }
     if (problemas.length) throw new Error(problemas.slice(0, 4).join('; '));
   });
+  await paso('con el texto al 200 % las categorías se pegan debajo de las pestañas, sin taparlas (WCAG 1.4.4)', async () => {
+    await tel.goto(`${BASE}mesa.html?sala=${sala}&m=7#carta`);
+    await tel.waitForSelector('[data-plato=cerveza]');
+    await tel.addStyleTag({ content: 'html { font-size: 200% !important; }' });
+    await tel.evaluate(() => scrollTo(0, 1600));
+    await tel.waitForTimeout(300);
+    const [pestanas, categorias] = await tel.evaluate(() => ['.pestanas', '.categorias'].map((s) => document.querySelector(s).getBoundingClientRect().toJSON()));
+    if (categorias.top < pestanas.bottom - 1) throw new Error(`las categorías empiezan en ${Math.round(categorias.top)} px y las pestañas terminan en ${Math.round(pestanas.bottom)} px`);
+  });
   await paso('PIN equivocado: el campo vuelve a salir (también tras recargar) y con el PIN bueno el pedido entra', async () => {
     const admin = await ctx.newPage();
     vigilar(admin, 'panel');
