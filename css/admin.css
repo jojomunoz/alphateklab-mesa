@@ -488,3 +488,34 @@
 .panel-admin > .campo--en-linea select {
   min-width: 12rem;
 }
+
+/* Tabla de mesas en el teléfono: cada fila como un bloque (número y zona arriba, la dirección debajo). */
+@media (max-width: 640px) {
+  .tabla thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+  }
+  .tabla tr {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 2px 10px;
+    padding-block: 8px;
+    border-bottom: 1px solid var(--filete);
+  }
+  .tabla th,
+  .tabla td {
+    border: 0;
+    padding: 0;
+  }
+  .tabla tbody th::before {
+    content: 'Mesa ';
+  }
+  .tabla__url {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+}

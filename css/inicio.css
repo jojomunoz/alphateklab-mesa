@@ -306,6 +306,9 @@
 }
 
 .vistas a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
   font-family: var(--f-titulo);
   font-size: 1.1875rem;
 }

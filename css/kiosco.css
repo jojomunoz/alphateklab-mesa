@@ -20,16 +20,13 @@
   font-size: 0.8125rem;
 }
 
-.barra-demo--kiosco .barra-demo__fila {
-  padding-block: 0;
-}
-
-.barra-demo--kiosco .barra-demo__aviso {
-  padding-bottom: 4px;
+.barra-demo--kiosco > summary {
+  min-height: 36px;
+  padding-block: 6px;
 }
 
 .barra-demo--kiosco .conexion {
-  margin-left: 8px;
+  padding-bottom: 6px;
 }
 
 .kiosco {
@@ -146,7 +143,7 @@
 
 @media (min-aspect-ratio: 4 / 3) and (min-width: 1000px) {
   .k-pedido {
-    grid-template-columns: 15rem minmax(0, 1fr) 26rem;
+    grid-template-columns: 19rem minmax(0, 1fr) 31rem;
     grid-template-rows: auto minmax(0, 1fr);
     grid-template-areas: 'cabeza cabeza cabeza' 'categorias platos carrito';
   }
@@ -294,7 +291,7 @@
   display: grid;
   grid-template-rows: auto minmax(0, 1fr) auto;
   min-height: 0;
-  max-height: 38dvh;
+  max-height: 36dvh;
   padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
   border-top: 2px solid var(--filete);
   background: var(--superficie);
@@ -568,5 +565,36 @@
 @media (min-width: 720px) {
   .hoja--kiosco {
     max-width: 44rem;
+  }
+}
+
+/* En un teléfono (no es la pantalla del kiosco, pero tiene que funcionar): cabecera más compacta. */
+@media (max-width: 600px) {
+  .kiosco__cabeza {
+    padding: 8px 12px;
+  }
+  .kiosco__local {
+    font-size: 1.125rem;
+  }
+  .kiosco__local {
+    flex-wrap: wrap;
+    row-gap: 0;
+  }
+  .kiosco__local span {
+    flex-basis: 100%;
+    padding-left: 42px;
+    font-size: 0.875rem;
+  }
+  .kiosco__cabeza-botones .boton-k {
+    min-height: 48px;
+    font-size: 1rem;
+    padding-inline: 0.8em;
+  }
+  .k-categoria {
+    min-height: 56px;
+    font-size: 1.0625rem;
+  }
+  .k-plato {
+    min-height: 88px;
   }
 }

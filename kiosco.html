@@ -17,7 +17,12 @@
   <script type="module" src="js/vistas/kiosco.js"></script>
 </head>
 <body class="vista-kiosco">
-  <header class="barra-demo barra-demo--kiosco">
+  <details class="barra-demo barra-demo--kiosco">
+    <summary>
+      <svg class="icono" aria-hidden="true"><use href="img/iconos.svg#info"></use></svg>
+      <span>Modo demostración entre dispositivos: los datos pasan por un servidor público de pruebas (ntfy.sh). No escribas datos reales.</span>
+      <span class="barra-demo__mas">Demo</span>
+    </summary>
     <div class="contenedor contenedor--kiosco">
       <div class="barra-demo__fila">
         <p class="barra-demo__marca"><strong>alphateklab Mesa</strong> · demo con un restaurante de ejemplo</p>
@@ -33,9 +38,9 @@
         </nav>
         <button type="button" class="boton boton--texto" data-restablecer hidden>Restablecer datos de ejemplo</button>
       </div>
-      <p class="barra-demo__aviso"><svg class="icono" aria-hidden="true"><use href="img/iconos.svg#info"></use></svg>Modo demostración entre dispositivos: los datos pasan por un servidor público de pruebas (ntfy.sh). No escribas datos reales. <span class="conexion" id="conexion" data-estado="local"></span></p>
+      <p class="conexion" id="conexion" data-estado="local"></p>
     </div>
-  </header>
+  </details>
 
   <main id="principal" class="kiosco">
     <noscript><p class="nota">El kiosco necesita JavaScript.</p></noscript>
