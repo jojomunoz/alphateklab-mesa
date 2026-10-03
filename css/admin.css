@@ -332,13 +332,17 @@
 }
 
 .placa-impresa__local {
-  display: inline-flex;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
   align-items: center;
-  gap: 6px;
+  gap: 0 6px;
   font-family: var(--f-titulo);
 }
 
+/* «restaurante de ejemplo» va debajo del nombre, entero, no partido en una columna al lado. */
 .placa-impresa__local span {
+  flex-basis: 100%;
   font-family: var(--f-texto);
   font-weight: 400;
   font-size: 0.75rem;
@@ -416,22 +420,28 @@
     width: 100%;
     display: grid;
     grid-template-columns: 1fr 1fr;
-    grid-auto-rows: calc((11in - 0.8in) / 2);
+    /* Cuatro placas por hoja carta (dos por fila). Un poco menos de media hoja por fila: con la altura exacta, el
+       borde de 1 px empujaba la segunda fila a la página siguiente y salían dos por hoja. */
+    grid-auto-rows: calc((11in - 0.8in) / 2 - 0.06in);
     gap: 0;
   }
   body.imprimiendo-placas .placa-impresa {
+    break-inside: avoid;
+    overflow: hidden;
     border: 1px dashed #777;
     border-radius: 0;
     background: #fff;
     color: #000;
     align-content: center;
-    padding: 0.3in;
+    gap: 0.06in;
+    padding: 0.2in 0.25in;
   }
   body.imprimiendo-placas .placa-impresa__mesa strong {
-    font-size: 96pt;
+    font-size: 72pt;
+    line-height: 1;
   }
   body.imprimiendo-placas .placa-impresa__qr {
-    width: 2.6in;
+    width: 2.3in;
   }
 }
 
