@@ -42,6 +42,7 @@ node --test pruebas/                       # lógica pura
 node herramientas/recorrido.mjs            # recorrido con Playwright (servidor en marcha)
 node herramientas/recorrido.mjs --relevo   # además, dos navegadores por el relevo ntfy.sh real
 node herramientas/capturas.mjs [carpeta]   # capturas de cada vista a 390 y 1280, claro y oscuro, y el kiosco a 1080×1920
+node herramientas/placas-pdf.mjs           # imprime las placas a PDF y comprueba cuatro por hoja carta
 python3 herramientas/mutaciones.py         # rompe cada regla a propósito y comprueba que alguna prueba falla
 ```
 

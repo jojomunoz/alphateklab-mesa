@@ -568,6 +568,11 @@ async function iniciar() {
     });
   }
   addEventListener('hashchange', () => irA(location.hash.slice(1)));
+  // Con Ctrl+P desde «Mesas y QR» también salen las placas, no la pantalla del panel.
+  addEventListener('beforeprint', () => {
+    if (ui.tab === 'mesas') document.body.classList.add('imprimiendo-placas');
+  });
+  addEventListener('afterprint', () => document.body.classList.remove('imprimiendo-placas'));
   // Firma de lo que pinta cada pestaña: así un pedido en otra pestaña no regenera los QR ni borra lo que se escribe.
   const firma = (e) => ({
     carta: JSON.stringify(e.carta) + e.ajustes.nombre,
