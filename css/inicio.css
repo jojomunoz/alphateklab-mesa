@@ -353,3 +353,37 @@
   padding-block: 28px 40px;
   border-top: 1px solid var(--filete);
 }
+
+/* En el teléfono no tiene sentido «escanea el QR con tu teléfono»: el botón principal abre la mesa aquí, y la placa,
+   los pasos y los botones de computadora quedan para la pantalla ancha (revisión de las demos, 3-oct). */
+.prueba__telefono,
+.solo-telefono {
+  display: none;
+}
+.prueba__telefono {
+  gap: 10px;
+  max-width: 42ch;
+}
+@media (max-width: 700px) {
+  .prueba__telefono {
+    display: grid;
+  }
+  .solo-telefono {
+    display: inline;
+  }
+  .solo-pantalla-ancha,
+  .prueba .placa,
+  .prueba__pasos,
+  .prueba__botones,
+  #aviso-localhost {
+    display: none;
+  }
+}
+
+/* en el teléfono, la portada de la demo no repite el aviso largo del relevo: el estado de la conexión ya se ve en el
+   bloque de prueba, y la barra ocupaba casi un tercio de la pantalla */
+@media (max-width: 700px) {
+  .barra-demo__aviso {
+    display: none;
+  }
+}

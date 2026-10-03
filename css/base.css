@@ -887,3 +887,9 @@ body.con-barra-carrito .avisos-breves {
     transition: none;
   }
 }
+
+.barra-demo__detalle {
+  margin: 4px 0 8px;
+  font-size: 0.875rem;
+  color: var(--tinta-2);
+}

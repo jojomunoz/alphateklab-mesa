@@ -43,7 +43,7 @@ async function iniciar() {
   if (!r) return;
   const { caja } = r;
   const url = urlMesa(baseDe(location.href), caja.sala, MESA);
-  for (const a of [$('#abrir-mesa-aqui'), $('#vista-mesa')]) a.href = url;
+  for (const a of [$('#abrir-mesa-aqui'), $('#vista-mesa'), $('#abrir-mesa-telefono')]) if (a) a.href = url;
   const u = new URL(url);
   $('#placa-dominio').textContent = `${u.host}${u.pathname.replace(/mesa\.html$/, '')}`;
   $('#placa-dominio').title = url;
