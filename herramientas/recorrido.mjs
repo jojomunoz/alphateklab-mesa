@@ -2,16 +2,20 @@
 //   python3 -m http.server 4870 -d ~/alphateklab/repos
 //   node herramientas/recorrido.mjs            → teléfono (390×844) y computadora (1280×800) en el mismo navegador
 //   node herramientas/recorrido.mjs --relevo   → además, dos navegadores distintos hablando por ntfy.sh
+//   node herramientas/recorrido.mjs --solo-relevo → solo eso (ntfy.sh limita por IP: tras muchas corridas seguidas
+//                                               contesta 429 y el relevo queda «sin conexión» un rato)
 // Variables: BASE (por omisión http://localhost:4870/alphateklab-mesa/), PLAYWRIGHT (ruta del paquete).
 
 const PW = process.env.PLAYWRIGHT ?? '/home/jonathan/alphatend-do/sitio/node_modules/playwright/index.mjs';
 const { chromium } = await import(PW);
 const BASE = process.env.BASE ?? 'http://localhost:4870/alphateklab-mesa/';
-const CON_RELEVO = process.argv.includes('--relevo');
+const SOLO_RELEVO = process.argv.includes('--solo-relevo');
+const CON_RELEVO = SOLO_RELEVO || process.argv.includes('--relevo');
 
 let pasan = 0;
 let fallan = 0;
 const errores = [];
+const limitados = [];
 const paginas = new Map();
 const DIR_FALLAS = process.env.FALLAS ?? null; // carpeta donde guardar capturas si un paso falla
 
@@ -31,7 +35,11 @@ async function paso(nombre, fn) {
 function vigilar(page, quien) {
   paginas.set(quien, page);
   page.on('console', (m) => {
-    if (m.type() === 'error' || m.type() === 'warning') errores.push(`${quien} [${m.type()}] ${m.text()}`);
+    if (m.type() !== 'error' && m.type() !== 'warning') return;
+    // El 429 de ntfy.sh (limita por IP) lo anota el navegador como error de red; no es un error de la página, que
+    // reintenta. Se cuenta aparte para que se vea, sin tapar los errores propios.
+    if (/status of 429/.test(m.text()) && /ntfy\.sh/.test(m.location()?.url ?? '')) limitados.push(quien);
+    else errores.push(`${quien} [${m.type()}] ${m.text()}`);
   });
   page.on('pageerror', (e) => errores.push(`${quien} [pageerror] ${e.message}`));
 }
@@ -235,7 +243,8 @@ async function porRelevo() {
     const salon = await ctxA.newPage();
     vigilar(salon, 'salón (A)');
     await salon.goto(`${BASE}salon.html`);
-    await salon.waitForSelector('#conexion[data-estado=conectado]', { timeout: 15000 });
+    // Dentro de un paso: si ntfy.sh no responde (o limita con 429), cuenta como falla y no pasa en silencio.
+    await paso('la computadora se conecta al relevo ntfy.sh', () => salon.waitForSelector('#conexion[data-estado=conectado]', { timeout: 45000 }));
     const sala = await salon.evaluate(() => JSON.parse(localStorage.getItem('atk-mesa:sala')));
     console.log(`  sala ${sala}, tema atk-mesa-${sala}`);
     const ctxB = await telefono.newContext({ locale: 'es-PA', viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
@@ -288,7 +297,7 @@ async function porRelevo() {
 
 const browser = await chromium.launch();
 try {
-  await mismoNavegador(browser);
+  if (!SOLO_RELEVO) await mismoNavegador(browser);
 } catch {
   /* el paso ya dijo qué falló */
 } finally {
@@ -303,4 +312,5 @@ if (CON_RELEVO) {
 }
 console.log(`\n${pasan} pasos bien, ${fallan} con falla.`);
 console.log(errores.length ? `Consola con ${errores.length} errores o avisos:\n${errores.join('\n')}` : 'Consola: sin errores ni avisos.');
+if (limitados.length) console.log(`ntfy.sh contestó 429 (límite por IP) ${limitados.length} veces; la página reintentó.`);
 process.exit(fallan || errores.length ? 1 : 0);

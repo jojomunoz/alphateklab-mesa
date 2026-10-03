@@ -14,6 +14,9 @@ import { generarId } from '../nucleo/url.mjs';
 
 const VENTANA_REMOTA_MS = 6 * 3600_000;
 const AGRUPAR_MS = 350;
+// Si ntfy.sh no acepta el mensaje (sin red, o 429 cuando limita por IP), el resumen se reintenta; uno más nuevo de
+// la misma mesa reemplaza al pendiente.
+const REINTENTOS_MS = [5000, 15000, 30000];
 
 export function conectarCajaAlRelevo(caja, { alEstado = () => {} } = {}) {
   const vistos = crearRegistro(500);
@@ -25,22 +28,21 @@ export function conectarCajaAlRelevo(caja, { alEstado = () => {} } = {}) {
     return Number.isFinite(t) && Date.now() - t < VENTANA_REMOTA_MS;
   }
 
-  function programarEstado(mesa) {
+  function programarEstado(mesa, intento = 0, espera = AGRUPAR_MS) {
     if (!Number.isInteger(mesa) || !relevo) return;
     clearTimeout(pendientes.get(mesa));
-    pendientes.set(
-      mesa,
-      setTimeout(async () => {
-        pendientes.delete(mesa);
-        const datos = resumenMesa(caja.estado, mesa, caja.cartaBase, Date.now());
-        const msg = crearMensaje({ tipo: 'estado', mesa, datos, id: `es-${generarId(10)}`, disp: caja.disp });
-        try {
-          await relevo.publicar(msg);
-        } catch {
-          // Sin red: el teléfono volverá a pedir el estado cuando se reconecte.
-        }
-      }, AGRUPAR_MS),
-    );
+    const temporizador = setTimeout(async () => {
+      pendientes.delete(mesa);
+      // El resumen se arma al publicar, no al programar: un reintento manda el estado de ese momento.
+      const datos = resumenMesa(caja.estado, mesa, caja.cartaBase, Date.now());
+      const msg = crearMensaje({ tipo: 'estado', mesa, datos, id: `es-${generarId(10)}`, disp: caja.disp });
+      try {
+        await relevo.publicar(msg);
+      } catch {
+        if (!pendientes.has(mesa) && intento < REINTENTOS_MS.length) programarEstado(mesa, intento + 1, REINTENTOS_MS[intento]);
+      }
+    }, espera);
+    pendientes.set(mesa, temporizador);
   }
 
   relevo = crearRelevo({
