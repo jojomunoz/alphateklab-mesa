@@ -3,7 +3,7 @@
 // captura: scroll horizontal del cuerpo, objetivos táctiles de menos de 44 px y foco visible al tabular.
 //   node herramientas/capturas.mjs [carpeta]   (por omisión ./capturas, que está en .gitignore)
 
-const PW = process.env.PLAYWRIGHT ?? '/home/jonathan/alphatend-do/sitio/node_modules/playwright/index.mjs';
+const PW = new URL('./navegador.mjs', import.meta.url).href; // Playwright: ver herramientas/navegador.mjs
 const { chromium } = await import(PW);
 const { mkdirSync } = await import('node:fs');
 const BASE = process.env.BASE ?? 'http://localhost:4870/alphateklab-mesa/';

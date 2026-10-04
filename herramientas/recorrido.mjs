@@ -6,7 +6,7 @@
 //                                               contesta 429 y el relevo queda «sin conexión» un rato)
 // Variables: BASE (por omisión http://localhost:4870/alphateklab-mesa/), PLAYWRIGHT (ruta del paquete).
 
-const PW = process.env.PLAYWRIGHT ?? '/home/jonathan/alphatend-do/sitio/node_modules/playwright/index.mjs';
+const PW = new URL('./navegador.mjs', import.meta.url).href; // Playwright: ver herramientas/navegador.mjs
 const { chromium } = await import(PW);
 const BASE = process.env.BASE ?? 'http://localhost:4870/alphateklab-mesa/';
 const SOLO_RELEVO = process.argv.includes('--solo-relevo');

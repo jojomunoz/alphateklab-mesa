@@ -1,0 +1,12 @@
+{
+  "name": "alphateklab-mesa",
+  "private": true,
+  "description": "Demo de pedir y pagar desde la mesa (carta QR, salón, cocina, kiosco). Ver README.",
+  "scripts": {
+    "prueba": "node --test pruebas/",
+    "recorrido": "node herramientas/recorrido.mjs"
+  },
+  "devDependencies": {
+    "playwright": "1.61.1"
+  }
+}

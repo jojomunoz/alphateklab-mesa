@@ -1,7 +1,7 @@
 // Imprime la hoja de placas a PDF (como la imprimiría Chrome) y comprueba que salen cuatro por hoja carta.
 // Con la fila a media hoja exacta, el borde empujaba la segunda fila y salían dos por hoja (pasó el 3-oct).
 //   node herramientas/placas-pdf.mjs [salida.pdf]   (servidor en marcha)
-const PW = process.env.PLAYWRIGHT ?? '/home/jonathan/alphatend-do/sitio/node_modules/playwright/index.mjs';
+const PW = new URL('./navegador.mjs', import.meta.url).href; // Playwright: ver herramientas/navegador.mjs
 const { chromium } = await import(PW);
 const { readFileSync } = await import('node:fs');
 const BASE = process.env.BASE ?? 'http://localhost:4870/alphateklab-mesa/';
